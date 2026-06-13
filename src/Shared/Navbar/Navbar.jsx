@@ -23,18 +23,18 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-[78px]">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <h2 className="text-xl font-semibold text-white">
+              {/* <h2 className="text-xl font-semibold text-white">
                 Faces On Faces
-              </h2>
+              </h2> */}
 
-              {/* If using image logo */}
-              {/* 
+              
+              
               <img
-                src="/logo.png"
+                src="https://i.ibb.co.com/q3TsWn8y/faces-sollutions-logo.png"
                 alt="Logo"
-                className="w-auto h-10"
+                className="w-auto h-16"
               />
-              */}
+             
             </Link>
 
             {/* Desktop Menu */}

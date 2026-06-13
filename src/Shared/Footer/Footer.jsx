@@ -18,16 +18,17 @@ export default function Footer() {
 
           {/* BRAND */}
           <div>
-            <div className="flex items-center gap-2 mb-5">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-400">
-                <span className="text-xs font-bold text-black">
-                  F
-                </span>
-              </div>
-
-              <h3 className="text-lg font-semibold text-white">
+            <div className="flex items-center mb-5">
+             
+              {/* <h3 className="text-lg font-semibold text-white">
                 Faces On Faces
-              </h3>
+              </h3> */}
+
+               <img
+                src="https://i.ibb.co.com/q3TsWn8y/faces-sollutions-logo.png"
+                alt="Logo"
+                className="w-auto h-16"
+              />
             </div>
 
             <p className="max-w-sm text-sm leading-relaxed text-gray-400">
