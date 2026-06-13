@@ -1,129 +1,289 @@
-// Footer.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Twitter, Mail } from "lucide-react";
+import {
+  Instagram,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Send,
+} from "lucide-react";
 
 export default function Footer() {
-  const quickLinks = [
-    { name: "Home", path: "/" },
-    { name: "Products", path: "/products" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
-  ];
-
-  const categories = [
-    { name: "Floral", path: "/products" },
-    { name: "Woody", path: "/products" },
-    { name: "Fresh", path: "/products" },
-    { name: "Oriental", path: "/products" },
-  ];
-
   return (
-    <footer className="pt-20 pb-8 text-white bg-black">
-      <div className="px-6 mx-auto max-w-7xl">
+    <footer className="bg-[#040707] border-t border-cyan-500/10">
+      <div className="px-6 mx-auto max-w-7xl lg:px-10">
 
-        {/* TOP GRID */}
-        <div className="grid grid-cols-1 gap-12 mb-16 md:grid-cols-2 lg:grid-cols-4">
+        {/* TOP */}
+        <div className="grid gap-12 py-16 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
 
           {/* BRAND */}
           <div>
-            <h4 className="mb-4 font-serif text-2xl tracking-widest">
-           Demo Footer
-            </h4>
-            <p className="mb-6 text-sm leading-relaxed text-white/50">
-         brings
-              timeless fragrance traditions to the modern world.
+            <div className="flex items-center gap-2 mb-5">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-cyan-400">
+                <span className="text-xs font-bold text-black">
+                  F
+                </span>
+              </div>
+
+              <h3 className="text-lg font-semibold text-white">
+                Faces On Faces
+              </h3>
+            </div>
+
+            <p className="max-w-sm text-sm leading-relaxed text-gray-400">
+              Empowering beauty professionals with world-class
+              aesthetic education, certification, and career
+              development opportunities.
             </p>
 
-            <div className="flex gap-4">
-              <a href="#" className="text-white/60 hover:text-white">
-                <Instagram size={20} />
+            {/* Newsletter */}
+            <div className="mt-8">
+              <h4 className="mb-3 text-sm font-medium text-white">
+                Stay Updated
+              </h4>
+
+              <div className="flex">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 px-4 py-3 text-sm text-white border rounded-l-xl border-white/10 bg-white/5 focus:outline-none"
+                />
+
+                <button className="flex items-center justify-center w-12 transition rounded-r-xl bg-cyan-400 hover:bg-cyan-300">
+                  <Send
+                    size={16}
+                    className="text-black"
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Social */}
+            <div className="flex gap-3 mt-6">
+              <a
+                href="#"
+                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
+              >
+                <Facebook
+                  size={18}
+                  className="text-gray-300"
+                />
               </a>
-              <a href="#" className="text-white/60 hover:text-white">
-                <Facebook size={20} />
+
+              <a
+                href="#"
+                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
+              >
+                <Instagram
+                  size={18}
+                  className="text-gray-300"
+                />
               </a>
-              <a href="#" className="text-white/60 hover:text-white">
-                <Twitter size={20} />
+
+              <a
+                href="#"
+                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
+              >
+                <Twitter
+                  size={18}
+                  className="text-gray-300"
+                />
+              </a>
+
+              <a
+                href="#"
+                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
+              >
+                <Linkedin
+                  size={18}
+                  className="text-gray-300"
+                />
               </a>
             </div>
           </div>
 
-          {/* QUICK LINKS */}
+          {/* Academy */}
           <div>
-            <h5 className="mb-6 text-sm tracking-widest uppercase">
-              Quick Links
-            </h5>
+            <h4 className="mb-5 text-sm font-semibold text-white">
+              Academy
+            </h4>
+
             <ul className="space-y-3">
-              {quickLinks.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.path}
-                    className="text-sm text-white/50 hover:text-white"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link
+                  to="/about"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  About Us
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/courses"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Our Courses
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/careers"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Careers
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/press"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Press
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* COLLECTIONS */}
+          {/* Programs */}
           <div>
-            <h5 className="mb-6 text-sm tracking-widest uppercase">
-              Collections
-            </h5>
+            <h4 className="mb-5 text-sm font-semibold text-white">
+              Programs
+            </h4>
+
             <ul className="space-y-3">
-              {categories.map((cat) => (
-                <li key={cat.name}>
-                  <Link
-                    to={cat.path}
-                    className="text-sm text-white/50 hover:text-white"
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link
+                  to="/advanced"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Advanced
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/fundamental"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Fundamental
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/certifications"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Certifications
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/masterclasses"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Masterclasses
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* CONTACT */}
+          {/* Resources */}
           <div>
-            <h5 className="mb-6 text-sm tracking-widest uppercase">
-              Contact
-            </h5>
-            <div className="flex items-center gap-3 text-sm text-white/50">
-              <Mail size={16} />
-             demo@email.com
-            </div>
+            <h4 className="mb-5 text-sm font-semibold text-white">
+              Resources
+            </h4>
+
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  to="/blog"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Blog
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/tutorials"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Tutorials
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/faqs"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  FAQs
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="mb-5 text-sm font-semibold text-white">
+              Legal
+            </h4>
+
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  to="/privacy-policy"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/terms-and-conditions"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Terms of Service
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="/cookie-policy"
+                  className="text-sm text-gray-400 hover:text-cyan-300"
+                >
+                  Cookie Policy
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* BOTTOM BAR */}
-        <div className="flex flex-col items-center justify-between gap-4 pt-6 border-t border-white/10 md:flex-row">
-          <p className="text-sm text-white/40">
-            © 2026 Demo. All rights reserved.
+        {/* BOTTOM */}
+        <div className="flex flex-col items-center justify-between gap-4 py-6 border-t border-white/10 md:flex-row">
+          <p className="text-xs text-gray-500">
+            © 2026 Faces On Faces Academy. All rights reserved.
           </p>
 
-          <div className="flex gap-4">
-            <Link to="/privacy-policy" className="text-sm text-white/50 hover:text-white">
-              Privacy Policy
-            </Link>
-            <Link to="/terms-and-conditions" className="text-sm text-white/50 hover:text-white">
-              Terms & Conditions
-            </Link>
-            <Link to="/return-and-refunds" className="text-sm text-white/50 hover:text-white">
-              Return & Refunds
-            </Link>
-          </div>
-        </div>
-
-        {/* CREDIT */}
-        <div className="mt-4 text-center">
-          <p className="text-xs text-white/30">
-            Developed by <span className="text-rose-400">Faces Media</span>
+          <p className="text-xs text-gray-500">
+            Designed for modern aesthetic professionals.
           </p>
         </div>
-
       </div>
     </footer>
   );

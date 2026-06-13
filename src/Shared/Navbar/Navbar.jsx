@@ -24,7 +24,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center">
               <h2 className="text-xl font-semibold text-white">
-                Luminary
+                Faces On Faces
               </h2>
 
               {/* If using image logo */}
