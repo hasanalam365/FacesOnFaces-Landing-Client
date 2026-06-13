@@ -4,6 +4,7 @@ import Stats from './Stats'
 import SponsorName from './SponsorName'
 import FeaturesCourses from './FeaturesCourses'
 import WhyChoose from './WhyChoose'
+import SuccessStory from './SuccessStory'
 
 const Homes = () => {
   return (
@@ -13,6 +14,7 @@ const Homes = () => {
     <SponsorName/>
     <FeaturesCourses/>
     <WhyChoose/>
+    <SuccessStory/>
       
     </div>
   )
