@@ -5,6 +5,8 @@ import SponsorName from './SponsorName'
 import FeaturesCourses from './FeaturesCourses'
 import WhyChoose from './WhyChoose'
 import SuccessStory from './SuccessStory'
+import GallaryShowcase from './GallaryShowcase'
+import LearningExperience from './LearningExperience'
 
 const Homes = () => {
   return (
@@ -15,6 +17,8 @@ const Homes = () => {
     <FeaturesCourses/>
     <WhyChoose/>
     <SuccessStory/>
+    <GallaryShowcase/>
+    <LearningExperience/>
       
     </div>
   )
