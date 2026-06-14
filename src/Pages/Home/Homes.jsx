@@ -9,7 +9,7 @@ import WhyChoose from './WhyChoose'
 // import FAQ from './FAQ'
 import SuccessStory from './SuccessStory'
 import GallaryShowcase from './GallaryShowcase'
-// import LearningExperience from './LearningExperience'
+import LearningExperience from './LearningExperience'
 
 const Homes = () => {
   return (
@@ -21,7 +21,7 @@ const Homes = () => {
     <WhyChoose/>
     <SuccessStory/>
     <GallaryShowcase/>
-    {/* <LearningExperience/> */}
+    <LearningExperience/>
     {/* <Instructors/> */}
     {/* <FAQ/> */}
     {/* <StartJourney/> */}

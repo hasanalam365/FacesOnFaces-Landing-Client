@@ -25,9 +25,9 @@ export default function Footer() {
               </h3> */}
 
                <img
-                src="https://i.ibb.co.com/q3TsWn8y/faces-sollutions-logo.png"
+                src="https://i.ibb.co.com/TM5zgDgD/logo-png.webp"
                 alt="Logo"
-                className="w-auto h-16"
+                className="w-auto h-10"
               />
             </div>
 
