@@ -62,6 +62,7 @@ const Banner = () => {
                 alt="Beauty Model"
                 className="object-cover w-full h-[500px] md:h-[600px]"
               />
+             
             </div>
 
             {/* Floating Card Top */}

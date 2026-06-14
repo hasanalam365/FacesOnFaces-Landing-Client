@@ -7,7 +7,8 @@ export default {
  theme: {
     extend: {
       fontFamily: {
-        science: ["Science Gothic", "sans-serif"],
+        heading: ["Cormorant Garamond", "serif"],
+        body: ["Inter", "sans-serif"],
       },
     },
   },

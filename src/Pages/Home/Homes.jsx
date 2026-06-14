@@ -4,11 +4,11 @@ import Stats from './Stats'
 import SponsorName from './SponsorName'
 import FeaturesCourses from './FeaturesCourses'
 import WhyChoose from './WhyChoose'
-import StartJourney from './StartJourney'
+// import StartJourney from './StartJourney'
 // import Instructors from './Instructors'
 // import FAQ from './FAQ'
-// import SuccessStory from './SuccessStory'
-// import GallaryShowcase from './GallaryShowcase'
+import SuccessStory from './SuccessStory'
+import GallaryShowcase from './GallaryShowcase'
 // import LearningExperience from './LearningExperience'
 
 const Homes = () => {
@@ -19,12 +19,12 @@ const Homes = () => {
     <SponsorName/>
     <FeaturesCourses/>
     <WhyChoose/>
-    {/* <SuccessStory/> */}
-    {/* <GallaryShowcase/> */}
+    <SuccessStory/>
+    <GallaryShowcase/>
     {/* <LearningExperience/> */}
     {/* <Instructors/> */}
     {/* <FAQ/> */}
-    <StartJourney/>
+    {/* <StartJourney/> */}
       
     </div>
   )

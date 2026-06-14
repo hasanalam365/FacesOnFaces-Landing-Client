@@ -3,19 +3,20 @@ import React from "react";
 const GallaryShowcase = () => {
   const images = {
     large:
-      "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop",
+      "https://i.ibb.co.com/4gZdBCjQ/group-one.jpg",
     topRight1:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop",
+      "https://i.ibb.co.com/hxFbcbVc/Dermal-Filler-Foundation-Fo-F-jpg.webp",
     topRight2:
-      "https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?q=80&w=800&auto=format&fit=crop",
+      "https://i.ibb.co.com/6Kfz5vX/home-about-png.webp",
     bottomLeft:
-      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=800&auto=format&fit=crop",
+      "https://i.ibb.co.com/N6pJCvLP/group-five.jpg",
+      
     center:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop",
+      "https://i.ibb.co.com/60Wy5w4Q/group-two.jpg",
     rightBottom1:
-      "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=800&auto=format&fit=crop",
+      "https://i.ibb.co.com/kFfzsk9/group-four.jpg",
     rightBottom2:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop",
+      "https://i.ibb.co.com/6JgBh4Jv/group-three.jpg",
   };
 
   return (
@@ -38,7 +39,7 @@ const GallaryShowcase = () => {
             <img
               src={images.large}
               alt=""
-              className="w-full h-[320px] object-cover rounded-xl"
+              className="w-full h-[480px] object-cover rounded-xl"
             />
           </div>
 
@@ -47,7 +48,7 @@ const GallaryShowcase = () => {
             <img
               src={images.topRight1}
               alt=""
-              className="w-full h-[150px] object-cover rounded-xl"
+              className="w-full h-[200px] object-cover rounded-xl"
             />
           </div>
 
@@ -55,7 +56,7 @@ const GallaryShowcase = () => {
             <img
               src={images.topRight2}
               alt=""
-              className="w-full h-[150px] object-cover rounded-xl"
+              className="w-full h-[250px] object-cover rounded-xl"
             />
           </div>
 
@@ -64,16 +65,16 @@ const GallaryShowcase = () => {
             <img
               src={images.bottomLeft}
               alt=""
-              className="w-full h-[280px] object-cover rounded-xl"
+              className="w-full h-[376px] object-cover rounded-xl"
             />
           </div>
 
           {/* Bottom Center */}
-          <div className="col-span-8 md:col-span-6">
+          <div className="col-span-12 md:col-span-6">
             <img
               src={images.center}
               alt=""
-              className="w-full h-[280px] object-cover rounded-xl"
+            className="w-full h-[376px] object-cover rounded-xl"
             />
           </div>
 
@@ -82,13 +83,13 @@ const GallaryShowcase = () => {
             <img
               src={images.rightBottom1}
               alt=""
-              className="w-full h-[132px] object-cover rounded-xl"
+              className="w-full h-[180px] object-cover rounded-xl"
             />
 
             <img
               src={images.rightBottom2}
               alt=""
-              className="w-full h-[132px] object-cover rounded-xl"
+              className="w-full h-[180px] object-cover rounded-xl"
             />
           </div>
         </div>
