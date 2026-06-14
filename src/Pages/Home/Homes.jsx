@@ -4,7 +4,8 @@ import Stats from './Stats'
 import SponsorName from './SponsorName'
 import FeaturesCourses from './FeaturesCourses'
 import WhyChoose from './WhyChoose'
-import Instructors from './Instructors'
+// import Instructors from './Instructors'
+import FAQ from './FAQ'
 // import SuccessStory from './SuccessStory'
 // import GallaryShowcase from './GallaryShowcase'
 // import LearningExperience from './LearningExperience'
@@ -20,7 +21,8 @@ const Homes = () => {
     {/* <SuccessStory/> */}
     {/* <GallaryShowcase/> */}
     {/* <LearningExperience/> */}
-    <Instructors/>
+    {/* <Instructors/> */}
+    <FAQ/>
       
     </div>
   )
