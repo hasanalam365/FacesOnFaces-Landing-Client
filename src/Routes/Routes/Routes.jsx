@@ -4,6 +4,7 @@ import MainLayout from "../../Layouts/MainLayout/MainLayout";
 
 import DashboardLayout from "../../Layouts/Dashboard/DashboardLayout";
 import Homes from "../../Pages/Home/Homes";
+import ExploreCourses from "../../Pages/ExploreCourses/ExploreCourses";
 import Enroll from "../../Pages/Enroll/Enroll";
 
 
@@ -24,10 +25,17 @@ export const router = createBrowserRouter([
             {
                 path: '/enroll',
                 element: <Enroll/>
-            }
+            },
+           
           
            
         ]
+    },
+    {
+         
+                path: '/explore-course',
+                element: <ExploreCourses/>
+            
     },
     {
         path: '/dashboard',

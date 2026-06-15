@@ -1,6 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Banner = () => {
+
+  const navigate=useNavigate()
+
+  const handleExplore=()=>{
+    navigate('/explore-course')
+  }
+
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#05090A]">
       {/* Background Glow */}
@@ -43,13 +51,13 @@ const Banner = () => {
 
             {/* Buttons */}
             <div className="flex flex-col gap-4 mt-10 sm:flex-row">
-              <button className="px-8 py-4 font-medium text-black transition rounded-full bg-cyan-400 hover:scale-105">
+              <button onClick={handleExplore} className="px-8 py-4 font-medium text-black transition rounded-full bg-cyan-400 hover:scale-105">
                 Explore Courses →
               </button>
 
-              <button className="px-8 py-4 text-white transition border rounded-full border-white/10 bg-white/5 hover:bg-white/10">
+              {/* <button className="px-8 py-4 text-white transition border rounded-full border-white/10 bg-white/5 hover:bg-white/10">
                 Book Consultation
-              </button>
+              </button> */}
             </div>
           </div>
 

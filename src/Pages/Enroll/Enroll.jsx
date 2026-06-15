@@ -140,9 +140,9 @@ const Enroll = () => {
 
                 <select className="w-full px-4 py-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none">
                   <option className="bg-black">14 Certificate Foundation Course</option>
-                  <option className="bg-black">Foundation Dermal Filler Course</option>
+                  {/* <option className="bg-black">Foundation Dermal Filler Course</option>
                   <option className="bg-black">Foundation Anti Wrinkle Course</option>
-                  <option className="bg-black">Liquid BBL – 2 Days Course</option>
+                  <option className="bg-black">Liquid BBL – 2 Days Course</option> */}
                   
                 </select>
               </div>
