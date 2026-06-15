@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
+
 import {
   User,
   Mail,
@@ -8,15 +10,43 @@ import {
 } from "lucide-react";
 
 const Enroll = () => {
-  return (
-    <section className="min-h-screen bg-[#050505] py-24 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-14">
-          <span className="inline-block px-4 py-2 mb-5 text-sm border rounded-full border-cyan-400/20 bg-cyan-400/10 text-cyan-400">
-            Join Our Program
-          </span>
+  const form = useRef();
 
+  const [loading, setLoading] = useState(false);
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    emailjs
+      .sendForm(
+        "YOUR_SERVICE_ID",
+        "YOUR_TEMPLATE_ID",
+        form.current,
+        "YOUR_PUBLIC_KEY"
+      )
+      .then(
+        () => {
+          alert("Enrollment submitted successfully!");
+
+          form.current.reset();
+          setLoading(false);
+        },
+        (error) => {
+          console.log(error);
+
+          alert("Something went wrong. Please try again.");
+
+          setLoading(false);
+        }
+      );
+  };
+
+  return (
+    <section className="py-24 bg-black">
+      <div className="container px-6 mx-auto">
+        <div className="mb-16 text-center">
           <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl">
             Enroll Today &
             <span className="text-cyan-400"> Start Learning</span>
@@ -45,37 +75,25 @@ const Enroll = () => {
                 "Career Support & Guidance",
                 "Certificate After Completion",
               ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-4"
-                >
+                <div key={index} className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-400/10">
-                    <BookOpen
-                      size={18}
-                      className="text-cyan-400"
-                    />
+                    <BookOpen size={18} className="text-cyan-400" />
                   </div>
 
                   <p className="text-white/80">{item}</p>
                 </div>
               ))}
             </div>
-
-            <div className="p-6 mt-10 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
-              <h4 className="mb-2 text-xl font-semibold text-white">
-                Limited Seats Available
-              </h4>
-
-              <p className="text-white/60">
-                Reserve your spot now and get access to our premium learning
-                experience.
-              </p>
-            </div>
           </div>
 
           {/* Form */}
           <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10">
-            <form className="space-y-5">
+            <form
+              ref={form}
+              onSubmit={sendEmail}
+              className="space-y-5"
+            >
+              {/* Name */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Full Name
@@ -89,12 +107,15 @@ const Enroll = () => {
 
                   <input
                     type="text"
+                    name="from_name"
+                    required
                     placeholder="Enter your full name"
                     className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
               </div>
 
+              {/* Email */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Email Address
@@ -108,12 +129,15 @@ const Enroll = () => {
 
                   <input
                     type="email"
+                    name="from_email"
+                    required
                     placeholder="Enter your email"
                     className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
               </div>
 
+              {/* Phone */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Phone Number
@@ -127,26 +151,32 @@ const Enroll = () => {
 
                   <input
                     type="tel"
+                    name="phone"
+                    required
                     placeholder="Enter your phone number"
                     className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
               </div>
 
+              {/* Course */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Select Course
                 </label>
 
-                <select className="w-full px-4 py-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none">
-                  <option className="bg-black">14 Certificate Foundation Course</option>
-                  {/* <option className="bg-black">Foundation Dermal Filler Course</option>
-                  <option className="bg-black">Foundation Anti Wrinkle Course</option>
-                  <option className="bg-black">Liquid BBL – 2 Days Course</option> */}
-                  
+                <select
+                  name="course"
+                  required
+                  className="w-full px-4 py-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
+                >
+                  <option className="bg-black">
+                    14 Certificate Foundation Course
+                  </option>
                 </select>
               </div>
 
+              {/* Message */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Message
@@ -160,6 +190,7 @@ const Enroll = () => {
 
                   <textarea
                     rows="5"
+                    name="message"
                     placeholder="Tell us about your goals..."
                     className="w-full pt-4 pl-12 pr-4 text-white transition border resize-none rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   ></textarea>
@@ -168,9 +199,10 @@ const Enroll = () => {
 
               <button
                 type="submit"
-                className="w-full py-4 font-semibold text-black transition-all duration-300 rounded-xl bg-cyan-400 hover:bg-cyan-300 hover:scale-[1.02]"
+                disabled={loading}
+                className="w-full py-4 font-semibold text-black transition-all duration-300 rounded-xl bg-cyan-400 hover:bg-cyan-300 hover:scale-[1.02] disabled:opacity-50"
               >
-                Submit Enrollment
+                {loading ? "Sending..." : "Submit Enrollment"}
               </button>
             </form>
           </div>
