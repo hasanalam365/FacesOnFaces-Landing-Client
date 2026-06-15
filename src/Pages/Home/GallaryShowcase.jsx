@@ -3,20 +3,20 @@ import React from "react";
 const GallaryShowcase = () => {
   const images = {
     large:
-      "https://i.ibb.co.com/4gZdBCjQ/group-one.jpg",
+      "https://i.ibb.co.com/1c1YbFB/group-1.jpg",
     topRight1:
-      "https://i.ibb.co.com/hxFbcbVc/Dermal-Filler-Foundation-Fo-F-jpg.webp",
+      "https://i.ibb.co.com/DgTbjDHj/group-2.jpg",
     topRight2:
-      "https://i.ibb.co.com/6Kfz5vX/home-about-png.webp",
+      "https://i.ibb.co.com/p622DTFL/group-3.jpg",
     bottomLeft:
-      "https://i.ibb.co.com/N6pJCvLP/group-five.jpg",
+      "https://i.ibb.co.com/fd31cZyT/group-6.jpg",
       
     center:
-      "https://i.ibb.co.com/60Wy5w4Q/group-two.jpg",
+      "https://i.ibb.co.com/gFgPmvKf/group-4.jpg",
     rightBottom1:
-      "https://i.ibb.co.com/kFfzsk9/group-four.jpg",
+      "https://i.ibb.co.com/DDjMfxMG/group-5.jpg",
     rightBottom2:
-      "https://i.ibb.co.com/6JgBh4Jv/group-three.jpg",
+      "https://i.ibb.co.com/3yWCwPXy/group-7.jpg",
   };
 
   return (
@@ -48,7 +48,7 @@ const GallaryShowcase = () => {
             <img
               src={images.topRight1}
               alt=""
-              className="w-full h-[200px] object-cover rounded-xl"
+              className="w-full h-[250px] md:h-[200px] lg:h-[200px] object-cover rounded-xl"
             />
           </div>
 
@@ -79,7 +79,7 @@ const GallaryShowcase = () => {
           </div>
 
           {/* Bottom Right - Two Vertical Images */}
-          <div className="flex flex-col col-span-4 gap-4 md:col-span-3">
+          <div className="flex flex-row col-span-12 gap-4 md:flex-col lg:flex-col md:col-span-3">
             <img
               src={images.rightBottom1}
               alt=""
