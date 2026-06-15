@@ -1,11 +1,12 @@
 // Navbar.jsx
 
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate =useNavigate()
 
   const navLinks = [
     { name: "Courses", path: "/" },
@@ -58,9 +59,12 @@ export default function Navbar() {
 
             {/* Desktop CTA */}
             <div className="items-center hidden lg:flex">
-              <button className="py-3 text-sm font-medium text-black transition-all duration-300 rounded-full px-7 bg-cyan-400 hover:scale-105 hover:bg-cyan-300">
-                Enroll Now
-              </button>
+               <button
+    onClick={() => navigate("/enroll")}
+    className="py-3 text-sm font-medium text-black transition-all duration-300 rounded-full px-7 bg-cyan-400 hover:scale-105 hover:bg-cyan-300"
+  >
+    Enroll Now
+  </button>
             </div>
 
             {/* Mobile Button */}
@@ -106,9 +110,12 @@ export default function Navbar() {
                 </NavLink>
               ))}
 
-              <button className="w-full py-3 mt-3 font-medium text-black transition rounded-full bg-cyan-400 hover:bg-cyan-300">
-                Enroll Now
-              </button>
+               <button
+    onClick={() => navigate("/enroll")}
+    className="py-3 text-sm font-medium text-black transition-all duration-300 rounded-full px-7 bg-cyan-400 hover:scale-105 hover:bg-cyan-300"
+  >
+    Enroll Now
+  </button>
             </div>
           </div>
         </div>

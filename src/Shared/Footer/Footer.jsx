@@ -282,7 +282,7 @@ export default function Footer() {
           </p>
 
           <p className="text-xs text-gray-500">
-            Designed for modern aesthetic professionals.
+            Designed by Faces Solutions
           </p>
         </div>
       </div>
