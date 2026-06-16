@@ -1,6 +1,4 @@
 import React, { useRef, useState } from "react";
-import emailjs from "@emailjs/browser";
-
 import {
   User,
   Mail,
@@ -10,42 +8,48 @@ import {
 } from "lucide-react";
 
 const Enroll = () => {
-  const form = useRef();
-
+  const form = useRef(null);
   const [loading, setLoading] = useState(false);
 
-  const sendEmail = (e) => {
+  const sendEmail = async (e) => {
     e.preventDefault();
 
     setLoading(true);
 
-    emailjs
-      .sendForm(
-        "YOUR_SERVICE_ID",
-        "YOUR_TEMPLATE_ID",
-        form.current,
-        "YOUR_PUBLIC_KEY"
-      )
-      .then(
-        () => {
-          alert("Enrollment submitted successfully!");
+    try {
+      const formData = new FormData(form.current);
 
-          form.current.reset();
-          setLoading(false);
-        },
-        (error) => {
-          console.log(error);
-
-          alert("Something went wrong. Please try again.");
-
-          setLoading(false);
+      const response = await fetch(
+        "https://api.web3forms.com/submit",
+        {
+          method: "POST",
+          body: formData,
         }
       );
+
+      const result = await response.json();
+
+      console.log("Status:", response.status);
+      console.log("Result:", result);
+
+      if (result.success) {
+        alert("Enrollment submitted successfully!");
+        form.current.reset();
+      } else {
+        alert(result.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit form. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <section className="py-24 bg-black">
+    <section className="py-20 bg-black">
       <div className="container px-6 mx-auto">
+        {/* Header */}
         <div className="mb-16 text-center">
           <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl">
             Enroll Today &
@@ -53,8 +57,8 @@ const Enroll = () => {
           </h1>
 
           <p className="max-w-2xl mx-auto text-white/60">
-            Fill out the form below and our team will contact you shortly with
-            all the course details and enrollment information.
+            Fill out the form below and our team will contact you shortly
+            with all the course details and enrollment information.
           </p>
         </div>
 
@@ -93,6 +97,19 @@ const Enroll = () => {
               onSubmit={sendEmail}
               className="space-y-5"
             >
+              {/* Hidden Fields */}
+              <input
+                type="hidden"
+                name="access_key"
+                value="2239f0d3-8a55-41bf-93b0-60695d8b684b"
+              />
+
+              <input
+                type="hidden"
+                name="subject"
+                value="New Course Enrollment"
+              />
+
               {/* Name */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
@@ -107,7 +124,7 @@ const Enroll = () => {
 
                   <input
                     type="text"
-                    name="from_name"
+                    name="name"
                     required
                     placeholder="Enter your full name"
                     className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
@@ -129,7 +146,7 @@ const Enroll = () => {
 
                   <input
                     type="email"
-                    name="from_email"
+                    name="email"
                     required
                     placeholder="Enter your email"
                     className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
@@ -170,7 +187,10 @@ const Enroll = () => {
                   required
                   className="w-full px-4 py-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                 >
-                  <option className="bg-black">
+                  <option
+                    value="14 Certificate Foundation Course"
+                    className="bg-black"
+                  >
                     14 Certificate Foundation Course
                   </option>
                 </select>

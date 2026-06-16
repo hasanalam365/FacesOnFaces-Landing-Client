@@ -4,8 +4,15 @@ import {
   ArrowRight,
   MessageCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const StartJourney = () => {
+const navigate=useNavigate()
+
+const handleEnroll=()=>{
+  navigate('/enroll')
+}
+
   return (
     <section className="relative overflow-hidden bg-black py-28">
       {/* Background Glow */}
@@ -74,6 +81,7 @@ const StartJourney = () => {
         >
           {/* Primary Button */}
           <motion.button
+          onClick={handleEnroll}
             whileHover={{
               scale: 1.05,
             }}

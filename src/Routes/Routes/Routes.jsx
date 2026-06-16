@@ -5,7 +5,7 @@ import MainLayout from "../../Layouts/MainLayout/MainLayout";
 import DashboardLayout from "../../Layouts/Dashboard/DashboardLayout";
 import Homes from "../../Pages/Home/Homes";
 // import ErrorPage from "../../Pages/404/ErrorPage";
-// import ExploreCourses from "../../Pages/ExploreCourses/ExploreCourses";
+import ExploreCourses from "../../Pages/ExploreCourses/ExploreCourses";
 import Enroll from "../../Pages/Enroll/Enroll";
 
 
@@ -32,12 +32,12 @@ export const router = createBrowserRouter([
            
         ]
     },
-    // {
+    {
          
-    //             path: '/explore-course',
-    //             element: <ExploreCourses/>
+                path: '/explore-course',
+                element: <ExploreCourses/>
             
-    // },
+    },
  
     {
         path: '/dashboard',
