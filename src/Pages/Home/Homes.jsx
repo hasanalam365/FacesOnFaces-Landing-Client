@@ -2,7 +2,7 @@ import React from 'react'
 import Banner from './Banner'
 import Stats from './Stats'
 import SponsorName from './SponsorName'
-import FeaturesCourses from './FeaturesCourses'
+// import FeaturesCourses from './FeaturesCourses'
 import WhyChoose from './WhyChoose'
 import StartJourney from './StartJourney'
 import Instructors from './Instructors'
@@ -17,7 +17,7 @@ const Homes = () => {
     <Banner/>
     <Stats/>
     <SponsorName/>
-    <FeaturesCourses/>
+    {/* <FeaturesCourses/> */}
     <WhyChoose/>
     <SuccessStory/>
     <GallaryShowcase/>
