@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import {
   User,
@@ -5,7 +6,42 @@ import {
   Phone,
   BookOpen,
   MessageSquare,
+  MapPin,
+  Calendar,
 } from "lucide-react";
+
+const courseFeatures = [
+  "Infection Control",
+  "Safety in Medicine",
+  "Anatomy & Physiology Level 3",
+  "Complications Management",
+  "Health & Safety",
+  "Skin Booster",
+  "Lumi Eyes",
+  "Polynucleotide",
+  "Microneedling",
+  "Fat Dissolver",
+  "Chemical Skin Peels",
+  "Foundation Dermal Filler",
+  "Foundation Anti-Wrinkle",
+  "Use of Hyaluronidase",
+];
+
+const locations = [
+  "London",
+  "Upminster",
+  "Edinburgh",
+  "Belfast",
+  "Glasgow",
+  "Dublin",
+];
+
+const upcomingDates = [
+  "London • 3rd–5th October",
+  "London • 7th–9th November",
+  "Upminster • 17th–19th October",
+  "Edinburgh • 21st–23rd November",
+];
 
 const Enroll = () => {
   const form = useRef(null);
@@ -29,9 +65,6 @@ const Enroll = () => {
 
       const result = await response.json();
 
-      console.log("Status:", response.status);
-      console.log("Result:", result);
-
       if (result.success) {
         alert("Enrollment submitted successfully!");
         form.current.reset();
@@ -47,8 +80,9 @@ const Enroll = () => {
   };
 
   return (
-    <section className="py-20 bg-black">
-      <div className="container px-6 mx-auto">
+    <section className="min-h-screen bg-[#050505] py-20">
+      <div className="px-6 mx-auto max-w-7xl">
+
         {/* Header */}
         <div className="mb-16 text-center">
           <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl">
@@ -57,57 +91,179 @@ const Enroll = () => {
           </h1>
 
           <p className="max-w-2xl mx-auto text-white/60">
-            Fill out the form below and our team will contact you shortly
-            with all the course details and enrollment information.
+            Review the course details below and complete your enrollment
+            form to secure your place.
           </p>
         </div>
 
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          {/* Left Side */}
-          <div className="relative overflow-hidden border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-12">
-            <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-cyan-400/10 blur-3xl"></div>
+        <div className="grid gap-10 lg:grid-cols-2">
 
-            <h2 className="mb-6 text-3xl font-bold text-white">
-              Why Join Us?
-            </h2>
+          {/* Course Details */}
+          <div className="overflow-hidden border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
 
-            <div className="space-y-6">
-              {[
-                "Industry Expert Instructors",
-                "Hands-On Practical Learning",
-                "Real World Projects",
-                "Career Support & Guidance",
-                "Certificate After Completion",
-              ].map((item, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-400/10">
-                    <BookOpen size={18} className="text-cyan-400" />
+            <img
+              src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1200&auto=format&fit=crop"
+              alt="Course"
+              className="object-cover w-full h-72"
+            />
+
+            <div className="p-8">
+
+              <span className="px-4 py-2 text-sm font-medium text-black rounded-full bg-cyan-400">
+                14 Certificates Included
+              </span>
+
+              <h2 className="mt-5 text-3xl font-bold text-white">
+                14 Certificate Foundation Course
+              </h2>
+
+              <div className="mt-6 space-y-4">
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60">
+                    Course Fee
+                  </span>
+
+                  <div className="flex items-center gap-3">
+                    <span className="line-through text-white/40">
+                      £1,999
+                    </span>
+
+                    <span className="text-2xl font-bold text-cyan-400">
+                      £1,599
+                    </span>
                   </div>
-
-                  <p className="text-white/80">{item}</p>
                 </div>
-              ))}
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60">
+                    Duration
+                  </span>
+
+                  <span className="text-white">
+                    3 Day Intensive Training
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60">
+                    Certifications
+                  </span>
+
+                  <span className="text-white">
+                    14 Included
+                  </span>
+                </div>
+              </div>
+
+              {/* Course Includes */}
+              <div className="mt-10">
+                <h3 className="mb-5 text-xl font-semibold text-white">
+                  Course Includes
+                </h3>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {courseFeatures.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02]"
+                    >
+                      <BookOpen
+                        size={16}
+                        className="text-cyan-400"
+                      />
+
+                      <span className="text-sm text-white/80">
+                        {feature}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Locations */}
+              <div className="mt-10">
+                <h3 className="mb-5 text-xl font-semibold text-white">
+                  Available Locations
+                </h3>
+
+                <div className="flex flex-wrap gap-3">
+                  {locations.map((location, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 px-4 py-2 border rounded-full bg-cyan-400/10 border-cyan-400/20"
+                    >
+                      <MapPin
+                        size={14}
+                        className="text-cyan-400"
+                      />
+
+                      <span className="text-sm text-white">
+                        {location}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Upcoming Dates */}
+              <div className="mt-10">
+                <h3 className="mb-5 text-xl font-semibold text-white">
+                  Upcoming Course Dates
+                </h3>
+
+                <div className="space-y-3">
+                  {upcomingDates.map((date, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-4 border rounded-xl border-white/10"
+                    >
+                      <Calendar
+                        size={16}
+                        className="text-cyan-400"
+                      />
+
+                      <span className="text-white/80">
+                        {date}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
 
-          {/* Form */}
-          <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10">
+          {/* Enrollment Form */}
+          <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10 backdrop-blur-xl">
+
             <form
               ref={form}
               onSubmit={sendEmail}
               className="space-y-5"
             >
-              {/* Hidden Fields */}
-              <input
-                type="hidden"
-                name="access_key"
-                value="2239f0d3-8a55-41bf-93b0-60695d8b684b"
-              />
+             <input
+  type="hidden"
+  name="access_key"
+  value={import.meta.env.VITE_WEB3_MESSAGE_KEY}
+/>
 
               <input
                 type="hidden"
                 name="subject"
                 value="New Course Enrollment"
+              />
+
+              <input
+                type="hidden"
+                name="payment_status"
+                value="Pending"
+              />
+
+              <input
+                type="hidden"
+                name="course_price"
+                value="1599"
               />
 
               {/* Name */}
@@ -127,7 +283,7 @@ const Enroll = () => {
                     name="name"
                     required
                     placeholder="Enter your full name"
-                    className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
+                    className="w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -149,7 +305,7 @@ const Enroll = () => {
                     name="email"
                     required
                     placeholder="Enter your email"
-                    className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
+                    className="w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -171,7 +327,7 @@ const Enroll = () => {
                     name="phone"
                     required
                     placeholder="Enter your phone number"
-                    className="w-full py-4 pl-12 pr-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
+                    className="w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -179,21 +335,31 @@ const Enroll = () => {
               {/* Course */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
-                  Select Course
+                  Course Name
                 </label>
 
-                <select
+                <input
+                  type="text"
                   name="course"
-                  required
-                  className="w-full px-4 py-4 text-white transition border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
-                >
-                  <option
-                    value="14 Certificate Foundation Course"
-                    className="bg-black"
-                  >
-                    14 Certificate Foundation Course
-                  </option>
-                </select>
+                  value="14 Certificate Foundation Course"
+                  readOnly
+                  className="w-full px-4 py-4 text-white border rounded-xl bg-white/5 border-white/10"
+                />
+              </div>
+
+              {/* Fee */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  Course Fee
+                </label>
+
+                <input
+                  type="text"
+                  name="course_fee"
+                  value="£1,599"
+                  readOnly
+                  className="w-full px-4 py-4 font-semibold border rounded-xl text-cyan-400 bg-white/5 border-white/10"
+                />
               </div>
 
               {/* Message */}
@@ -212,7 +378,7 @@ const Enroll = () => {
                     rows="5"
                     name="message"
                     placeholder="Tell us about your goals..."
-                    className="w-full pt-4 pl-12 pr-4 text-white transition border resize-none rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
+                    className="w-full pt-4 pl-12 pr-4 text-white border resize-none rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none"
                   ></textarea>
                 </div>
               </div>
@@ -222,9 +388,12 @@ const Enroll = () => {
                 disabled={loading}
                 className="w-full py-4 font-semibold text-black transition-all duration-300 rounded-xl bg-cyan-400 hover:bg-cyan-300 hover:scale-[1.02] disabled:opacity-50"
               >
-                {loading ? "Sending..." : "Submit Enrollment"}
+                {loading
+                  ? "Submitting..."
+                  : "Submit Enrollment"}
               </button>
             </form>
+
           </div>
         </div>
       </div>
@@ -233,3 +402,4 @@ const Enroll = () => {
 };
 
 export default Enroll;
+
