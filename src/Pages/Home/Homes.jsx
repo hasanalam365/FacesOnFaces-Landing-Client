@@ -1,33 +1,51 @@
-import React from 'react'
-import Banner from './Banner'
-import Stats from './Stats'
-import SponsorName from './SponsorName'
-// import FeaturesCourses from './FeaturesCourses'
-import WhyChoose from './WhyChoose'
-import StartJourney from './StartJourney'
-import Instructors from './Instructors'
-import FAQ from './FAQ'
-import SuccessStory from './SuccessStory'
-import GallaryShowcase from './GallaryShowcase'
-import LearningExperience from './LearningExperience'
+import React from "react";
+import Banner from "./Banner";
+import Stats from "./Stats";
+import SponsorName from "./SponsorName";
+import WhyChoose from "./WhyChoose";
+import StartJourney from "./StartJourney";
+import Instructors from "./Instructors";
+import FAQ from "./FAQ";
+import SuccessStory from "./SuccessStory";
+import GallaryShowcase from "./GallaryShowcase";
+import LearningExperience from "./LearningExperience";
 
 const Homes = () => {
   return (
     <div>
-    <Banner/>
-    <Stats/>
-    <SponsorName/>
-    {/* <FeaturesCourses/> */}
-    <WhyChoose/>
-    <SuccessStory/>
-    <GallaryShowcase/>
-    <LearningExperience/>
-    <Instructors/>
-    <FAQ/>
-    <StartJourney/>
-      
-    </div>
-  )
-}
+      <section id="home">
+        <Banner />
+      </section>
 
-export default Homes
+      <Stats />
+      <SponsorName />
+
+      <section id="why-us">
+        <WhyChoose />
+      </section>
+
+      <StartJourney />
+
+      <section id="instructors">
+        <Instructors />
+      </section>
+
+      <section id="stories">
+        <SuccessStory />
+      </section>
+      <section id="gallary">
+        <GallaryShowcase />
+      </section>
+
+     
+
+      <section id="faq">
+        <FAQ />
+      </section>
+
+      <LearningExperience />
+    </div>
+  );
+};
+
+export default Homes;
