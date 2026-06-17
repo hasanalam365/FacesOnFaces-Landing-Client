@@ -124,7 +124,7 @@ const ExploreCourses = () => {
         {/* Left Side */}
         <div className="relative overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1200&auto=format&fit=crop"
+            src="https://i.ibb.co.com/YBvghy3R/14-certificates.webp"
             alt="Course"
             className="
             object-cover

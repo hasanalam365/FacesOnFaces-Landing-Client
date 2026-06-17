@@ -102,9 +102,9 @@ const Enroll = () => {
           <div className="overflow-hidden border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
 
             <img
-              src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?q=80&w=1200&auto=format&fit=crop"
+              src="https://i.ibb.co.com/YBvghy3R/14-certificates.webp"
               alt="Course"
-              className="object-cover w-full h-72"
+              className="object-cover w-full h-[350px]"
             />
 
             <div className="p-8">
