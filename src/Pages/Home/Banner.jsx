@@ -31,15 +31,17 @@ const Banner = () => {
 
             {/* Heading */}
             <h1 className="max-w-xl text-5xl font-light leading-tight text-white md:text-6xl lg:text-7xl">
-              Master
+              14
               <br />
               <span className="italic text-cyan-300">
-                Aesthetics.
+              Certificate
               </span>
               <br />
-              Build Your
+             Fast-Track
               <br />
-              Future.
+             Course
+
+                 
             </h1>
 
             {/* Description */}

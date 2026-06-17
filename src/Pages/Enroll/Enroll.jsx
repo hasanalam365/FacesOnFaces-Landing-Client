@@ -32,7 +32,7 @@ const locations = [
   "Upminster",
   "Edinburgh",
   "Belfast",
-  "Glasgow",
+  
   "Dublin",
 ];
 
@@ -114,7 +114,7 @@ const Enroll = () => {
               </span>
 
               <h2 className="mt-5 text-3xl font-bold text-white">
-                14 Certificate Foundation Course
+                14 Certificate Fast-Track Course
               </h2>
 
               <div className="mt-6 space-y-4">
@@ -126,11 +126,11 @@ const Enroll = () => {
 
                   <div className="flex items-center gap-3">
                     <span className="line-through text-white/40">
-                      £1,999
+                      $1,599
                     </span>
 
                     <span className="text-2xl font-bold text-cyan-400">
-                      £1,599
+                      $1,099
                     </span>
                   </div>
                 </div>

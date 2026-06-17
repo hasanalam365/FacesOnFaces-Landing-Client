@@ -103,7 +103,7 @@ const SuccessStory = () => {
                 key={current}
                 initial={{
                   opacity: 0,
-                  y: 30,
+                  x: 30,
                 }}
                 animate={{
                   opacity: 1,
@@ -111,10 +111,10 @@ const SuccessStory = () => {
                 }}
                 exit={{
                   opacity: 0,
-                  y: -30,
+                  x: -30,
                 }}
                 transition={{
-                  duration: 0.4,
+                  duration: 0.8,
                 }}
               >
                 <Quote

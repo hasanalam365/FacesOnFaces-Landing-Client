@@ -31,7 +31,7 @@ const locations = [
   "Upminster",
   "Edinburgh",
   "Belfast",
-  "Glasgow",
+  
   "Dublin",
 ];
 
@@ -91,7 +91,7 @@ const ExploreCourses = () => {
 
       <h2 className="mt-6 text-4xl font-bold text-white md:text-6xl">
         14 Certificate
-        <span className="text-cyan-400"> Foundation Course</span>
+        <span className="text-cyan-400"> Fast-Track Course</span>
       </h2>
 
       <p className="max-w-3xl mx-auto mt-6 text-lg text-white/60">
@@ -152,11 +152,11 @@ const ExploreCourses = () => {
           <div className="mb-8">
             <div className="flex items-center gap-3">
               <span className="text-xl line-through text-white/40">
-                £1,999
+               $1,599
               </span>
 
               <span className="text-4xl font-bold text-cyan-400">
-                £1,599
+                $1,099
               </span>
             </div>
 
