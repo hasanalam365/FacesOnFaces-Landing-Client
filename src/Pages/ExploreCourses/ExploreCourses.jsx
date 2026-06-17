@@ -127,7 +127,7 @@ const ExploreCourses = () => {
             src="https://i.ibb.co.com/YBvghy3R/14-certificates.webp"
             alt="Course"
             className="
-            object-cover
+            object-contain
             w-full
             h-full
             min-h-[500px]
