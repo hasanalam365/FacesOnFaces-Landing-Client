@@ -6,14 +6,14 @@ import {
   Quote,
   Star,
 } from "lucide-react";
+import Stats from "./Stats";
 
 const testimonials = [
   {
     id: 1,
     name: "James Wilson",
     role: "Clinical Practitioner",
-    image:
-      "https://randomuser.me/api/portraits/men/32.jpg",
+    image: "https://randomuser.me/api/portraits/men/32.jpg",
     review:
       "The level of professionalism and depth of knowledge at Luminary is unmatched. I went from complete novice to leading a team of practitioners in under two years.",
   },
@@ -21,8 +21,7 @@ const testimonials = [
     id: 2,
     name: "Sarah Mitchell",
     role: "Aesthetic Specialist",
-    image:
-      "https://randomuser.me/api/portraits/women/44.jpg",
+    image: "https://randomuser.me/api/portraits/women/44.jpg",
     review:
       "Every module was practical and incredibly detailed. The hands-on training gave me confidence from day one.",
   },
@@ -30,10 +29,35 @@ const testimonials = [
     id: 3,
     name: "Michael Carter",
     role: "Clinic Owner",
-    image:
-      "https://randomuser.me/api/portraits/men/52.jpg",
+    image: "https://randomuser.me/api/portraits/men/52.jpg",
     review:
       "The mentorship and lifetime support are exceptional. It transformed the way I approach my business and patients.",
+  },
+  {
+    id: 4,
+    name: "Emma Richardson",
+    role: "Advanced Aesthetic Practitioner",
+    image: "https://randomuser.me/api/portraits/women/68.jpg",
+    review:
+      "I enrolled to expand my skills, but the experience exceeded every expectation. The trainers were supportive, knowledgeable, and genuinely invested in my success.",
+  },
+
+  {
+    id: 5,
+    name: "Daniel Brooks",
+    role: "Medical Aesthetics Consultant",
+    image: "https://randomuser.me/api/portraits/men/75.jpg",
+    review:
+      "The combination of theory and practical sessions gave me the confidence to start treating clients immediately. My career progressed faster than I ever imagined.",
+  },
+
+  {
+    id: 6,
+    name: "Olivia Bennett",
+    role: "Skin Rejuvenation Expert",
+    image: "https://randomuser.me/api/portraits/women/33.jpg",
+    review:
+      "From the first session to post-course support, everything was outstanding. The training helped me build a loyal client base and grow my business significantly.",
   },
 ];
 
@@ -174,8 +198,14 @@ const SuccessStory = () => {
           </div>
         </div>
       </div>
+
+     <div className="mt-5">
+       <Stats/>
+     </div>
     </section>
+    
   );
 };
 
 export default SuccessStory;
+
