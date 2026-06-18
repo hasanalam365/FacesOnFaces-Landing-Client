@@ -81,6 +81,13 @@ export default function Footer() {
               >
                 Terms of Service
               </Link>
+               <span className="text-gray-600">•</span>
+              <Link
+                to="/refund-policy"
+                className="text-gray-400 transition hover:text-cyan-300"
+              >
+                Refund Policy
+              </Link>
             </div>
           </div>
         </div>

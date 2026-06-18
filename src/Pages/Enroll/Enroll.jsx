@@ -1,20 +1,9 @@
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  User,
-  Mail,
-  Phone,
-  BookOpen,
-  MessageSquare,
-  MapPin,
-  Calendar,
-   Award,
-   CheckCircle,
-   Clock,
-  ChevronDown,
-} from "lucide-react";
+import {User,Mail,Phone,BookOpen,MessageSquare,MapPin,Calendar,ChevronDown} from "lucide-react";
 
+import PaymentForm from "../../Components/PaymentForm";
 
 const courseFeatures = [
   "Infection Control",
@@ -100,6 +89,34 @@ const Enroll = () => {
   const form = useRef(null);
   const [loading, setLoading] = useState(false);
    const [activeLocation, setActiveLocation] = useState(null);
+   const [clientSecret, setClientSecret] =useState("");
+
+
+   const createPaymentIntent = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:5000/create-payment-intent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          amount: 1099,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.clientSecret) {
+      setClientSecret(data.clientSecret);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   const sendEmail = async (e) => {
     e.preventDefault();
@@ -132,6 +149,45 @@ const Enroll = () => {
       setLoading(false);
     }
   };
+
+const handlePaymentSuccess =
+  async () => {
+    try {
+      const formData = new FormData(
+        form.current
+      );
+
+      const response = await fetch(
+        "https://api.web3forms.com/submit",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const result =
+        await response.json();
+
+      if (result.success) {
+        alert(
+          "Payment Successful & Enrollment Submitted!"
+        );
+
+        form.current.reset();
+      } else {
+        alert(
+          result.message ||
+            "Enrollment failed"
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+useEffect(() => {
+  createPaymentIntent();
+}, []);
 
   return (
     <section className="min-h-screen bg-[#050505] py-20">
@@ -357,7 +413,7 @@ const Enroll = () => {
 
             <form
               ref={form}
-              onSubmit={sendEmail}
+             
               className="space-y-5"
             >
              <input
@@ -501,17 +557,16 @@ const Enroll = () => {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-4 font-semibold text-black transition-all duration-300 rounded-xl bg-cyan-400 hover:bg-cyan-300 hover:scale-[1.02] disabled:opacity-50"
-              >
-                {loading
-                  ? "Submitting..."
-                  : "Submit Enrollment"}
-              </button>
+              
             </form>
-
+{clientSecret && (
+  <PaymentForm
+    clientSecret={clientSecret}
+    onPaymentSuccess={
+      handlePaymentSuccess
+    }
+  />
+)}
           </div>
         </div>
       </div>
