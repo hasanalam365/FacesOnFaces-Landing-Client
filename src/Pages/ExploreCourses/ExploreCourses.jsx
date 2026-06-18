@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Award,
   CheckCircle,
   MapPin,
   Calendar,
   Clock,
+  ChevronDown,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+
 
 const courseFeatures = [
   "Infection Control",
@@ -58,9 +60,51 @@ const stagger = {
   },
 };
 
+const courseSchedules = [
+  {
+    location: "London",
+    dates: [
+      "3rd–5th October",
+      "7th–9th November",
+    ],
+  },
+  {
+    location: "Upminster",
+    dates: [
+      "17th–19th October",
+    ],
+  },
+  {
+    location: "Edinburgh",
+    dates: [
+      "21st–23rd November",
+    ],
+  },
+  {
+    location: "Belfast",
+    dates: [
+      "10th–12th October",
+    ],
+  },
+  {
+    location: "Glasgow",
+    dates: [
+      "28th–30th November",
+    ],
+  },
+  {
+    location: "Dublin",
+    dates: [
+      "31st Oct–3rd Nov",
+    ],
+  },
+];
+
+
 const ExploreCourses = () => {
 
       const navigate=useNavigate()
+      const [activeLocation, setActiveLocation] = useState(null);
     
       const handleEnroll=()=>{
         navigate('/enroll')
@@ -260,56 +304,93 @@ const ExploreCourses = () => {
       </div>
     </motion.div>
 
-    {/* Schedule */}
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      variants={fadeUp}
-      className="mt-16"
-    >
-      <h3 className="mb-8 text-3xl font-bold text-center text-white">
-        Upcoming Course Dates
-      </h3>
+   {/* Schedule */}
+<motion.div
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true }}
+  variants={fadeUp}
+  className="mt-16"
+>
+  <h3 className="mb-8 text-3xl font-bold text-center text-white">
+    Upcoming Course Dates
+  </h3>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {[
-          "London • 3rd–5th October",
-          "London • 7th–9th November",
-          "Upminster • 17th–19th October",
-          "Edinburgh • 21st–23rd November",
-          "Belfast • 10th–12th October",
-          "Glasgow • 28th–30th November",
-          "Dublin • 31st Oct–3rd Nov",
-        ].map((date, index) => (
-          <div
-            key={index}
-            className="
-            group
-            p-5
-            transition-all
-            duration-500
-            border
-            rounded-2xl
-            border-white/10
-            bg-white/[0.03]
-            hover:border-cyan-400/30
-            hover:-translate-y-2
-            hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]
-          "
-          >
-            <div className="flex items-center gap-3">
-              <Calendar
-                size={18}
-                className="text-cyan-400"
-              />
+  <div className="max-w-4xl mx-auto space-y-4">
+    {courseSchedules.map((item, index) => (
+      <div
+        key={index}
+        className="
+          overflow-hidden
+          border
+          rounded-2xl
+          border-white/10
+          bg-white/[0.03]
+          backdrop-blur-xl
+          transition-all
+          duration-300
+          hover:border-cyan-400/30
+        "
+      >
+        {/* Header */}
+        <button
+          onClick={() =>
+            setActiveLocation(
+              activeLocation === index ? null : index
+            )
+          }
+          className="flex items-center justify-between w-full px-6 py-5 text-left "
+        >
+          <div className="flex items-center gap-3">
+            <MapPin
+              size={20}
+              className="text-cyan-400"
+            />
 
-              <span className="text-white">{date}</span>
-            </div>
+            <span className="text-lg font-medium text-white">
+              {item.location}
+            </span>
           </div>
-        ))}
+
+          <ChevronDown
+            className={`text-cyan-400 transition-transform duration-300 ${
+              activeLocation === index
+                ? "rotate-180"
+                : ""
+            }`}
+          />
+        </button>
+
+        {/* Content */}
+        <div
+          className={`overflow-hidden transition-all duration-500 ${
+            activeLocation === index
+              ? "max-h-96"
+              : "max-h-0"
+          }`}
+        >
+          <div className="px-6 pb-5 space-y-3">
+            {item.dates.map((date, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 p-4 border  rounded-xl bg-cyan-400/5 border-cyan-400/10"
+              >
+                <Calendar
+                  size={18}
+                  className="text-cyan-400"
+                />
+
+                <span className="text-white">
+                  {date}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </motion.div>
+    ))}
+  </div>
+</motion.div>
   </div>
 </section>
   );
