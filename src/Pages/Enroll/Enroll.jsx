@@ -90,12 +90,15 @@ const Enroll = () => {
   const [loading, setLoading] = useState(false);
    const [activeLocation, setActiveLocation] = useState(null);
    const [clientSecret, setClientSecret] =useState("");
+  
+const [paymentCompleted, setPaymentCompleted] = useState(false);
 
 
    const createPaymentIntent = async () => {
+
   try {
     const response = await fetch(
-      "http://localhost:5000/create-payment-intent",
+      `${import.meta.env.VITE_API_URL}/create-payment-intent`,
       {
         method: "POST",
         headers: {
@@ -150,40 +153,38 @@ const Enroll = () => {
     }
   };
 
-const handlePaymentSuccess =
-  async () => {
-    try {
-      const formData = new FormData(
-        form.current
-      );
+const handlePaymentSuccess = async () => {
+  try {
+    const formData = new FormData(form.current);
 
-      const response = await fetch(
-        "https://api.web3forms.com/submit",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const result =
-        await response.json();
-
-      if (result.success) {
-        alert(
-          "Payment Successful & Enrollment Submitted!"
-        );
-
-        form.current.reset();
-      } else {
-        alert(
-          result.message ||
-            "Enrollment failed"
-        );
+    const response = await fetch(
+      "https://api.web3forms.com/submit",
+      {
+        method: "POST",
+        body: formData,
       }
-    } catch (error) {
-      console.log(error);
+    );
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(
+        "Payment Successful & Enrollment Submitted!"
+      );
+
+      setPaymentCompleted(true);
+      setClientSecret("");
+
+      form.current.reset();
+    } else {
+      alert(
+        result.message || "Enrollment failed"
+      );
     }
-  };
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 useEffect(() => {
   createPaymentIntent();
@@ -559,13 +560,19 @@ useEffect(() => {
 
               
             </form>
-{clientSecret && (
-  <PaymentForm
-    clientSecret={clientSecret}
-    onPaymentSuccess={
-      handlePaymentSuccess
-    }
-  />
+{paymentCompleted ? (
+  <div className="p-4 text-center border rounded-xl border-green-500/30 bg-green-500/10">
+    <p className="font-semibold text-green-400">
+      Payment Completed Successfully ✅
+    </p>
+  </div>
+) : (
+  clientSecret && (
+    <PaymentForm
+      clientSecret={clientSecret}
+      onPaymentSuccess={handlePaymentSuccess}
+    />
+  )
 )}
           </div>
         </div>

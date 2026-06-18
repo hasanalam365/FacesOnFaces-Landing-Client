@@ -27,6 +27,8 @@ const PaymentForm = ({
 
     const card = elements.getElement(CardElement);
 
+   
+
     const result =
       await stripe.confirmCardPayment(
         clientSecret,
@@ -45,8 +47,8 @@ const PaymentForm = ({
 
     if (
       result.paymentIntent &&
-      result.paymentIntent.status ===
-        "succeeded"
+      result.paymentIntent.status ==="succeeded"
+      
     ) {
       await onPaymentSuccess();
     }
