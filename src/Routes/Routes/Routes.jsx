@@ -5,6 +5,7 @@ import Homes from "../../Pages/Home/Homes";
 import ErrorPage from "../../Pages/404/ErrorPage";
 import ExploreCourses from "../../Pages/ExploreCourses/ExploreCourses";
 import Enroll from "../../Pages/Enroll/Enroll";
+import TermsAndCondition from "../../Pages/Terms&Condition/TermsAndCondition";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
         path: "/explore-course",
         element: <ExploreCourses />,
       },
+      {
+        path: '/terms-and-conditions',
+        element: <TermsAndCondition/>
+      }
     ],
   },
 ]);
