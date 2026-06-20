@@ -3,11 +3,11 @@ import React from "react";
 const GallaryShowcase = () => {
   const images = {
     large:
-      "https://i.ibb.co.com/qL95hDyx/faces5.jpg",
+      "https://i.ibb.co.com/k6h526HM/faces3.jpg",
     topRight1:
-      "https://i.ibb.co.com/vCT1qBMp/faces3.jpg",
+      "https://i.ibb.co.com/k7DPcB9/faces1.jpg",
     topRight2:
-      "https://i.ibb.co.com/zVZvnSFG/faces2.jpg",
+      "https://i.ibb.co.com/mM4p59N/faces2.jpg",
     bottomLeft:
       "https://i.ibb.co.com/r23Q8mNP/faces6.jpg",
       
