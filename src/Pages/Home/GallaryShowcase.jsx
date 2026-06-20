@@ -3,20 +3,20 @@ import React from "react";
 const GallaryShowcase = () => {
   const images = {
     large:
-      "https://i.ibb.co.com/1c1YbFB/group-1.jpg",
+      "https://i.ibb.co.com/qL95hDyx/faces5.jpg",
     topRight1:
-      "https://i.ibb.co.com/DgTbjDHj/group-2.jpg",
+      "https://i.ibb.co.com/vCT1qBMp/faces3.jpg",
     topRight2:
-      "https://i.ibb.co.com/p622DTFL/group-3.jpg",
+      "https://i.ibb.co.com/zVZvnSFG/faces2.jpg",
     bottomLeft:
-      "https://i.ibb.co.com/fd31cZyT/group-6.jpg",
+      "https://i.ibb.co.com/r23Q8mNP/faces6.jpg",
       
     center:
-      "https://i.ibb.co.com/gFgPmvKf/group-4.jpg",
+      "https://i.ibb.co.com/vCT1qBMp/faces3.jpg",
     rightBottom1:
-      "https://i.ibb.co.com/DDjMfxMG/group-5.jpg",
+      "https://i.ibb.co.com/jPjnCTZw/faces1.jpg",
     rightBottom2:
-      "https://i.ibb.co.com/3yWCwPXy/group-7.jpg",
+      "https://i.ibb.co.com/v46d24Wv/faces4.jpg",
   };
 
   return (
