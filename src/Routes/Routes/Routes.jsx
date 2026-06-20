@@ -6,6 +6,7 @@ import ErrorPage from "../../Pages/404/ErrorPage";
 import ExploreCourses from "../../Pages/ExploreCourses/ExploreCourses";
 import Enroll from "../../Pages/Enroll/Enroll";
 import TermsAndCondition from "../../Pages/Terms&Condition/TermsAndCondition";
+import PrivacyPolicy from "../../Pages/PrivacyPolicy/PrivacyPolicy";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: '/terms-and-conditions',
         element: <TermsAndCondition/>
+      },
+      {
+        path: '/privacy-policy',
+        element: <PrivacyPolicy/>
       }
     ],
   },
