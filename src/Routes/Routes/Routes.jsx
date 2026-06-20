@@ -7,6 +7,8 @@ import ExploreCourses from "../../Pages/ExploreCourses/ExploreCourses";
 import Enroll from "../../Pages/Enroll/Enroll";
 import TermsAndCondition from "../../Pages/Terms&Condition/TermsAndCondition";
 import PrivacyPolicy from "../../Pages/PrivacyPolicy/PrivacyPolicy";
+import CookiePolicy from "../../Pages/CookiePolicy/CookiePolicy";
+import RefundPolicy from "../../Pages/RefundPolicy/RefundPolicy";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +35,14 @@ export const router = createBrowserRouter([
       {
         path: '/privacy-policy',
         element: <PrivacyPolicy/>
+      },
+      {
+        path: '/refund-policy',
+        element: <RefundPolicy/>
+      },
+      {
+        path: '/cookie-policy',
+        element: <CookiePolicy/>
       }
     ],
   },
