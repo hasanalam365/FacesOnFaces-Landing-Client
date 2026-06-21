@@ -213,7 +213,7 @@ useEffect(() => {
           <div className="overflow-hidden border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
 
             <img
-              src="https://i.ibb.co.com/YBvghy3R/14-certificates.webp"
+              src="https://i.ibb.co.com/k6h526HM/faces3.jpg"
               alt="Course"
               className="object-cover w-full h-[350px]"
             />

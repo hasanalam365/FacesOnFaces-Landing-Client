@@ -168,7 +168,7 @@ const ExploreCourses = () => {
         {/* Left Side */}
         <div className="relative overflow-hidden">
           <img
-            src="https://i.ibb.co.com/YBvghy3R/14-certificates.webp"
+            src="https://i.ibb.co.com/mM4p59N/faces2.jpg"
             alt="Course"
             className="
             object-contain
@@ -373,7 +373,7 @@ const ExploreCourses = () => {
             {item.dates.map((date, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 p-4 border  rounded-xl bg-cyan-400/5 border-cyan-400/10"
+                className="flex items-center gap-3 p-4 border rounded-xl bg-cyan-400/5 border-cyan-400/10"
               >
                 <Calendar
                   size={18}
