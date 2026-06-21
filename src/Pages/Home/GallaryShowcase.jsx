@@ -56,11 +56,11 @@ const GallaryShowcase = () => {
   </div>
 
   {/* Bottom Row */}
-  <div className="col-span-12 md:col-span-3">
+  <div className="col-span-12 md:col-span-6">
     <img
       src={images.bottomLeft}
       alt=""
-      className="w-full h-[260px] object-cover rounded-xl"
+      className="w-full h-[260px] md:h-[350px] lg:h-[350px] object-cover rounded-xl"
     />
   </div>
 
@@ -68,17 +68,11 @@ const GallaryShowcase = () => {
     <img
       src={images.center}
       alt=""
-      className="w-full h-[260px] object-cover rounded-xl"
+      className="w-full h-[260px] md:h-[350px] lg:h-[350px] object-cover rounded-xl"
     />
   </div>
 
-  <div className="col-span-12 md:col-span-3">
-    <img
-      src={images.topRight1}
-      alt=""
-      className="w-full h-[260px] object-cover rounded-xl"
-    />
-  </div>
+  
 </div>
       </div>
     </section>
