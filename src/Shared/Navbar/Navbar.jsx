@@ -18,32 +18,31 @@ export default function Navbar() {
   ];
 
   const handleScroll = (sectionId) => {
-    setMobileMenuOpen(false);
+  setMobileMenuOpen(false);
 
-    if (location.pathname !== "/") {
-      navigate("/");
+  const scrollToSection = () => {
+    const section = document.getElementById(sectionId);
 
-      setTimeout(() => {
-        const section = document.getElementById(sectionId);
-
-        if (section) {
-          section.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, 200);
-    } else {
-      const section = document.getElementById(sectionId);
-
-      if (section) {
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   };
+
+  if (location.pathname !== "/") {
+    navigate("/");
+
+    setTimeout(() => {
+      scrollToSection();
+    }, 300);
+  } else {
+    setTimeout(() => {
+      scrollToSection();
+    }, 300);
+  }
+};
 
   return (
     <nav className="fixed top-0 left-0 z-50 w-full">
@@ -84,8 +83,11 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Button */}
+            
             <button
+            
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              
               className="text-white lg:hidden"
             >
               {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -115,12 +117,15 @@ export default function Navbar() {
                 </button>
               ))}
 
-              <button
-                onClick={() => navigate("/enroll")}
-                className="py-3 text-sm font-medium text-black transition-all duration-300 rounded-full px-7 bg-cyan-400 hover:bg-cyan-300"
-              >
-                Enroll Now
-              </button>
+             <button
+  onClick={() => {
+    setMobileMenuOpen(false);
+    navigate("/enroll");
+  }}
+  className="py-3 text-sm font-medium text-black transition-all duration-300 rounded-full px-7 bg-cyan-400 hover:bg-cyan-300"
+>
+  Enroll Now
+</button>
             </div>
           </div>
         </div>
