@@ -24,18 +24,14 @@ const [paymentCompleted, setPaymentCompleted] = useState(false);
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/create-payment-intent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          amount: 1099,
-        }),
-      }
-    );
+  `${import.meta.env.VITE_API_URL}/create-payment-intent`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }
+);
 
     const data = await response.json();
 
