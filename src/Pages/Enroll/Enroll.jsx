@@ -43,51 +43,44 @@ const [paymentCompleted, setPaymentCompleted] = useState(false);
   }
 };
 
-  const sendEmail = async (e) => {
-    e.preventDefault();
+  
 
-    setLoading(true);
-
-    try {
-      const formData = new FormData(form.current);
-
-      const response = await fetch(
-        "https://api.web3forms.com/submit",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const result = await response.json();
-
-      if (result.success) {
-        alert("Enrollment submitted successfully!");
-        form.current.reset();
-      } else {
-        alert(result.message || "Something went wrong.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Failed to submit form. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-const handlePaymentSuccess = async () => {
+const handlePaymentSuccess = async (
+  paymentIntentId
+) => {
   try {
-    const formData = new FormData(form.current);
+    const formData = new FormData(
+      form.current
+    );
+
+    const enrollmentData = {
+      paymentIntentId,
+
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      course: formData.get("course"),
+      course_fee:
+        formData.get("course_fee"),
+      message: formData.get("message"),
+    };
 
     const response = await fetch(
-      "https://api.web3forms.com/submit",
+      `${import.meta.env.VITE_API_URL}/create-enrollment`,
       {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify(
+          enrollmentData
+        ),
       }
     );
 
-    const result = await response.json();
+    const result =
+      await response.json();
 
     if (result.success) {
       alert(
@@ -99,9 +92,7 @@ const handlePaymentSuccess = async () => {
 
       form.current.reset();
     } else {
-      alert(
-        result.message || "Enrollment failed"
-      );
+      alert("Enrollment failed");
     }
   } catch (error) {
     console.log(error);
@@ -142,11 +133,7 @@ useEffect(() => {
              
               className="space-y-5"
             >
-             <input
-  type="hidden"
-  name="access_key"
-  value={import.meta.env.VITE_WEB3_MESSAGE_KEY}
-/>
+
 
               <input
                 type="hidden"
@@ -154,11 +141,7 @@ useEffect(() => {
                 value="New Course Enrollment"
               />
 
-              <input
-                type="hidden"
-                name="payment_status"
-                value="Pending"
-              />
+             
 
               <input
                 type="hidden"

@@ -45,13 +45,15 @@ const PaymentForm = ({
       return;
     }
 
-    if (
-      result.paymentIntent &&
-      result.paymentIntent.status ==="succeeded"
-      
-    ) {
-      await onPaymentSuccess();
-    }
+   if (
+  result.paymentIntent &&
+  result.paymentIntent.status ===
+    "succeeded"
+) {
+  await onPaymentSuccess(
+    result.paymentIntent.id
+  );
+} 
 
     setProcessing(false);
   };
