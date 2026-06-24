@@ -1,16 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Banner = () => {
   const navigate = useNavigate();
   const videoRef = useRef(null);
-  const [isMuted, setIsMuted] = useState(true);
 
-  const handleExplore = () => {
-    navigate('/explore-course');
-  };
-
-  // ✅ IntersectionObserver — scroll করে চলে গেলে pause হবে
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -18,23 +12,20 @@ const Banner = () => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.play();
+          video.play().catch(() => {});
         } else {
           video.pause();
         }
       },
-      { threshold: 0.3 } // ৩০% দেখা গেলে play, না হলে pause
+      { threshold: 0.4 }
     );
 
     observer.observe(video);
     return () => observer.disconnect();
   }, []);
 
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
+  const handleExplore = () => {
+    navigate("/explore-course");
   };
 
   return (
@@ -85,15 +76,13 @@ const Banner = () => {
 
           {/* RIGHT VIDEO SECTION */}
           <div className="relative flex justify-center order-1 md:order-2 lg:justify-end">
-
             <div className="relative overflow-hidden border rounded-[30px] border-white/10 bg-white/5 backdrop-blur-xl w-[320px] md:w-[420px]">
               <video
                 ref={videoRef}
                 autoPlay
-                muted       // ✅ browser autoplay এর জন্য muted থাকতেই হবে
+                controls
                 loop
                 playsInline
-                controls
                 className="object-cover w-full h-[500px] md:h-[600px]"
               >
                 <source
@@ -102,14 +91,6 @@ const Banner = () => {
                 />
                 Your browser does not support the video tag.
               </video>
-
-              {/* 🔊 Sound Toggle Button */}
-              <button
-                onClick={toggleMute}
-                className="absolute flex items-center gap-2 px-3 py-2 text-xs text-white transition border rounded-full bottom-4 left-4 bg-black/50 border-white/20 backdrop-blur-sm hover:bg-black/70"
-              >
-                {isMuted ? "🔇 Tap for Sound" : "🔊 Sound On"}
-              </button>
             </div>
 
             {/* Floating Bottom */}
@@ -124,8 +105,8 @@ const Banner = () => {
                 <span className="text-sm text-white">4.9/5</span>
               </div>
             </div>
-
           </div>
+
         </div>
       </div>
     </section>

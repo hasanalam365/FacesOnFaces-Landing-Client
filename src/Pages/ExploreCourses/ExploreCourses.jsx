@@ -196,11 +196,11 @@ const ExploreCourses = () => {
           <div className="mb-8">
             <div className="flex items-center gap-3">
               <span className="text-xl line-through text-white/40">
-               $1,599
+               £1,599
               </span>
 
               <span className="text-4xl font-bold text-cyan-400">
-                $1,099
+               £1,099
               </span>
             </div>
 
