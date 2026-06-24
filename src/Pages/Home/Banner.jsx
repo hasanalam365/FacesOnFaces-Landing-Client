@@ -66,14 +66,27 @@ const Banner = () => {
           {/* RIGHT IMAGE SECTION */}
           <div className="relative flex justify-center lg:justify-end">
             {/* Main Card */}
-            <div className="relative overflow-hidden border rounded-[30px] border-white/10 bg-white/5 backdrop-blur-xl w-[320px] md:w-[420px]">
+            {/* <div className="relative overflow-hidden border rounded-[30px] border-white/10 bg-white/5 backdrop-blur-xl w-[320px] md:w-[420px]">
               <img
                 src="https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=1200&auto=format&fit=crop"
                 alt="Beauty Model"
                 className="object-cover w-full h-[500px] md:h-[600px]"
               />
              
-            </div>
+            </div> */}
+           <div className="relative overflow-hidden border rounded-[30px] border-white/10 bg-white/5 backdrop-blur-xl w-[320px] md:w-[420px]">
+  <video
+    autoPlay
+    
+    controls
+    loop
+    playsInline
+    className="object-cover w-full h-[500px] md:h-[600px]"
+  >
+    <source src="https://res.cloudinary.com/dutdi2jfa/video/upload/v1782271944/course-video_louzql.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
             {/* Floating Card Top */}
             <div className="absolute right-0 px-4 py-3 border rounded-2xl top-8 bg-white/10 backdrop-blur-xl border-white/10">
