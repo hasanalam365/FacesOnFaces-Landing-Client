@@ -14,6 +14,7 @@ export default function Navbar() {
     { name: "Instructors", id: "instructors" },
     { name: "Stories", id: "stories" },
     { name: "Gallary", id: "gallary" },
+    { name: "Price Plans", id: "price-plans" },
     { name: "FAQ", id: "faq" },
   ];
 
