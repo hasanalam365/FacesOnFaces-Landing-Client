@@ -1,7 +1,6 @@
 import React from "react";
 import Banner from "./Banner";
 import Stats from "./Stats";
-import SponsorName from "./SponsorName";
 import WhyChoose from "./WhyChoose";
 import StartJourney from "./StartJourney";
 import Instructors from "./Instructors";
@@ -9,6 +8,7 @@ import FAQ from "./FAQ";
 import SuccessStory from "./SuccessStory";
 import GallaryShowcase from "./GallaryShowcase";
 import LearningExperience from "./LearningExperience";
+import Location from "./Location";
 // import PricePlan from "./PricePlan";
 
 const Homes = () => {
@@ -19,7 +19,7 @@ const Homes = () => {
       </section>
 
       <Stats />
-      <SponsorName />
+      <Location />
 
       <section id="why-us">
         <WhyChoose />
