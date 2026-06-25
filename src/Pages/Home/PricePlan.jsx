@@ -36,6 +36,7 @@ import { useNavigate } from "react-router-dom";
         "Full course access on day one",
         "Dedicated enrollment advisor",
       ],
+      link: '/deposit-enroll'
     },
     {
       badge: "Flexible",
