@@ -142,7 +142,7 @@ const LeftSide = () => {
                   onClick={() => handleLocationClick(item.location)}
                   className={`flex items-center gap-2 px-4 py-2 border rounded-full transition-all duration-200 cursor-pointer
                     ${isActive
-                      ? "bg-cyan-400/25 border-cyan-400 text-cyan-400"
+                      ? "bg-cyan-400/25 border-cyan-600 text-white"
                       : "bg-cyan-400/10 border-cyan-400/20 text-white hover:bg-cyan-400/20 hover:border-cyan-400/40"
                     }`}
                 >

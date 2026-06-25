@@ -68,8 +68,8 @@ const DepositEnroll = () => {
         course:
           "14 Certificate Fast-Track Course",
 
-        depositPaid: "£699",
-        remainingBalance: "£400",
+        depositPaid: "£250",
+        remainingBalance: "£849",
       };
 
       const response = await fetch(
@@ -81,6 +81,7 @@ const DepositEnroll = () => {
           },
           body: JSON.stringify(enrollmentData),
         }
+       
       );
 
       const result = await response.json();
@@ -137,7 +138,7 @@ Course
                 </span>
 
                 <span className="text-xl font-bold text-cyan-400">
-                  £699
+                  £250
                 </span>
               </div>
 
@@ -147,7 +148,7 @@ Course
                 </span>
 
                 <span className="text-white">
-                  £400
+                  £849
                 </span>
               </div>
             </div>
@@ -230,7 +231,7 @@ Course
             <p className="text-sm text-white/60">
               I agree to the Terms &
               Conditions and understand
-              that the £499 deposit secures
+              that the £250 deposit secures
               my place on the course.
             </p>
           </div>

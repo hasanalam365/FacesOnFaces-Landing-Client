@@ -98,7 +98,7 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
         className="flex items-center justify-center w-full gap-2 py-4 mt-5 font-semibold text-black transition rounded-xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Lock size={16} />
-        {processing ? "Processing Payment..." : "Pay £1,099 & Enroll"}
+        {processing ? "Processing Payment..." : "Pay  & Enroll"}
       </button>
 
       {/*  Trust badge */}

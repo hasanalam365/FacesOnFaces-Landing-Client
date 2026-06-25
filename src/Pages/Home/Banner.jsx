@@ -86,7 +86,7 @@ const Banner = () => {
                 className="object-cover w-full h-[500px] md:h-[600px]"
               >
                 <source
-                  src="https://res.cloudinary.com/dutdi2jfa/video/upload/v1782271944/course-video_louzql.mp4"
+                  src="https://res.cloudinary.com/dutdi2jfa/video/upload/v1782397846/course-video_e2yx4f.mp4"
                   type="video/mp4"
                 />
                 Your browser does not support the video tag.

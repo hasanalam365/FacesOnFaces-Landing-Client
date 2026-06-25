@@ -26,8 +26,8 @@ import { useNavigate } from "react-router-dom";
       title: "Deposit",
       description:
         "Reserve your spot with a deposit now and pay the remaining balance before your course start date.",
-      price: "£699",
-      subText: "Deposit today, then £400",
+      price: "£250",
+      subText: "Deposit today, then £849",
       buttonText: "Pay Deposit Now",
       featured: true,
       features: [
