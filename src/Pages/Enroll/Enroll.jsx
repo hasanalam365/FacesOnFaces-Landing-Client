@@ -188,7 +188,7 @@ const Enroll = () => {
                 </label>
                 <input
                   type="text"
-                  value="14 Certificate Foundation Course"
+                  value="14 Certificate Fast-Track Course"
                   readOnly
                   className="w-full px-4 py-4 text-white border cursor-not-allowed rounded-xl bg-white/5 border-white/10 opacity-60"
                 />

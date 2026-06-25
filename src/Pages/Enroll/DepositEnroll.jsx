@@ -66,14 +66,14 @@ const DepositEnroll = () => {
         phone: formData.get("phone"),
 
         course:
-          "14 Certificate Foundation Course",
+          "14 Certificate Fast-Track Course",
 
         depositPaid: "£699",
         remainingBalance: "£400",
       };
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/create-enrollment`,
+        `${import.meta.env.VITE_API_URL}/create-deposit-enrollment`,
         {
           method: "POST",
           headers: {
@@ -124,7 +124,10 @@ const DepositEnroll = () => {
           {/* Course Summary */}
           <div className="p-6 mb-8 border rounded-2xl border-cyan-500/20 bg-cyan-500/5">
             <h3 className="text-xl font-semibold text-white">
-              14 Certificate Foundation Course
+              14
+Certificate
+Fast-Track
+Course
             </h3>
 
             <div className="mt-5 space-y-3">
