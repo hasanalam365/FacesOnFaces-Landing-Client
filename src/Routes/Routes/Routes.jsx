@@ -25,10 +25,10 @@ export const router = createBrowserRouter([
         path: "/enroll",
         element: <Enroll />,
       },
-      {
-        path: '/deposit-enroll',
-        element: <DepositEnroll/>
-      },
+      // {
+      //   path: '/deposit-enroll',
+      //   element: <DepositEnroll/>
+      // },
       {
         path: "/explore-course",
         element: <ExploreCourses />,

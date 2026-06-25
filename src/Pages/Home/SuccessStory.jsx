@@ -199,9 +199,7 @@ const SuccessStory = () => {
         </div>
       </div>
 
-     <div className="mt-5">
-       <Stats/>
-     </div>
+     
     </section>
     
   );

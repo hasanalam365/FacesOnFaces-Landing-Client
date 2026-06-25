@@ -67,7 +67,7 @@ const WhyChoose = () => {
             <h2 className="mb-6 font-serif text-4xl leading-tight text-white md:text-5xl">
               Why Choose{" "}
               <span className="italic text-cyan-400">
-                Luminary
+                Faces On Faces
               </span>
             </h2>
 

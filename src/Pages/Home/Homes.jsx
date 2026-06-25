@@ -9,7 +9,7 @@ import FAQ from "./FAQ";
 import SuccessStory from "./SuccessStory";
 import GallaryShowcase from "./GallaryShowcase";
 import LearningExperience from "./LearningExperience";
-import PricePlan from "./PricePlan";
+// import PricePlan from "./PricePlan";
 
 const Homes = () => {
   return (
@@ -43,9 +43,9 @@ const Homes = () => {
       <section id="faq">
         <FAQ />
       </section>
-      <section id="price-plane">
+      {/* <section id="price-plane">
       <PricePlan/>
-      </section>
+      </section> */}
 
 
 

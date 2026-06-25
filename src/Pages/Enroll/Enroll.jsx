@@ -59,7 +59,7 @@ const Enroll = () => {
         name: formData.get("name"),
         email: formData.get("email"),
         phone: formData.get("phone"),
-        message: formData.get("message"),
+       
       };
 
       const response = await fetch(
@@ -207,23 +207,7 @@ const Enroll = () => {
                 />
               </div>
 
-              {/* Message */}
-              <div>
-                <label className="block mb-2 text-sm text-white/70">
-                  Message
-                </label>
-                <div className="relative">
-                  <MessageSquare size={18} className="absolute top-5 left-4 text-white/40" />
-                  <textarea
-                    rows="5"
-                    name="message"
-                    disabled={paymentCompleted}
-                    placeholder="Tell us about your goals..."
-                    maxLength={1000}
-                    className="w-full pt-4 pl-12 pr-4 text-white border resize-none rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
+            
             </form>
 
             {/* Payment section */}
