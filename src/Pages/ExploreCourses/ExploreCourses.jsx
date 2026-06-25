@@ -22,7 +22,7 @@ const courseFeatures = [
   "Polynucleotide",
   "Microneedling",
   "Fat Dissolver",
-  "Chemical Skin Peels",
+  "Vitamin B12",
   "Foundation Dermal Filler",
   "Foundation Anti-Wrinkle",
   "Use of Hyaluronidase",
