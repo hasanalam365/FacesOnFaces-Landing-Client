@@ -9,7 +9,7 @@ import TermsAndCondition from "../../Pages/Terms&Condition/TermsAndCondition";
 import PrivacyPolicy from "../../Pages/PrivacyPolicy/PrivacyPolicy";
 import CookiePolicy from "../../Pages/CookiePolicy/CookiePolicy";
 import RefundPolicy from "../../Pages/RefundPolicy/RefundPolicy";
-import DepositEnroll from "../../Pages/Enroll/DepositEnroll";
+// import DepositEnroll from "../../Pages/Enroll/DepositEnroll";
 
 export const router = createBrowserRouter([
   {
