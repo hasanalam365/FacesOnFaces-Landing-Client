@@ -5,14 +5,14 @@ import LeftSide from "./LeftSide";
 
 const Enroll = () => {
   const form = useRef(null);
-  const hasFetched = useRef(false); 
+  const hasFetched = useRef(false);
 
   const [clientSecret, setClientSecret] = useState("");
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
-  // শুধু backend এ থাকা fields পাঠানো হবে
   const createPaymentIntent = async () => {
     try {
       setLoading(true);
@@ -43,7 +43,7 @@ const Enroll = () => {
   };
 
   useEffect(() => {
-    if (hasFetched.current) return; 
+    if (hasFetched.current) return;
     hasFetched.current = true;
     createPaymentIntent();
   }, []);
@@ -54,7 +54,6 @@ const Enroll = () => {
 
       const formData = new FormData(form.current);
 
-  
       const enrollmentData = {
         paymentIntentId,
         name: formData.get("name"),
@@ -116,7 +115,7 @@ const Enroll = () => {
           {/* Enrollment Form */}
           <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10 backdrop-blur-xl">
 
-            {/*  Global error message */}
+            {/* Global error message */}
             {errorMsg && (
               <div className="flex items-start gap-3 p-4 mb-5 border rounded-xl border-red-500/30 bg-red-500/10">
                 <AlertCircle size={18} className="text-red-400 mt-0.5 shrink-0" />
@@ -137,9 +136,9 @@ const Enroll = () => {
                     type="text"
                     name="name"
                     required
-                    disabled={paymentCompleted} 
+                    disabled={paymentCompleted}
                     placeholder="Enter your full name"
-                    maxLength={100} 
+                    maxLength={100}
                     className={inputClass}
                   />
                 </div>
@@ -156,7 +155,7 @@ const Enroll = () => {
                     type="email"
                     name="email"
                     required
-                    disabled={paymentCompleted} 
+                    disabled={paymentCompleted}
                     placeholder="Enter your email"
                     className={inputClass}
                   />
@@ -174,15 +173,15 @@ const Enroll = () => {
                     type="tel"
                     name="phone"
                     required
-                    disabled={paymentCompleted} 
+                    disabled={paymentCompleted}
                     placeholder="Enter your phone number"
-                    maxLength={20} 
+                    maxLength={20}
                     className={inputClass}
                   />
                 </div>
               </div>
 
-              {/* Course — display only, not sent to backend */}
+              {/* Course — display only */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Course Name
@@ -195,7 +194,7 @@ const Enroll = () => {
                 />
               </div>
 
-              {/* Fee — display only, not sent to backend */}
+              {/* Fee — display only */}
               <div>
                 <label className="block mb-2 text-sm text-white/70">
                   Course Fee
@@ -218,9 +217,9 @@ const Enroll = () => {
                   <textarea
                     rows="5"
                     name="message"
-                    disabled={paymentCompleted} 
+                    disabled={paymentCompleted}
                     placeholder="Tell us about your goals..."
-                    maxLength={1000} 
+                    maxLength={1000}
                     className="w-full pt-4 pl-12 pr-4 text-white border resize-none rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -230,7 +229,7 @@ const Enroll = () => {
             {/* Payment section */}
             <div className="mt-5">
               {paymentCompleted ? (
-                //  Success state
+                /* Success state */
                 <div className="flex items-center justify-center gap-3 p-5 border rounded-xl border-green-500/30 bg-green-500/10">
                   <CheckCircle size={20} className="text-green-400 shrink-0" />
                   <p className="font-semibold text-green-400">
@@ -238,7 +237,7 @@ const Enroll = () => {
                   </p>
                 </div>
               ) : loading ? (
-                //  Loading state
+                /* Loading state */
                 <div className="flex items-center justify-center p-5">
                   <div className="w-6 h-6 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
                   <span className="ml-3 text-sm text-white/50">
@@ -246,10 +245,64 @@ const Enroll = () => {
                   </span>
                 </div>
               ) : clientSecret ? (
-                <PaymentForm
-                  clientSecret={clientSecret}
-                  onPaymentSuccess={handlePaymentSuccess}
-                />
+                <>
+                  {/* Terms & Conditions Checkbox */}
+                  <div
+                    className={`flex items-start gap-3 p-4 mb-5 border rounded-xl transition-colors duration-200 ${
+                      isTermsAccepted
+                        ? "border-cyan-400/30 bg-cyan-400/5"
+                        : "border-white/10 bg-white/5"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={isTermsAccepted}
+                      onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm leading-relaxed cursor-pointer text-white/60"
+                    >
+                      I have read and agree to the{" "}
+                      <a
+                        href="/terms-and-conditions"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                      >
+                        Terms & Conditions
+                      </a>{" "}
+                      and{" "}
+                      <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                      >
+                        Privacy Policy
+                      </a>
+                      . I understand that the enrollment fee of £1,099 is
+                      non-refundable.
+                    </label>
+                  </div>
+
+                  {/* Payment Form with overlay if terms not accepted */}
+                  <div className="relative">
+                    {!isTermsAccepted && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center px-6 rounded-xl bg-black/60 backdrop-blur-sm">
+                        <p className="text-sm text-center text-white/60">
+                         
+                        </p>
+                      </div>
+                    )}
+                    <PaymentForm
+                      clientSecret={clientSecret}
+                      onPaymentSuccess={handlePaymentSuccess}
+                    />
+                  </div>
+                </>
               ) : null}
             </div>
 
