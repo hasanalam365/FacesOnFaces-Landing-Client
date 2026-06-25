@@ -1,10 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  Instagram,
-  Facebook,
-  Linkedin,
-} from "lucide-react";
+import {Facebook} from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -44,24 +41,17 @@ export default function Footer() {
               </a>
 
               <a
-                href="#"
-                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
-              >
-                <Instagram
-                  size={18}
-                  className="text-gray-300"
-                />
-              </a>
-
-              <a
-                href="#"
-                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
-              >
-                <Linkedin
-                  size={18}
-                  className="text-gray-300"
-                />
-              </a>
+  href="https://wa.me/+447308888874"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-green-400/30 hover:bg-green-500/10"
+>
+  <FaWhatsapp
+    size={18}
+    className="text-gray-300"
+  />
+</a>
+             
             </div>
 
             {/* Legal Links */}
