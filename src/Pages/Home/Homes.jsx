@@ -10,6 +10,8 @@ import GallaryShowcase from "./GallaryShowcase";
 import LearningExperience from "./LearningExperience";
 import Location from "./Location";
 import PricePlan from "./PricePlan";
+// import LeftSide from "../Enroll/LeftSide";
+
 
 const Homes = () => {
   return (
@@ -17,6 +19,12 @@ const Homes = () => {
       <section id="home">
         <Banner />
       </section>
+
+{/* <section className="w-[75%] py-8 mx-auto">
+  <LeftSide/>
+</section> */}
+
+
 
       <Stats />
       <Location />

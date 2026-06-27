@@ -26,7 +26,7 @@ const features = [
     icon: ShieldCheck,
     title: "Lifetime Support",
     description:
-      "Ongoing mentorship and alumni network access long after graduation.",
+      "Ongoing Lifetime Support and Complication Support.",
   },
   {
     icon: MonitorPlay,

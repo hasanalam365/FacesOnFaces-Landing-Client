@@ -296,9 +296,7 @@ const ExploreCourses = () => {
               Enroll Now
             </button>
 
-            <button onClick={handleBackHome} className="px-8 py-4 text-white transition-all duration-300 border rounded-full border-white/15 hover:border-cyan-400 hover:text-cyan-400 hover:scale-105">
-              Back Home
-            </button>
+            
           </div>
         </div>
       </div>

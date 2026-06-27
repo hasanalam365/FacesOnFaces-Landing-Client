@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Banner = () => {
-  const navigate = useNavigate();
+
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -24,10 +24,7 @@ const Banner = () => {
     return () => observer.disconnect();
   }, []);
 
-  const handleExplore = () => {
-    navigate("/explore-course");
-  };
-
+ 
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#05090A]">
       {/* Background Glow */}
@@ -58,20 +55,13 @@ const Banner = () => {
               Course
             </h1>
 
-            <p className="max-w-md mt-8 text-base leading-relaxed text-gray-400">
+            <p className="max-w-md mt-8 mb-5 text-base leading-relaxed text-gray-400">
               Professional training programs designed to help
               ambitious students launch successful careers in
               aesthetics and beauty.
             </p>
 
-            <div className="flex flex-col gap-4 mt-10 sm:flex-row">
-              <button
-                onClick={handleExplore}
-                className="px-8 py-4 font-medium text-black transition rounded-full bg-cyan-400 hover:scale-105"
-              >
-                Explore Courses →
-              </button>
-            </div>
+            
           </div>
 
           {/* RIGHT VIDEO SECTION */}
