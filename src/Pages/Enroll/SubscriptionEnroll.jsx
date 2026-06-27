@@ -120,7 +120,7 @@ const SubscriptionEnroll = () => {
             <span className="italic font-light text-cyan-300">Enrollment</span>
           </h1>
           <p className="max-w-xl mx-auto mt-4 text-white/50">
-            Pay your first month today and spread the remaining cost over 11 equal monthly payments.
+            Pay your first month today and spread the remaining cost over equal every month payments.
           </p>
         </div>
 

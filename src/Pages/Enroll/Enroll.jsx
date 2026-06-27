@@ -61,7 +61,7 @@ const plans = [
     buttonText: "Start Subscription",
     featured: false,
     features: [
-      "12 equal monthly payments",
+      
       "Direct debit setup",
       "Signed subscription agreement",
       "Cancel terms apply",
