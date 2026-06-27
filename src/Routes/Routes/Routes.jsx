@@ -10,6 +10,7 @@ import PrivacyPolicy from "../../Pages/PrivacyPolicy/PrivacyPolicy";
 import CookiePolicy from "../../Pages/CookiePolicy/CookiePolicy";
 import RefundPolicy from "../../Pages/RefundPolicy/RefundPolicy";
 import DepositEnroll from "../../Pages/Enroll/DepositEnroll";
+import SubscriptionEnroll from "../../Pages/Enroll/SubscriptionEnroll";
 
 export const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       {
         path: '/deposit-enroll',
         element: <DepositEnroll/>
+      },
+      {
+       path:"/subscription-enroll" ,
+       element:<SubscriptionEnroll />
       },
       {
         path: "/explore-course",
