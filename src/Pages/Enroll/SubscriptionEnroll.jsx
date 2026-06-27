@@ -130,23 +130,23 @@ const SubscriptionEnroll = () => {
           <div className="space-y-6">
             <div className="p-7 border rounded-3xl border-cyan-500/20 bg-white/[0.03] backdrop-blur-xl">
               <div className="flex items-end gap-3 mb-1">
-                <span className="text-5xl font-light text-white">£100</span>
+                <span className="text-5xl font-light text-white">£250</span>
                 <span className="mb-2 text-white/40">today</span>
               </div>
-              <p className="text-sm text-cyan-400">Then £100 / month × 11 remaining months</p>
+              <p className="text-sm text-cyan-400">Then £100 / month </p>
               <div className="pt-5 mt-6 space-y-3 border-t border-white/10">
                 <div className="flex justify-between text-sm">
                   <span className="text-white/50">First Payment (Today)</span>
-                  <span className="font-medium text-cyan-400">£100</span>
+                  <span className="font-medium text-cyan-400">£250</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-white/50">Remaining Payments</span>
-                  <span className="text-white">£100 × 11 months</span>
+                  <span className="text-white">£100 /month</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                {/* <div className="flex justify-between text-sm">
                   <span className="text-white/50">Total Amount</span>
                   <span className="text-white">£1,200</span>
-                </div>
+                </div> */}
                 <div className="flex justify-between text-sm">
                   <span className="text-white/50">Course</span>
                   <span className="text-white text-right max-w-[180px]">14 Certificate Fast-Track Course</span>
@@ -236,7 +236,7 @@ const SubscriptionEnroll = () => {
 
                   <div>
                     <label className="block mb-2 text-sm text-white/70">First Payment</label>
-                    <input type="text" value="£100 — First Month" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
+                    <input type="text" value="£250 — First Payment" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
                   </div>
                 </form>
 
@@ -262,7 +262,7 @@ const SubscriptionEnroll = () => {
                             Terms & Conditions
                           </a>{" "}
                           and understand that a signed subscription agreement is required
-                          before enrollment is confirmed. The first payment of £100 is non-refundable.
+                          before enrollment is confirmed. 
                         </label>
                       </div>
 

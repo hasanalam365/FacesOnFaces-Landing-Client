@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   User,
   Mail,
@@ -7,6 +7,8 @@ import {
   AlertCircle,
   Check,
   ArrowRight,
+  ChevronDown,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PaymentForm from "../../Components/PaymentForm";
@@ -67,19 +69,246 @@ const plans = [
   },
 ];
 
+// ─── Plan Modal ────────────────────────────────────────────────
+const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
+  // ESC key to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    // Prevent body scroll while modal is open
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, onClose]);
+
+  // Click-outside backdrop handler
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
+  return (
+    <>
+      {/* Inject keyframe animation via a style tag */}
+      <style>{`
+        @keyframes modalFadeIn {
+          from { opacity: 0; transform: scale(0.96) translateY(12px); }
+          to   { opacity: 1; transform: scale(1)    translateY(0);    }
+        }
+        .modal-enter {
+          animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
+
+      {/* Backdrop */}
+      <div
+        onClick={handleBackdropClick}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "1rem",
+          backgroundColor: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? "auto" : "none",
+          transition: "opacity 0.25s ease",
+        }}
+      >
+        {/* Modal panel */}
+        {isOpen && (
+          <div
+            className="modal-enter"
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "1100px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              backgroundColor: "#0a0e12",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "1.5rem",
+              padding: "2.5rem",
+              boxShadow: "0 40px 120px rgba(0,0,0,0.8), 0 0 60px rgba(34,211,238,0.06)",
+            }}
+          >
+            {/* Glow */}
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%,-50%)",
+                width: "500px",
+                height: "400px",
+                background: "radial-gradient(ellipse, rgba(34,211,238,0.07) 0%, transparent 70%)",
+                pointerEvents: "none",
+                borderRadius: "9999px",
+              }}
+            />
+
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              style={{
+                position: "absolute",
+                top: "1.25rem",
+                right: "1.25rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "2.25rem",
+                height: "2.25rem",
+                borderRadius: "9999px",
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.05)",
+                color: "rgba(255,255,255,0.6)",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                zIndex: 10,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(34,211,238,0.15)";
+                e.currentTarget.style.borderColor = "rgba(34,211,238,0.5)";
+                e.currentTarget.style.color = "#22d3ee";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+                e.currentTarget.style.color = "rgba(255,255,255,0.6)";
+              }}
+            >
+              <X size={16} />
+            </button>
+
+            {/* Modal header */}
+            <div className="mb-10 text-center" style={{ position: "relative", zIndex: 1 }}>
+              <p className="text-cyan-400 text-xs tracking-[4px] uppercase mb-4">
+                Enrollment Options
+              </p>
+              <h2 className="font-serif text-3xl font-light text-white md:text-4xl">
+                Choose Your{" "}
+                <span className="italic text-cyan-300">Payment Plan</span>
+              </h2>
+              <p className="max-w-xl mx-auto mt-3 text-sm text-gray-400">
+                Flexible ways to start your journey — pay in full, leave a
+                deposit, or subscribe monthly via direct debit.
+              </p>
+            </div>
+
+            {/* Plan cards */}
+            <div
+              style={{ position: "relative", zIndex: 1 }}
+              className="grid gap-6 lg:grid-cols-3"
+            >
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`relative rounded-3xl p-7 flex flex-col
+                    transition-all duration-500 cursor-pointer
+                    ${
+                      plan.featured
+                        ? "bg-[#0f1519] border border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-3 hover:scale-[1.02] hover:shadow-[0_20px_60px_rgba(34,211,238,0.3)]"
+                        : selectedPlan === plan.id
+                        ? "bg-[#0c1014] border border-cyan-400 scale-[1.02]"
+                        : "bg-[#0c1014] border border-gray-800 hover:-translate-y-2 hover:scale-[1.01] hover:border-cyan-400/60 hover:shadow-[0_12px_40px_rgba(34,211,238,0.12)]"
+                    }`}
+                >
+                  {/* Badge */}
+                  {plan.featured ? (
+                    <div className="absolute -translate-x-1/2 -top-3 left-1/2">
+                      <span className="px-4 py-1 text-xs font-semibold text-black rounded-full bg-cyan-400">
+                        {plan.badge}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex px-4 py-1 mb-5 text-xs text-gray-300 border border-gray-700 rounded-full w-fit">
+                      {plan.badge}
+                    </div>
+                  )}
+
+                  <div className={plan.featured ? "mt-5" : ""}>
+                    <h3 className="mb-2 text-xl font-medium text-white">
+                      {plan.title}
+                    </h3>
+                    <p className="mb-6 text-sm leading-relaxed text-gray-400">
+                      {plan.description}
+                    </p>
+                    <div className="mb-6">
+                      <h2 className="text-4xl font-light text-white">
+                        {plan.price}
+                      </h2>
+                      <p
+                        className={`text-sm mt-1 ${
+                          plan.featured ? "text-cyan-400" : "text-gray-500"
+                        }`}
+                      >
+                        {plan.subText}
+                      </p>
+                    </div>
+                    <ul className="flex-grow mb-6 space-y-3">
+                      {plan.features.map((feature, i) => (
+                        <li
+                          key={i}
+                          className="flex items-center gap-3 text-sm text-gray-300"
+                        >
+                          <Check
+                            size={14}
+                            className="flex-shrink-0 text-cyan-400"
+                          />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Button */}
+                  <button
+                    onClick={() => onSelectPlan(plan.id)}
+                    className={`mt-auto w-full py-3.5 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all duration-300 ${
+                      plan.featured
+                        ? "bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
+                        : "border border-gray-700 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300 text-white"
+                    }`}
+                  >
+                    {plan.buttonText}
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
 // ─── Main Component ────────────────────────────────────────────
 const Enroll = () => {
   const navigate = useNavigate();
   const form = useRef(null);
   const hasFetched = useRef(false);
-  const formRef = useRef(null); // for scroll
+  const formRef = useRef(null);
 
-  const [selectedPlan, setSelectedPlan] = useState(null); // null | 'full'
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [clientSecret, setClientSecret] = useState("");
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+
+  // Controls modal visibility
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Fetch payment intent only when full plan is selected
   const createPaymentIntent = async () => {
@@ -113,12 +342,22 @@ const Enroll = () => {
       navigate("/subscription-enroll");
       return;
     }
-    // full
+    // Pay in Full: close modal, stay on page, set plan
+    setModalOpen(false);
     setSelectedPlan("full");
-    // scroll to form after short delay
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
+  };
+
+  const handleCloseModal = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+
+  // Open modal when Course Fee field is clicked
+  const handleFeeFieldClick = () => {
+    if (paymentCompleted) return;
+    setModalOpen(true);
   };
 
   // Fetch payment intent once when full plan is selected
@@ -167,8 +406,19 @@ const Enroll = () => {
   const inputClass =
     "w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed";
 
+  // Derived label for the Course Fee selector field
+  const feeSelectorLabel = selectedPlan === "full" ? "£1,099" : null;
+
   return (
     <section className="min-h-screen bg-[#050505] py-20">
+      {/* Plan selection modal */}
+      <PlanModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        onSelectPlan={handlePlanSelect}
+        selectedPlan={selectedPlan}
+      />
+
       <div className="px-6 mx-auto max-w-7xl">
 
         {/* ── Header ── */}
@@ -183,310 +433,217 @@ const Enroll = () => {
           </p>
         </div>
 
-        {/* ── Price Plan Cards ── */}
-        <div className="relative mb-20">
-          {/* background glow */}
-          <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[150px] rounded-full pointer-events-none" />
-
-          <div className="relative z-10 mb-10 text-center">
-            <p className="text-cyan-400 text-xs tracking-[4px] uppercase mb-4">
-              Enrollment Options
-            </p>
-            <h2 className="font-serif text-4xl font-light text-white md:text-5xl">
-              Choose Your{" "}
-              <span className="italic text-cyan-300">Payment Plan</span>
-            </h2>
-            <p className="max-w-2xl mx-auto mt-4 text-gray-400">
-              Flexible ways to start your journey — pay in full, leave a
-              deposit, or subscribe monthly via direct debit.
-            </p>
-          </div>
-
-          <div className="relative z-10 grid gap-8 lg:grid-cols-3">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className={`relative rounded-3xl p-8 flex flex-col min-h-[620px]
-                  transition-all duration-500 cursor-pointer
-                  ${
-                    plan.featured
-                      ? "bg-[#0f1519] border border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-4 hover:scale-[1.03] hover:shadow-[0_30px_80px_rgba(34,211,238,0.35)]"
-                      : selectedPlan === plan.id
-                      ? "bg-[#0c1014] border border-cyan-400 scale-[1.02]"
-                      : "bg-[#0c1014] border border-gray-800 hover:-translate-y-3 hover:scale-[1.02] hover:border-cyan-400/60 hover:shadow-[0_20px_60px_rgba(34,211,238,0.15)]"
-                  }`}
-              >
-                {/* Badge */}
-                {plan.featured ? (
-                  <div className="absolute -translate-x-1/2 -top-3 left-1/2">
-                    <span className="px-4 py-1 text-xs font-semibold text-black rounded-full bg-cyan-400">
-                      {plan.badge}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="inline-flex px-4 py-1 mb-6 text-xs text-gray-300 border border-gray-700 rounded-full w-fit">
-                    {plan.badge}
-                  </div>
-                )}
-
-                <div className={plan.featured ? "mt-6" : ""}>
-                  <h3 className="mb-3 text-2xl font-medium text-white">
-                    {plan.title}
-                  </h3>
-                  <p className="mb-8 text-sm leading-relaxed text-gray-400">
-                    {plan.description}
-                  </p>
-                  <div className="mb-8">
-                    <h2 className="text-5xl font-light text-white">
-                      {plan.price}
-                    </h2>
-                    <p
-                      className={`text-sm mt-2 ${
-                        plan.featured ? "text-cyan-400" : "text-gray-500"
-                      }`}
-                    >
-                      {plan.subText}
-                    </p>
-                  </div>
-                  <ul className="flex-grow space-y-4">
-                    {plan.features.map((feature, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center gap-3 text-gray-300"
-                      >
-                        <Check
-                          size={16}
-                          className="flex-shrink-0 text-cyan-400"
-                        />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Button */}
-                <button
-                  onClick={() => handlePlanSelect(plan.id)}
-                  className={`mt-auto w-full py-4 rounded-full flex items-center justify-center gap-2 font-medium transition-all duration-300 ${
-                    plan.featured
-                      ? "bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
-                      : "border border-gray-700 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300 text-white"
-                  }`}
-                >
-                  {plan.buttonText}
-                  <ArrowRight size={18} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Course Details + Enrollment Form (shown after selecting full pay) ── */}
+        {/* ── Course Details + Enrollment Form (always visible) ── */}
         <div ref={formRef} className="grid gap-10 lg:grid-cols-2">
           <LeftSide />
 
-          {/* Right: Form */}
+          {/* Right: Form — always shown */}
           <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10 backdrop-blur-xl">
 
-            {!selectedPlan ? (
-              /* Placeholder before plan selected */
-              <div className="flex flex-col items-center justify-center h-full py-20 text-center">
-                <div className="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-cyan-400/10">
-                  <ArrowRight size={28} className="text-cyan-400" />
-                </div>
-                <h3 className="mb-3 text-xl font-semibold text-white">
-                  Select a Payment Plan
-                </h3>
-                <p className="max-w-xs text-white/40">
-                  Choose your preferred payment option above to continue with
-                  enrollment.
-                </p>
+            {/* Global error */}
+            {errorMsg && (
+              <div className="flex items-start gap-3 p-4 mb-5 border rounded-xl border-red-500/30 bg-red-500/10">
+                <AlertCircle
+                  size={18}
+                  className="text-red-400 mt-0.5 shrink-0"
+                />
+                <p className="text-sm text-red-400">{errorMsg}</p>
               </div>
-            ) : (
-              <>
-                {/* Global error */}
-                {errorMsg && (
-                  <div className="flex items-start gap-3 p-4 mb-5 border rounded-xl border-red-500/30 bg-red-500/10">
-                    <AlertCircle
-                      size={18}
-                      className="text-red-400 mt-0.5 shrink-0"
-                    />
-                    <p className="text-sm text-red-400">{errorMsg}</p>
-                  </div>
-                )}
+            )}
 
-                <form ref={form} className="space-y-5">
-                  {/* Name */}
-                  <div>
-                    <label className="block mb-2 text-sm text-white/70">
-                      Full Name
-                    </label>
-                    <div className="relative">
-                      <User
-                        size={18}
-                        className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2"
-                      />
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        disabled={paymentCompleted}
-                        placeholder="Enter your full name"
-                        maxLength={100}
-                        className={inputClass}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block mb-2 text-sm text-white/70">
-                      Email Address
-                    </label>
-                    <div className="relative">
-                      <Mail
-                        size={18}
-                        className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2"
-                      />
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        disabled={paymentCompleted}
-                        placeholder="Enter your email"
-                        className={inputClass}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block mb-2 text-sm text-white/70">
-                      Phone Number
-                    </label>
-                    <div className="relative">
-                      <Phone
-                        size={18}
-                        className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2"
-                      />
-                      <input
-                        type="tel"
-                        name="phone"
-                        required
-                        disabled={paymentCompleted}
-                        placeholder="Enter your phone number"
-                        maxLength={20}
-                        className={inputClass}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Course — display only */}
-                  <div>
-                    <label className="block mb-2 text-sm text-white/70">
-                      Course Name
-                    </label>
-                    <input
-                      type="text"
-                      value="14 Certificate Fast-Track Course"
-                      readOnly
-                      className="w-full px-4 py-4 text-white border cursor-not-allowed rounded-xl bg-white/5 border-white/10 opacity-60"
-                    />
-                  </div>
-
-                  {/* Fee — display only */}
-                  <div>
-                    <label className="block mb-2 text-sm text-white/70">
-                      Course Fee
-                    </label>
-                    <input
-                      type="text"
-                      value="£1,099"
-                      readOnly
-                      className="w-full px-4 py-4 font-semibold border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10"
-                    />
-                  </div>
-                </form>
-
-                {/* Payment section */}
-                <div className="mt-5">
-                  {paymentCompleted ? (
-                    <div className="flex items-center justify-center gap-3 p-5 border rounded-xl border-green-500/30 bg-green-500/10">
-                      <CheckCircle
-                        size={20}
-                        className="text-green-400 shrink-0"
-                      />
-                      <p className="font-semibold text-green-400">
-                        Payment Completed & Enrollment Confirmed!
-                      </p>
-                    </div>
-                  ) : loading ? (
-                    <div className="flex items-center justify-center p-5">
-                      <div className="w-6 h-6 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
-                      <span className="ml-3 text-sm text-white/50">
-                        Setting up payment...
-                      </span>
-                    </div>
-                  ) : clientSecret ? (
-                    <>
-                      {/* Terms checkbox */}
-                      <div
-                        className={`flex items-start gap-3 p-4 mb-5 border rounded-xl transition-colors duration-200 ${
-                          isTermsAccepted
-                            ? "border-cyan-400/30 bg-cyan-400/5"
-                            : "border-white/10 bg-white/5"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          id="terms"
-                          checked={isTermsAccepted}
-                          onChange={(e) =>
-                            setIsTermsAccepted(e.target.checked)
-                          }
-                          className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
-                        />
-                        <label
-                          htmlFor="terms"
-                          className="text-sm leading-relaxed cursor-pointer text-white/60"
-                        >
-                          I have read and agree to the{" "}
-                          <a
-                            href="/terms-and-conditions"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
-                          >
-                            Terms & Conditions
-                          </a>{" "}
-                          and{" "}
-                          <a
-                            href="/privacy-policy"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
-                          >
-                            Privacy Policy
-                          </a>
-                          . I understand that the enrollment fee of £1,099 is
-                          non-refundable.
-                        </label>
-                      </div>
-
-                      {/* Payment form with overlay */}
-                      <div className="relative">
-                        {!isTermsAccepted && (
-                          <div className="absolute inset-0 z-10 rounded-xl bg-black/60 backdrop-blur-sm" />
-                        )}
-                        <PaymentForm
-                          clientSecret={clientSecret}
-                          onPaymentSuccess={handlePaymentSuccess}
-                        />
-                      </div>
-                    </>
-                  ) : null}
+            <form ref={form} className="space-y-5">
+              {/* Name */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User
+                    size={18}
+                    className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2"
+                  />
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    disabled={paymentCompleted}
+                    placeholder="Enter your full name"
+                    maxLength={100}
+                    className={inputClass}
+                  />
                 </div>
-              </>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail
+                    size={18}
+                    className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2"
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    disabled={paymentCompleted}
+                    placeholder="Enter your email"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone
+                    size={18}
+                    className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2"
+                  />
+                  <input
+                    type="tel"
+                    name="phone"
+                    required
+                    disabled={paymentCompleted}
+                    placeholder="Enter your phone number"
+                    maxLength={20}
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              {/* Course — display only */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  Course Name
+                </label>
+                <input
+                  type="text"
+                  value="14 Certificate Fast-Track Course"
+                  readOnly
+                  className="w-full px-4 py-4 text-white border cursor-not-allowed rounded-xl bg-white/5 border-white/10 opacity-60"
+                />
+              </div>
+
+              {/* Course Fee — clickable plan selector that opens modal */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  Course Fee
+                </label>
+                <button
+                  type="button"
+                  onClick={handleFeeFieldClick}
+                  disabled={paymentCompleted}
+                  className={`w-full px-4 py-4 text-left border rounded-xl transition-all duration-200 flex items-center justify-between
+                    ${paymentCompleted ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
+                    ${
+                      modalOpen
+                        ? "border-cyan-400 bg-cyan-400/5"
+                        : feeSelectorLabel
+                        ? "border-cyan-400/60 bg-white/5"
+                        : "border-white/10 bg-white/5 hover:border-cyan-400/50"
+                    }`}
+                >
+                  <span
+                    className={
+                      feeSelectorLabel
+                        ? "font-semibold text-cyan-400"
+                        : "text-white/40"
+                    }
+                  >
+                    {feeSelectorLabel ?? "Click to Select Payment Option"}
+                  </span>
+                  <ChevronDown
+                    size={18}
+                    className={`text-white/40 transition-transform duration-300 ${
+                      modalOpen ? "rotate-180 text-cyan-400" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+            </form>
+
+            {/* Payment section — only shown after Pay in Full is selected */}
+            {selectedPlan === "full" && (
+              <div className="mt-5">
+                {paymentCompleted ? (
+                  <div className="flex items-center justify-center gap-3 p-5 border rounded-xl border-green-500/30 bg-green-500/10">
+                    <CheckCircle
+                      size={20}
+                      className="text-green-400 shrink-0"
+                    />
+                    <p className="font-semibold text-green-400">
+                      Payment Completed & Enrollment Confirmed!
+                    </p>
+                  </div>
+                ) : loading ? (
+                  <div className="flex items-center justify-center p-5">
+                    <div className="w-6 h-6 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
+                    <span className="ml-3 text-sm text-white/50">
+                      Setting up payment...
+                    </span>
+                  </div>
+                ) : clientSecret ? (
+                  <>
+                    {/* Terms checkbox */}
+                    <div
+                      className={`flex items-start gap-3 p-4 mb-5 border rounded-xl transition-colors duration-200 ${
+                        isTermsAccepted
+                          ? "border-cyan-400/30 bg-cyan-400/5"
+                          : "border-white/10 bg-white/5"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        checked={isTermsAccepted}
+                        onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                        className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
+                      />
+                      <label
+                        htmlFor="terms"
+                        className="text-sm leading-relaxed cursor-pointer text-white/60"
+                      >
+                        I have read and agree to the{" "}
+                        <a
+                          href="/terms-and-conditions"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                        >
+                          Terms & Conditions
+                        </a>{" "}
+                        and{" "}
+                        <a
+                          href="/privacy-policy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                        >
+                          Privacy Policy
+                        </a>
+                        
+                      </label>
+                    </div>
+
+                    {/* Payment form with overlay */}
+                    <div className="relative">
+                      {!isTermsAccepted && (
+                        <div className="absolute inset-0 z-10 rounded-xl bg-black/60 backdrop-blur-sm" />
+                      )}
+                      <PaymentForm
+                        clientSecret={clientSecret}
+                        onPaymentSuccess={handlePaymentSuccess}
+                      />
+                    </div>
+                  </>
+                ) : null}
+              </div>
             )}
           </div>
         </div>
