@@ -5,29 +5,27 @@ const instructors = [
   {
     id: 1,
     name: "Dr. Vahid",
-    role: "Lead Instructor",
+   
     image:
       "https://i.ibb.co.com/F48xW4CC/Dr-Vahid.jpg",
-    experience: "7+ Years",
-    specialty: "Advanced Facial Procedures",
+   
   },
   {
     id: 2,
     name: "Dr. Mobina",
-    role: "Clinical Director",
+    
     image:
       "https://i.ibb.co.com/tTbDmTL8/mobina.jpg",
-    experience: "3+ Years",
-    specialty: "Regenerative Aesthetics & Skin Science",
+   
   },
   {
     id: 3,
     name: "Dr. Mario",
-    role: "Head of Dermatology",
+    
     image:
       "https://i.ibb.co.com/kgSmyHXf/Dr-mario.jpg",
-    experience: "7+ Years",
-    specialty: "Dermatology & Clinical Training",
+ 
+   
   },
 ];
 
@@ -99,9 +97,7 @@ const Instructors = () => {
                     {item.name}
                   </h3>
 
-                  <p className="text-sm font-medium text-cyan-400">
-                    {item.role}
-                  </p>
+                 
 
                   <motion.div
                     initial={false}
@@ -121,26 +117,7 @@ const Instructors = () => {
                     }}
                     className="overflow-hidden"
                   >
-                    <div className="pt-4 border-t border-white/10">
-                      <div className="flex justify-between mb-4 text-sm text-white/80">
-                        <span>
-                          Experience
-                        </span>
-                        <span className="text-white">
-                          {item.experience}
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between gap-4 text-sm">
-                        <span className="text-white/80">
-                          Specialty
-                        </span>
-
-                        <span className="text-right text-white max-w-[180px]">
-                          {item.specialty}
-                        </span>
-                      </div>
-                    </div>
+                  
                   </motion.div>
                 </div>
               </motion.div>
