@@ -1,5 +1,5 @@
-import { BookOpen, Calendar, ChevronDown, MapPin, X } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState } from "react";
+import { BookOpen, Calendar, MapPin, X } from "lucide-react";
 
 const courseFeatures = [
   "Infection Control",
@@ -21,240 +21,241 @@ const courseFeatures = [
 const courseSchedules = [
   {
     location: "London",
-    dates: [
-      "3rd–5th October",
-      "7th–9th November",
-    ],
+    dates: ["3rd–5th October", "7th–9th November"],
   },
   {
     location: "Upminster",
-    dates: [
-      "17th–19th October",
-    ],
+    dates: ["17th–19th October"],
   },
   {
     location: "Edinburgh",
-    dates: [
-      "21st–23rd November",
-    ],
+    dates: ["21st–23rd November"],
   },
   {
     location: "Belfast",
-    dates: [
-      "10th–12th October",
-    ],
+    dates: ["10th–12th October"],
   },
   {
     location: "Glasgow",
-    dates: [
-      "28th–30th November",
-    ],
+    dates: ["28th–30th November"],
   },
   {
     location: "Dublin",
-    dates: [
-      "31st Oct–3rd Nov",
-    ],
+    dates: ["31st Oct–3rd Nov"],
   },
 ];
 
-
 const CourseDetails = () => {
+  const [activeLocation, setActiveLocation] = useState(null);
 
-     const [activeLocation, setActiveLocation] = useState(null);
-    
-      const handleLocationClick = (locationName) => {
-        const found = courseSchedules.find((s) => s.location === locationName);
-        if (!found) return;
-        setActiveLocation(activeLocation?.location === locationName ? null : found);
-      };
+  const handleLocationClick = (locationName) => {
+    const found = courseSchedules.find(
+      (s) => s.location === locationName
+    );
+
+    if (!found) return;
+
+    setActiveLocation(
+      activeLocation?.location === locationName ? null : found
+    );
+  };
 
   return (
-  <div className="overflow-hidden border shadow-2xl bg-white/5 backdrop-blur-xl border-white/10 rounded-3xl">
-    <div className="grid lg:grid-cols-2">
-      
-      {/* Left Image */}
-      <div className="relative h-[320px] lg:h-full bg-black">
-  <img
-    src="https://i.ibb.co.com/k6h526HM/faces3.jpg"
-    alt="Course"
-    className="object-contain w-full h-full"
-  />
+    <section className="py-20">
+      <div className="max-w-6xl mx-auto overflow-hidden border shadow-2xl rounded-3xl border-cyan-400/20 bg-[#0f1519]">
 
-  <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/15 to-transparent"></div>
-</div>
+        <div className="p-6 lg:p-10">
 
-      {/* Right Content */}
-      <div className="p-6 lg:p-10">
+          {/* Header */}
+          <div className="pb-8 mb-10 border-b border-cyan-400/10">
+            <span className="inline-block px-4 py-2 text-sm font-medium text-black rounded-full bg-cyan-400">
+              14 Certificates Included
+            </span>
 
-        <span className="px-4 py-2 text-sm font-medium text-black rounded-full bg-cyan-400">
-          14 Certificates Included
-        </span>
+            <h2 className="mt-5 text-4xl font-bold text-white">
+              14 Certificate Fast-Track Course
+            </h2>
 
-        <h2 className="mt-5 text-3xl font-bold text-white">
-          14 Certificate Fast-Track Course
-        </h2>
+            <p className="max-w-3xl mt-4 leading-relaxed text-white/60">
+              Master the UK's most in-demand aesthetic treatments through
+              intensive hands-on practical training. Build your confidence,
+              gain industry-recognised certifications, and start your
+              aesthetics career faster.
+            </p>
+          </div>
 
-        {/* Price */}
-        <div className="mt-8 space-y-4">
+          {/* Course Info */}
+          <div className="grid gap-6 mb-12 md:grid-cols-3">
 
-          <div className="flex items-center justify-between">
-            <span className="text-white/60">Course Fee</span>
+            <div className="p-6 border rounded-2xl border-cyan-400/20 bg-white/[0.03]">
+              <p className="text-sm text-white/50">
+                Course Fee
+              </p>
 
-            <div className="flex items-center gap-3">
-              <span className="line-through text-white/40">
-                £1,599
-              </span>
+              <div className="flex items-center gap-3 mt-3">
+                <span className="text-lg line-through text-white/30">
+                  £1,599
+                </span>
 
-              <span className="text-2xl font-bold text-cyan-400">
-                £1,099
-              </span>
+                <span className="text-3xl font-bold text-cyan-400">
+                  £1,099
+                </span>
+              </div>
+            </div>
+
+            <div className="p-6 border rounded-2xl border-cyan-400/20 bg-white/[0.03]">
+              <p className="text-sm text-white/50">
+                Duration
+              </p>
+
+              <h3 className="mt-3 text-2xl font-semibold text-white">
+                3 Days
+              </h3>
+
+              <p className="mt-1 text-white/60">
+                Intensive Practical Training
+              </p>
+            </div>
+
+            <div className="p-6 border rounded-2xl border-cyan-400/20 bg-white/[0.03]">
+              <p className="text-sm text-white/50">
+                Certifications
+              </p>
+
+              <h3 className="mt-3 text-2xl font-semibold text-white">
+                14 Included
+              </h3>
+
+              <p className="mt-1 text-white/60">
+                Industry Recognised Certificates
+              </p>
+            </div>
+
+          </div>
+
+          {/* Course Includes */}
+          <div className="mb-12">
+            <h3 className="mb-6 text-2xl font-semibold text-white">
+              Course Includes
+            </h3>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {courseFeatures.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-4 transition-all border rounded-xl border-cyan-400/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/5"
+                >
+                  <BookOpen
+                    size={18}
+                    className="text-cyan-400"
+                  />
+
+                  <span className="text-white/90">
+                    {feature}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-white/60">
-              Duration
-            </span>
+          {/* Locations */}
+          <div>
+            <h3 className="mb-2 text-2xl font-semibold text-white">
+              Available Locations
+            </h3>
 
-            <span className="text-white">
-              3 Day Intensive Training
-            </span>
-          </div>
+            <p className="mb-6 text-white/50">
+              Select a location to view upcoming course dates.
+            </p>
 
-          <div className="flex items-center justify-between">
-            <span className="text-white/60">
-              Certifications
-            </span>
+            <div className="flex flex-wrap gap-3">
 
-            <span className="text-white">
-              14 Included
-            </span>
-          </div>
+              {courseSchedules.map((item, index) => {
+                const isActive =
+                  activeLocation?.location === item.location;
 
-        </div>
-
-        {/* Course Includes */}
-        <div className="mt-10">
-          <h3 className="mb-5 text-xl font-semibold text-white">
-            Course Includes
-          </h3>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            {courseFeatures.map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03]"
-              >
-                <BookOpen
-                  size={16}
-                  className="text-cyan-400"
-                />
-
-                <span className="text-sm text-white/80">
-                  {feature}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Locations */}
-        <div className="mt-10">
-          <h3 className="mb-2 text-xl font-semibold text-white">
-            Available Locations
-          </h3>
-
-          <p className="mb-5 text-sm text-white/40">
-            Click a location to see available dates
-          </p>
-
-          <div className="flex flex-wrap gap-3">
-            {courseSchedules.map((item, index) => {
-              const isActive =
-                activeLocation?.location === item.location;
-
-              return (
-                <button
-                  key={index}
-                  onClick={() =>
-                    handleLocationClick(item.location)
-                  }
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all
-                  ${
-                    isActive
-                      ? "bg-cyan-400/25 border-cyan-500"
-                      : "bg-cyan-400/10 border-cyan-400/20 hover:bg-cyan-400/20"
-                  }`}
-                >
-                  <MapPin
-                    size={14}
-                    className="text-cyan-400"
-                  />
-
-                  <span className="text-sm text-white">
-                    {item.location}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {activeLocation && (
-            <div className="mt-5 overflow-hidden border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
-              <div className="flex items-center justify-between px-5 py-4 border-b border-cyan-400/10">
-
-                <div className="flex items-center gap-2">
-                  <MapPin
-                    size={16}
-                    className="text-cyan-400"
-                  />
-
-                  <span className="font-medium text-white">
-                    {activeLocation.location}
-                  </span>
-
-                  <span className="text-sm text-white/40">
-                    — Upcoming Dates
-                  </span>
-                </div>
-
-                <button
-                  onClick={() =>
-                    setActiveLocation(null)
-                  }
-                  className="text-white/50 hover:text-white"
-                >
-                  <X size={16} />
-                </button>
-
-              </div>
-
-              <div className="p-4 space-y-3">
-                {activeLocation.dates.map((date, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/[0.03]"
+                return (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      handleLocationClick(item.location)
+                    }
+                    className={`flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300
+                    ${
+                      isActive
+                        ? "bg-cyan-400/20 border-cyan-400 text-white"
+                        : "border-cyan-400/20 bg-white/[0.03] hover:bg-cyan-400/10 hover:border-cyan-400/50 text-white"
+                    }`}
                   >
-                    <Calendar
+                    <MapPin
                       size={16}
                       className="text-cyan-400"
                     />
 
-                    <span className="text-white">
-                      {date}
+                    {item.location}
+                  </button>
+                );
+              })}
+            </div>
+
+            {activeLocation && (
+              <div className="p-6 mt-6 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
+
+                <div className="flex items-center justify-between pb-4 mb-5 border-b border-cyan-400/10">
+
+                  <div className="flex items-center gap-2">
+                    <MapPin
+                      size={18}
+                      className="text-cyan-400"
+                    />
+
+                    <h4 className="text-lg font-semibold text-white">
+                      {activeLocation.location}
+                    </h4>
+
+                    <span className="text-white/40">
+                      Upcoming Dates
                     </span>
                   </div>
-                ))}
+
+                  <button
+                    onClick={() =>
+                      setActiveLocation(null)
+                    }
+                    className="transition text-white/50 hover:text-white"
+                  >
+                    <X size={18} />
+                  </button>
+
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  {activeLocation.dates.map((date, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-4 border rounded-xl border-cyan-400/10 bg-white/[0.03]"
+                    >
+                      <Calendar
+                        size={18}
+                        className="text-cyan-400"
+                      />
+
+                      <span className="text-white">
+                        {date}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
               </div>
-            </div>
-          )}
+            )}
+
+          </div>
+
         </div>
-
       </div>
-    </div>
-  </div>
-);
-}
+    </section>
+  );
+};
 
-export default CourseDetails
+export default CourseDetails;
