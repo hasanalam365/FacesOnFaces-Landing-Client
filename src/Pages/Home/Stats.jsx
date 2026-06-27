@@ -79,7 +79,7 @@ const Stats = () => {
                   </div>
 
                   {/* Number */}
-                 <h3 className="text-4xl text-white font-['Cormorant_Garamond']">
+                 <h3 className="text-2xl text-white font-['Cormorant_Garamond']">
   {stat.value}
 </h3>
 

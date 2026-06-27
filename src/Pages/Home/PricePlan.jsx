@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
  const plans = [
     {
-      badge: "Best Value",
+      
       title: "Pay in Full",
       description:"One simple payment — no ongoing commitments. Unlock full course materials and lifetime access.",
       
@@ -14,15 +14,16 @@ import { useNavigate } from "react-router-dom";
       featured: false,
       features: [
         "Full course access immediately",
-        "Lifetime alumni network",
+        "Lifetime support",
         "Save £500 vs other plans",
         "Priority scheduling",
+        
         
       ],
       link: '/enroll'
     },
     {
-      badge: "Most Popular",
+      
       title: "Deposit",
       description:
         "Reserve your spot with a deposit now and pay the remaining balance before your course start date.",
@@ -35,6 +36,8 @@ import { useNavigate } from "react-router-dom";
         "Balance due 14 days before start",
         "Full course access on day one",
         "Dedicated enrollment advisor",
+         "Balance due on the day of the course ",
+        "Manuals sent out after deposit",
       ],
       link: '/deposit-enroll'
     },
@@ -48,7 +51,7 @@ import { useNavigate } from "react-router-dom";
       buttonText: "Start Subscription",
       featured: false,
       features: [
-        "12 equal monthly payments",
+       
         "Direct debit setup",
         "Signed subscription agreement",
         "Cancel terms apply",
@@ -98,15 +101,16 @@ const handleEnroll=(link)=>{
             <div
               key={index}
               className={`relative rounded-3xl p-8 flex flex-col min-h-[620px]
-              transition-all duration-500 cursor-pointer
+border border-cyan-400/30
+transition-all duration-500 cursor-pointer
               ${
-                plan.featured
-                  ? "bg-[#0f1519] border border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-4 hover:scale-[1.03] hover:shadow-[0_30px_80px_rgba(34,211,238,0.35)]"
-                  : "bg-[#0c1014] border border-gray-800 hover:-translate-y-3 hover:scale-[1.02] hover:border-cyan-400/60 hover:shadow-[0_20px_60px_rgba(34,211,238,0.15)]"
-              }`}
+  plan.featured
+    ? "bg-[#0f1519] shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-4 hover:scale-[1.03] hover:shadow-[0_30px_80px_rgba(34,211,238,0.35)]"
+    : "bg-[#0c1014] hover:-translate-y-3 hover:scale-[1.02] hover:border-cyan-400/60 hover:shadow-[0_20px_60px_rgba(34,211,238,0.15)]"
+}`}
             >
               {/* Badge */}
-              {plan.featured ? (
+              {/* {plan.featured ? (
                 <div className="absolute -translate-x-1/2 -top-3 left-1/2">
                   <span className="px-4 py-1 text-xs font-semibold text-black rounded-full bg-cyan-400">
                     {plan.badge}
@@ -116,7 +120,7 @@ const handleEnroll=(link)=>{
                 <div className="inline-flex px-4 py-1 mb-6 text-xs text-gray-300 border border-gray-700 rounded-full w-fit">
                   {plan.badge}
                 </div>
-              )}
+              )} */}
 
               {/* Content */}
               <div className={plan.featured ? "mt-6" : ""}>

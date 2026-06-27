@@ -4,29 +4,29 @@ import { motion } from "framer-motion";
 const instructors = [
   {
     id: 1,
-    name: "Dr. Alexandra Voss",
+    name: "Dr. Vahid",
     role: "Lead Instructor",
     image:
-      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=1200&auto=format&fit=crop",
-    experience: "10+ Years",
+      "https://i.ibb.co.com/F48xW4CC/Dr-Vahid.jpg",
+    experience: "7+ Years",
     specialty: "Advanced Facial Procedures",
   },
   {
     id: 2,
-    name: "Dr. Marcus Sterling",
+    name: "Dr. Mobina",
     role: "Clinical Director",
     image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1200&auto=format&fit=crop",
-    experience: "12+ Years",
+      "https://i.ibb.co.com/tTbDmTL8/mobina.jpg",
+    experience: "3+ Years",
     specialty: "Regenerative Aesthetics & Skin Science",
   },
   {
     id: 3,
-    name: "Dr. Sophia Laurence",
+    name: "Dr. Mario",
     role: "Head of Dermatology",
     image:
-      "https://images.unsplash.com/photo-1594824476967-48c8b964273f?q=80&w=1200&auto=format&fit=crop",
-    experience: "15+ Years",
+      "https://i.ibb.co.com/kgSmyHXf/Dr-mario.jpg",
+    experience: "7+ Years",
     specialty: "Dermatology & Clinical Training",
   },
 ];
