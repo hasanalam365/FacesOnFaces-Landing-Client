@@ -10,7 +10,7 @@ import GallaryShowcase from "./GallaryShowcase";
 import LearningExperience from "./LearningExperience";
 import Location from "./Location";
 import PricePlan from "./PricePlan";
-// import LeftSide from "../Enroll/LeftSide";
+import CourseDetails from "./CourseDetails";
 
 
 const Homes = () => {
@@ -20,9 +20,9 @@ const Homes = () => {
         <Banner />
       </section>
 
-{/* <section className="w-[75%] py-8 mx-auto">
-  <LeftSide/>
-</section> */}
+<section className="">
+<CourseDetails/>
+</section>
 
 
 
