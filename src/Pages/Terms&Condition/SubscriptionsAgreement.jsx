@@ -222,7 +222,7 @@ const SubscriptionsAgreement = () => {
             <ClauseList items={[
               {
                 clause: "1.1",
-                text: `This Subscription Agreement is made between <strong>Faces on Faces</strong> ("Provider"), principal place of business at Little Malgraves Hall, Lower Dunton Road, Bulphan, Upminster RM14 3TD, and the Subscriber named in the agreement. In these terms "we", "our", and "us" refer to Faces on Faces Academy, and "you" and "your" refers to the Subscriber/Student.`,
+                text: ` This Subscription Agreement ("Agreement") is made and entered into by and between:  [Faces on Faces] referred to as ("Provider"), with its principal place of business at Little malgraves hall Lower dunton road Bulphan Upminster RM143TD, and  [Name]  referred to as ("Subscriber" or "Student"), with an address at: `,
               },
             ]} />
           </SectionCard>
@@ -230,25 +230,24 @@ const SubscriptionsAgreement = () => {
           {/* 2 */}
           <SectionCard id="s2" title="2. General conditions of booking">
             <ClauseList items={[
-              { clause: "2.1", text: "Faces on Faces Academy reserves the right to decline admission to any of its training courses." },
-              { clause: "2.2", text: "The Academy reserves the right to modify or cancel scheduled training courses, including changes to dates, locations, and course content. Subscribers will be notified in advance and offered an alternative date. No refunds will be issued for changes to date, location or course content." },
-              { clause: "2.3", text: "Regardless of circumstances, Faces on Faces Academy is not liable for any loss of earnings or expenses incurred by the Subscriber or any models in the event of a course cancellation or rescheduling." },
-              { clause: "2.4", text: "You must wear suitable clinic attire at all times — scrubs or a uniform and closed-toe shoes. Denim and sportswear are not permitted. Long hair must be tied back, jewellery kept to a minimum, nails cut short. <strong>All clothing must be black in colour.</strong>" },
-              { clause: "2.5", text: "You must email two forms of ID upon making your deposit or full payment, and bring the same ID (passport or driving licence + utility bill) to the training course. You will not be permitted to train without it." },
-              { clause: "2.6", text: "If you arrive more than 45 minutes late, you may not be permitted to attend. No refund will be issued; however, a rescheduled date may be offered at the Provider's discretion." },
-              { clause: "2.7", text: "The Academy will provide at least one model per student, though this cannot always be guaranteed. If a model fails to attend, remaining models will be shared. Students are encouraged to bring their own models (must be booked in advance). The Academy is not responsible for model cancellations but will offer an alternative date for missed procedures. No liability is accepted for loss of earnings or travel expenses." },
-              { clause: "2.8", text: "Faces on Faces is a medically-led training institution — trainers include doctors, nurses, and advanced practitioners. While a specific trainer cannot be guaranteed, training quality and delivery will remain consistent and professional at all times." },
-              { clause: "2.9", text: "If a refresher course is needed more than one month after completing the original training, it may be offered at <strong>50% of the original course price</strong> and must be paid in full at time of booking. Supervised practical sessions with your own models are available at the clinic subject to a nominal fee and availability." },
+              { clause: "2.1", text: " Faces on Faces Academy reserves the right to decline admission to any of its training courses. " },
+              { clause: "2.2", text: "Faces on Faces Academy reserves the right to modify or cancel scheduled training courses, including changes to dates, locations, and course content. Subscribers will be notified in advance of any such changes and offered an alternative date. No refunds will be issued for changes to the date, location, or course content.  " },
+              { clause: "2.3", text: " Regardless of the circumstances, Faces on Faces Academy is not liable for any loss of earnings or expenses incurred by the Subscriber or any models in the event of a course cancellation or rescheduling. " },
+              { clause: "2.4", text: " Subscribers must wear appropriate clinic attire at all times while in the training academy, including scrubs or a uniform and closed-toe shoes. Denim and sportswear are not permitted.  Long hair must be tied back, jewelry should be kept to a minimum, and nails must be short. Additionally, all clothing worn by the Subscriber must be black in color" },
+              { clause: "2.5", text: "Subscriber must email two forms of ID to the Provider on making their deposit or full payment, Subscriber must also bring the same ID such as a passport or driving license for picture ID and a utility bill for address ID, to the training course. Subscriber will not be permitted to train on the premises without it. " },
+              { clause: "2.6", text: " If the Subscriber arrives more than 45 minutes late for the course start time, they may not be permitted to attend. No refund will be issued; however, a rescheduled date may be offered at the Provider's discretion. " },
+              { clause: "2.7", text: " Faces on Faces Academy will provide at least one model per student; however, this cannot always be guaranteed, as models occasionally book but fail to attend. In such cases, the remaining models will be shared among students. If this is not satisfactory or if additional models are required, students are encouraged to bring their own models, which must be booked in advance. Faces on Faces Academy is not responsible for any cancellations by models. However, if a cancellation occurs, an alternative date will be offered for the missed procedures. The academy will not be held liable for any loss of earnings or travel expenses incurred due to rescheduling.   " },
+              { clause: "2.8", text: "Faces on Faces Academy is a medically-led training institution where trainers include doctors, nurses, and advanced practitioners. While we cannot guarantee which specific trainer will be assigned to the Subscriber on the day of their training, Faces on Faces will assure that all training will be delivered at the highest standard. Regardless of the trainer, the quality and level of instruction will remain consistent and professional." },
+              { clause: "2.9", text: "If a Subscriber wishes to undertake a refresher course more than one month after completing their original training, this may be offered at 50% of the original course price. Payment for the refresher must be made in full at the time of booking and cannot be included within the ongoing subscription payment plan. Subscribers may, as an optional support service, arrange to bring their own models to the clinic for supervised practical sessions. These sessions shall be conducted under the supervision of a qualified member of the Faces on Faces Academy team. Participation in such sessions shall be subject to a nominal fee, and all bookings must be made in advance through a designated representative of the Faces on Faces Academy. This service is offered solely at the discretion of the Academy and is subject to availability.  " },
             ]} />
           </SectionCard>
 
           {/* 3 */}
-          <SectionCard id="s3" title="3. Subscription terms & course access" muted>
+          <SectionCard id="s3" title="3. Subscription Terms  " muted>
             <ClauseList items={[
               {
                 clause: "3.1",
-                text: "By enrolling, the Subscriber joins a monthly subscription plan for the <strong>Fast Track Course</strong>, which includes: Fast Track Infection Control, Safety in Medicine, Anatomy & Physiology Level 3, Complications Management, Health and Safety, Microneedling, Skin Booster, Lumi Eye, Polynucleotide, Fat Dissolver, B12, Foundation Dermal Filler, Use of Hyaluronidase, and Foundation Anti-Wrinkle. Access is granted subject to these terms.",
-              },
+                text: " The Subscriber agrees to enroll in a monthly subscription plan for access to training courses provided by the Provider, Faces on Faces Academy. Under this agreement, the Subscriber is enrolled in the following courses: Fast Track Course, which includes the following modules as part of the Course:  "},
               {
                 clause: "3.2",
                 text: "An initial fee of <strong>£250</strong> is due upon signing, covering administrative costs, model arrangements, and account setup. The first monthly instalment of <strong>£100</strong> is also payable in advance. Thereafter, <strong>£100/month</strong> is collected via direct debit through GoCardless on a set monthly date.",
