@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { BookOpen, Calendar, MapPin, X } from "lucide-react";
+import { BookOpen } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const courseFeatures = [
   "Infection Control",
@@ -18,44 +19,12 @@ const courseFeatures = [
   "Use of Hyaluronidase",
 ];
 
-const courseSchedules = [
-  {
-    location: "London",
-    dates: ["3rd–5th October", "7th–9th November"],
-  },
-  {
-    location: "Upminster",
-    dates: ["17th–19th October"],
-  },
-  {
-    location: "Edinburgh",
-    dates: ["21st–23rd November"],
-  },
-  {
-    location: "Belfast",
-    dates: ["10th–12th October"],
-  },
-  
-  {
-    location: "Dublin",
-    dates: ["31st Oct–3rd Nov"],
-  },
-];
+
 
 const CourseDetails = () => {
   const [activeLocation, setActiveLocation] = useState(null);
 
-  const handleLocationClick = (locationName) => {
-    const found = courseSchedules.find(
-      (s) => s.location === locationName
-    );
-
-    if (!found) return;
-
-    setActiveLocation(
-      activeLocation?.location === locationName ? null : found
-    );
-  };
+  
 
   return (
     <section className="py-20">
@@ -156,100 +125,14 @@ const CourseDetails = () => {
             </div>
           </div>
 
-          {/* Locations */}
-          <div>
-            <h3 className="mb-2 text-2xl font-semibold text-white">
-              Available Locations
-            </h3>
-
-            <p className="mb-6 text-white/50">
-              Select a location to view upcoming course dates.
-            </p>
-
-            <div className="flex flex-wrap gap-3">
-
-              {courseSchedules.map((item, index) => {
-                const isActive =
-                  activeLocation?.location === item.location;
-
-                return (
-                  <button
-                    key={index}
-                    onClick={() =>
-                      handleLocationClick(item.location)
-                    }
-                    className={`flex items-center gap-2 px-5 py-3 rounded-full border transition-all duration-300
-                    ${
-                      isActive
-                        ? "bg-cyan-400/20 border-cyan-400 text-white"
-                        : "border-cyan-400/20 bg-white/[0.03] hover:bg-cyan-400/10 hover:border-cyan-400/50 text-white"
-                    }`}
-                  >
-                    <MapPin
-                      size={16}
-                      className="text-cyan-400"
-                    />
-
-                    {item.location}
-                  </button>
-                );
-              })}
-            </div>
-
-            {activeLocation && (
-              <div className="p-6 mt-6 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
-
-                <div className="flex items-center justify-between pb-4 mb-5 border-b border-cyan-400/10">
-
-                  <div className="flex items-center gap-2">
-                    <MapPin
-                      size={18}
-                      className="text-cyan-400"
-                    />
-
-                    <h4 className="text-lg font-semibold text-white">
-                      {activeLocation.location}
-                    </h4>
-
-                    <span className="text-white/40">
-                      Upcoming Dates
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      setActiveLocation(null)
-                    }
-                    className="transition text-white/50 hover:text-white"
-                  >
-                    <X size={18} />
-                  </button>
-
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  {activeLocation.dates.map((date, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-4 border rounded-xl border-cyan-400/10 bg-white/[0.03]"
-                    >
-                      <Calendar
-                        size={18}
-                        className="text-cyan-400"
-                      />
-
-                      <span className="text-white">
-                        {date}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            )}
-
-          </div>
-
+        <div className="flex justify-center mt-10">
+  <Link
+    to="/subscription-enroll"
+    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-black transition-all duration-300 bg-cyan-400 rounded-xl hover:bg-cyan-300 hover:scale-105"
+  >
+    Enroll Now
+  </Link>
+</div>
         </div>
       </div>
     </section>
