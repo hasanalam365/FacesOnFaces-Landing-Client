@@ -222,7 +222,7 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
                         ? "bg-[#0f1519] border border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-3 hover:scale-[1.02] hover:shadow-[0_20px_60px_rgba(34,211,238,0.3)]"
                         : selectedPlan === plan.id
                         ? "bg-[#0c1014] border border-cyan-400 scale-[1.02]"
-                        : "bg-[#0c1014] border  border-gray-800 hover:-translate-y-2 hover:scale-[1.01] hover:border-cyan-400/60 hover:shadow-[0_12px_40px_rgba(34,211,238,0.12)]"
+                        : "bg-[#0c1014] border border-cyan-400 hover:-translate-y-2 hover:scale-[1.01] hover:border-cyan-400/60 hover:shadow-[0_12px_40px_rgba(34,211,238,0.12)]"
                     }`}
                 >
                  
