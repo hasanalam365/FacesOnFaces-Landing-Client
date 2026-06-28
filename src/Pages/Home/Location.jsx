@@ -6,7 +6,7 @@ const locations = [
   "UPMINSTER",
   "EDINBURGH",
   "BELFAST",
-  "GLASGOW",
+  
   "DUBLIN",
 ];
 

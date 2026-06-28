@@ -4,7 +4,7 @@ import { BookOpen, Calendar, MapPin, X } from "lucide-react";
 const courseFeatures = [
   "Infection Control",
   "Safety in Medicine",
-  "Anatomy & Physiology Level 3",
+  "Anatomy and Physiology",
   "Complications Management",
   "Health & Safety",
   "Skin Booster",
@@ -35,10 +35,7 @@ const courseSchedules = [
     location: "Belfast",
     dates: ["10th–12th October"],
   },
-  {
-    location: "Glasgow",
-    dates: ["28th–30th November"],
-  },
+  
   {
     location: "Dublin",
     dates: ["31st Oct–3rd Nov"],
@@ -101,6 +98,7 @@ const CourseDetails = () => {
                   £1,099
                 </span>
               </div>
+             <p className="mt-1 text-white/60">For a limited time only</p>
             </div>
 
             <div className="p-6 border rounded-2xl border-cyan-400/20 bg-white/[0.03]">
@@ -127,7 +125,7 @@ const CourseDetails = () => {
               </h3>
 
               <p className="mt-1 text-white/60">
-                Industry Recognised Certificates
+                Industry recognised CPD certificates
               </p>
             </div>
 

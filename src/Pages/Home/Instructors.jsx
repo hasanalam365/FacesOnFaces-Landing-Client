@@ -12,7 +12,7 @@ const instructors = [
   },
   {
     id: 2,
-    name: "Dr. Mobina",
+    name: "Mobina",
     
     image:
       "https://i.ibb.co.com/tTbDmTL8/mobina.jpg",

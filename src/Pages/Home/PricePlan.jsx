@@ -162,12 +162,9 @@ transition-all duration-500 cursor-pointer
 
               {/* Button */}
               <button onClick={()=>handleEnroll(plan?.link)}
-                className={`mt-auto w-full py-4 rounded-full flex items-center justify-center gap-2 font-medium transition-all duration-300 ${
-                  plan.featured
-                    ? "bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
-                    : "border border-gray-700 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300"
-                }`}
-              >
+                className={`mt-auto w-full py-4 rounded-full flex items-center justify-center gap-2 font-medium 
+                  transition-all duration-300 bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] `}
+              > 
                 {plan.buttonText}
                 <ArrowRight size={18} />
               </button>

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 const courseFeatures = [
   "Infection Control",
   "Safety in Medicine",
-  "Anatomy & Physiology Level 3",
+  "Anatomy & Physiology",
   "Complications Management",
   "Health & Safety",
   "Skin Booster",
@@ -44,12 +44,7 @@ const courseSchedules = [
       "10th–12th October",
     ],
   },
-  {
-    location: "Glasgow",
-    dates: [
-      "28th–30th November",
-    ],
-  },
+  
   {
     location: "Dublin",
     dates: [
