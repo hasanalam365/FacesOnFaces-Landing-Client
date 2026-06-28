@@ -59,26 +59,50 @@ const ClauseList = ({ items }) => (
       <li key={i} style={{ fontSize: "13.5px", lineHeight: "1.8", color: "#475569" }}>
         <span style={{ fontWeight: 500, color: "#0f172a", marginRight: "5px" }}>{item.clause}</span>
         <span dangerouslySetInnerHTML={{ __html: item.text }} />
-        {item.sub && (
-          <ul
-            style={{
-              listStyle: "none",
-              padding: "8px 0 0 16px",
-              marginTop: "8px",
-              borderLeft: "2px solid #e2e8f0",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            {item.sub.map((s, j) => (
-              <li key={j} style={{ fontSize: "13px", lineHeight: "1.8", color: "#64748b" }}>
-                <span style={{ fontWeight: 500, color: "#475569", marginRight: "5px" }}>{s.clause}</span>
-                <span dangerouslySetInnerHTML={{ __html: s.text }} />
-              </li>
-            ))}
-          </ul>
-        )}
+       {item.bulletList && (
+  <div
+    style={{
+      marginTop: "12px",
+      padding: "14px 16px",
+      border: "1px solid #cbd5e1",
+      borderRadius: "10px",
+      background: "#f8fafc",
+    }}
+  >
+    <div
+      style={{
+        fontWeight: 600,
+        color: "#0f172a",
+        marginBottom: "10px",
+      }}
+    >
+      Fast Track Course
+    </div>
+
+    <ul
+      style={{
+        margin: 0,
+        paddingLeft: "20px",
+        display: "grid",
+        gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+        gap: "6px 24px",
+      }}
+    >
+      {item.bulletList.map((course, index) => (
+        <li
+          key={index}
+          style={{
+            color: "#475569",
+            fontSize: "13px",
+            lineHeight: "1.8",
+          }}
+        >
+          {course}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
       </li>
     ))}
   </ul>
@@ -245,13 +269,26 @@ const SubscriptionsAgreement = () => {
           {/* 3 */}
           <SectionCard id="s3" title="3. Subscription Terms  " muted>
             <ClauseList items={[
-              {
-                clause: "3.1",
-                text: " The Subscriber agrees to enroll in a monthly subscription plan for access to training courses provided by the Provider, Faces on Faces Academy. Under this agreement, the Subscriber is enrolled in the following courses: Fast Track Course, which includes the following modules as part of the Course:  "},
-              {
-                clause: "3.2",
-                text: "An initial fee of <strong>£250</strong> is due upon signing, covering administrative costs, model arrangements, and account setup. The first monthly instalment of <strong>£100</strong> is also payable in advance. Thereafter, <strong>£100/month</strong> is collected via direct debit through GoCardless on a set monthly date.",
-              },
+             {
+  clause: "3.1",
+  text: "The Subscriber agrees to enroll in a monthly subscription plan for access to training courses provided by the Provider, Faces on Faces Academy. Under this agreement, the Subscriber is enrolled in the following course:",
+  bulletList: [
+    "Infection Control",
+    "Safety in Medicine",
+    "Anatomy & Physiology Level 3",
+    "Complications Management",
+    "Health & Safety",
+    "Microneedling",
+    "Skin Booster",
+    "Lumi Eye",
+    "Polynucleotide",
+    "Fat Dissolver",
+    "Vitamin B12",
+    "Foundation Dermal Filler",
+    "Use of Hyaluronidase",
+    "Foundation Anti-Wrinkle",
+  ],
+},
               {
                 clause: "3.3",
                 text: "<strong>Right to cancel (Consumer Contracts Regulations 2013)</strong> — Subscribers who sign via distance means have the right to cancel within <strong>14 days</strong> from the date of signing without giving any reason, by emailing support@facesonfaces.com. A full refund will be issued provided no part of the course has been accessed or attended. If digital content has been accessed prior to cancellation, this right may be forfeited under Regulation 37. To delay receipt of course manuals until after the 14-day period, you must notify us in writing immediately after payment.",
