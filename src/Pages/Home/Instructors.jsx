@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const instructors = [
   {
     id: 1,
-    name: "Dr. Vahid",
+    name: "Doctor Vahid",
    
     image:
       "https://i.ibb.co.com/F48xW4CC/Dr-Vahid.jpg",
@@ -12,7 +12,7 @@ const instructors = [
   },
   {
     id: 2,
-    name: "Mobina",
+    name: " Advanced Practitioner Mobina",
     
     image:
       "https://i.ibb.co.com/tTbDmTL8/mobina.jpg",
@@ -20,7 +20,7 @@ const instructors = [
   },
   {
     id: 3,
-    name: "Dr. Mario",
+    name: "Doctor Mario",
     
     image:
       "https://i.ibb.co.com/kgSmyHXf/Dr-mario.jpg",

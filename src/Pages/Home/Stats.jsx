@@ -24,13 +24,7 @@ const stats = [
     icon: ShieldCheck,
     value: "100%",
     label: "Industry Certified",
-  },
-  {
-    id: 4,
-    icon: GraduationCap,
-    value: "25+",
-    label: "Expert Trainers",
-  },
+  }
 ];
 
 const Stats = () => {
@@ -42,7 +36,7 @@ const Stats = () => {
       </div>
 
       <div className="relative z-10 px-6 mx-auto max-w-7xl lg:px-10">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat) => {
             const Icon = stat.icon;
 

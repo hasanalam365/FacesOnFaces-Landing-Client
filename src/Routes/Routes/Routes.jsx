@@ -11,6 +11,7 @@ import CookiePolicy from "../../Pages/CookiePolicy/CookiePolicy";
 import RefundPolicy from "../../Pages/RefundPolicy/RefundPolicy";
 import DepositEnroll from "../../Pages/Enroll/DepositEnroll";
 import SubscriptionEnroll from "../../Pages/Enroll/SubscriptionEnroll";
+import SubscriptionsAgreement from "../../Pages/Terms&Condition/SubscriptionsAgreement";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: '/terms-and-conditions',
         element: <TermsAndCondition/>
+      },
+      {
+        path: '/subscription-agreement',
+        element: <SubscriptionsAgreement/>
       },
       {
         path: '/privacy-policy',

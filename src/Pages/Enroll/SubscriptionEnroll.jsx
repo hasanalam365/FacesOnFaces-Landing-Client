@@ -6,6 +6,7 @@ import {
 import PaymentForm from "../../Components/PaymentForm";
 import IdentityVerification from "../../Components/IdentityVerification";
 import AgreementStatus from "../../Components/AgreementStatus";
+import { Link } from "react-router-dom";
 
 
 const steps = [
@@ -94,6 +95,7 @@ const SubscriptionEnroll = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  
 
   // Collected data across steps
   const [identityData, setIdentityData] = useState(null);
@@ -286,14 +288,43 @@ const SubscriptionEnroll = () => {
                 <label className="block mb-2 text-sm text-white/70">First Payment</label>
                 <input type="text" value="£250 — First Payment" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
               </div>
+
+              <div className="flex items-start gap-3 mt-5">
+  <input
+    type="checkbox"
+    id="terms"
+    checked={isTermsAccepted}
+    onChange={(e) => setIsTermsAccepted(e.target.checked)}
+    className="w-4 h-4 mt-1 cursor-pointer accent-cyan-400"
+  />
+
+  <label
+    htmlFor="subscription-agreement"
+    className="text-sm leading-6 cursor-pointer text-white/60"
+  >
+    I have read and agree to the{" "}
+    <Link
+      to="/subscription-agreement"
+      target="_blank"
+      className="font-medium underline transition-colors text-cyan-400 underline-offset-2 hover:text-cyan-300"
+    >
+      Subscription Agreement
+    </Link>
+    .
+  </label>
+</div>
             </form>
-            <button
-              type="button"
-              onClick={handleFormNext}
-              className="w-full py-4 mt-5 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
-            >
-              Continue to Identity Verification →
-            </button>
+           <button
+  type="submit"
+  disabled={!isTermsAccepted}
+  className={`w-full rounded-xl py-3 font-medium transition-all ${
+    isTermsAccepted
+      ? "bg-cyan-400 text-black hover:bg-cyan-300"
+      : "cursor-not-allowed bg-gray-700 text-gray-400"
+  }`}
+>
+  Continue to Identity Verification →
+</button>
           </>
         )}
 
