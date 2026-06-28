@@ -18,7 +18,7 @@ import LeftSide from "./LeftSide";
 const plans = [
   {
     id: "full",
-    badge: "Best Value",
+   
     title: "Pay in Full",
     description:
       "One simple payment — no ongoing commitments. Unlock full course materials and lifetime access.",
@@ -28,14 +28,14 @@ const plans = [
     featured: false,
     features: [
       "Full course access immediately",
-      "Lifetime alumni network",
+      "Lifetime Support",
       "Save £500 vs other plans",
       "Priority scheduling",
     ],
   },
   {
     id: "deposit",
-    badge: "Most Popular",
+    
     title: "Deposit",
     description:
       "Reserve your spot with a deposit now and pay the remaining balance before your course start date.",
@@ -48,11 +48,13 @@ const plans = [
       "Balance due 14 days before start",
       "Full course access on day one",
       "Dedicated enrollment advisor",
+      "Balance due on the day of the course",
+      "Manuals sent out after deposit"
     ],
   },
   {
     id: "subscription",
-    badge: "Flexible",
+   
     title: "Subscription",
     description:
       "Spread the cost with a monthly direct debit. Requires a signed subscription agreement before enrolment.",
@@ -214,27 +216,16 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
                 <div
                   key={plan.id}
                   className={`relative rounded-3xl p-7 flex flex-col
-                    transition-all duration-500 cursor-pointer
+                    transition-all duration-500 cursor-pointer border border-cyan-400
                     ${
                       plan.featured
                         ? "bg-[#0f1519] border border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-3 hover:scale-[1.02] hover:shadow-[0_20px_60px_rgba(34,211,238,0.3)]"
                         : selectedPlan === plan.id
                         ? "bg-[#0c1014] border border-cyan-400 scale-[1.02]"
-                        : "bg-[#0c1014] border border-gray-800 hover:-translate-y-2 hover:scale-[1.01] hover:border-cyan-400/60 hover:shadow-[0_12px_40px_rgba(34,211,238,0.12)]"
+                        : "bg-[#0c1014] border  border-gray-800 hover:-translate-y-2 hover:scale-[1.01] hover:border-cyan-400/60 hover:shadow-[0_12px_40px_rgba(34,211,238,0.12)]"
                     }`}
                 >
-                  {/* Badge */}
-                  {plan.featured ? (
-                    <div className="absolute -translate-x-1/2 -top-3 left-1/2">
-                      <span className="px-4 py-1 text-xs font-semibold text-black rounded-full bg-cyan-400">
-                        {plan.badge}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="inline-flex px-4 py-1 mb-5 text-xs text-gray-300 border border-gray-700 rounded-full w-fit">
-                      {plan.badge}
-                    </div>
-                  )}
+                 
 
                   <div className={plan.featured ? "mt-5" : ""}>
                     <h3 className="mb-2 text-xl font-medium text-white">
@@ -277,7 +268,7 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
                     className={`mt-auto w-full py-3.5 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all duration-300 ${
                       plan.featured
                         ? "bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
-                        : "border border-gray-700 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300 text-white"
+                        : "bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
                     }`}
                   >
                     {plan.buttonText}
