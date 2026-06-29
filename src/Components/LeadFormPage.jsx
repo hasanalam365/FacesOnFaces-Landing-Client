@@ -10,6 +10,7 @@ import {
   Loader2,
   CheckCircle2,
   ArrowLeft,
+  ChevronDown,
 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -213,26 +214,61 @@ const LeadFormPage = ({ onBack }) => {
 
              
 
-              {/* Best Time */}
-              <div>
-                <label className="block mb-2 text-sm text-gray-300">
-                  Best Time To Call
-                </label>
-                <div className="flex items-center px-4 border rounded-xl border-white/10 bg-white/5">
-                  <Clock size={18} className="shrink-0 text-cyan-400" />
-                  <input
-                    type="text"
-                    name="bestTime"
-                    value={formData.bestTime}
-                    onChange={handleChange}
-                    placeholder="Tomorrow after 4 PM"
-                    className="w-full px-3 py-4 text-white bg-transparent outline-none"
-                  />
-                </div>
-                {errors.bestTime && (
-                  <p className="mt-2 text-sm text-red-400">{errors.bestTime}</p>
-                )}
-              </div>
+             
+{/* Best Time */}
+<div>
+  <label className="block mb-2 text-sm text-gray-300">
+    Best Time To Call
+  </label>
+
+  <div className="relative flex items-center px-4 border rounded-xl border-white/10 bg-white/5">
+  <Clock size={18} className="shrink-0 text-cyan-400" />
+
+  <select
+    name="bestTime"
+    value={formData.bestTime}
+    onChange={handleChange}
+    className="w-full px-3 py-4 pr-10 text-white bg-transparent outline-none appearance-none cursor-pointer"
+  >
+      <option value="" className="bg-[#091017]">
+        Select a time Slot
+      </option>
+
+      <option value="09:00 - 11:00" className="bg-[#091017]">
+        09:00 - 11:00
+      </option>
+
+      <option value="11:00 - 13:00" className="bg-[#091017]">
+        11:00 - 13:00
+      </option>
+
+      <option value="13:00 - 15:00" className="bg-[#091017]">
+        13:00 - 15:00
+      </option>
+
+      <option value="15:00 - 17:00" className="bg-[#091017]">
+        15:00 - 17:00
+      </option>
+
+      <option value="17:00 - 19:00" className="bg-[#091017]">
+        17:00 - 19:00
+      </option>
+
+      <option value="19:00 - 21:00" className="bg-[#091017]">
+        19:00 - 21:00
+      </option>
+    </select>
+    <ChevronDown
+    size={18}
+    className="absolute text-gray-400 pointer-events-none right-4"
+  />
+  </div>
+
+  {errors.bestTime && (
+    <p className="mt-2 text-sm text-red-400">{errors.bestTime}</p>
+  )}
+</div>
+
 
               {/* Message */}
               <div>
