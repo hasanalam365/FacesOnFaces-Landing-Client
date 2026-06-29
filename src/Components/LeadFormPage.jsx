@@ -266,7 +266,7 @@ const LeadFormPage = ({ onBack }) => {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="I'm interested in Level 7 Aesthetic Training..."
+                    placeholder="I'm interested in  Aesthetic Training..."
                     className="w-full text-white bg-transparent outline-none resize-none"
                   />
                 </div>
