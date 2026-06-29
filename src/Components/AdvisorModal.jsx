@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  MessageCircle,
-  Phone,
-  X,
-  ChevronRight,
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {MessageCircle,Phone,X,ChevronRight,} from "lucide-react";
 
-import LeadFormPage from "./LeadFormPage";
 
 const WHATSAPP_NUMBER = "+447308888874";
 
@@ -35,6 +30,7 @@ const modalVariants = {
 const AdvisorModal = ({ open, onClose }) => {
   const modalRef = useRef(null);
   const [showLeadForm, setShowLeadForm] = useState(false);
+const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
@@ -73,24 +69,9 @@ const AdvisorModal = ({ open, onClose }) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
   };
 
-  // ── Lead Form Page (full-screen overlay) ──
-  if (showLeadForm) {
-    return (
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            variants={backdropVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            className="fixed inset-0 z-[999] overflow-y-auto bg-black/70 backdrop-blur-md"
-          >
-            <LeadFormPage onBack={() => setShowLeadForm(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    );
-  }
+const handleNavigate=()=>{
+  navigate('/lead-form')
+}
 
   // ── Advisor Choice Modal ──
   return (
@@ -190,7 +171,7 @@ const AdvisorModal = ({ open, onClose }) => {
                       possible.
                     </p>
                     <button
-                      onClick={() => setShowLeadForm(true)}
+                      onClick={handleNavigate}
                       className="flex items-center justify-center w-full gap-2 px-5 py-3 mt-8 font-medium text-black transition rounded-xl bg-cyan-400 hover:bg-cyan-300"
                     >
                       Leave My Details

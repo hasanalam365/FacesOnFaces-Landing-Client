@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import { BookOpen, ChevronDown } from "lucide-react";
+import { BookOpen, ChevronDown, MessageCircle,ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import {  X } from "lucide-react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import AdvisorModal from "../../Components/AdvisorModal";
+
 
 const courseFeatures = [
   {
@@ -65,15 +69,23 @@ const courseFeatures = [
 
 
 const CourseDetails = () => {
-  const [activeLocation, setActiveLocation] = useState(null);
+
   const [openIndex, setOpenIndex] = useState(0);
   const [selectedCourse, setSelectedCourse] = useState(null);
+ const [advisorModalOpen, setAdvisorModalOpen] = useState(false);
+ const navigate = useNavigate();
 
 const toggleAccordion = (index) => {
   setOpenIndex(openIndex === index ? null : index);
 };
 
   
+
+const handleEnroll = () => {
+  navigate("/enroll");
+};
+
+
 
   return (
     <section className="py-20">
@@ -175,13 +187,38 @@ const toggleAccordion = (index) => {
   </div>
 </div>
 
-        <div className="flex justify-center mt-10">
-  <Link
-    to="/enroll"
-    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-black transition-all duration-300 bg-cyan-400 rounded-xl hover:bg-cyan-300 hover:scale-105"
+      <div className="flex flex-col items-center justify-center gap-5 mt-12 sm:flex-row">
+
+  {/* Enroll */}
+  <motion.button
+    onClick={handleEnroll}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.97 }}
+    className="flex items-center gap-3 px-8 py-4 font-medium text-black transition-all rounded-full group bg-cyan-400 hover:bg-cyan-300"
   >
     Enroll Now
-  </Link>
+
+    <ArrowRight
+      size={18}
+      className="transition-transform duration-300 group-hover:translate-x-1"
+    />
+  </motion.button>
+
+  {/* Talk To Advisor */}
+  <motion.button
+    onClick={() => setAdvisorModalOpen(true)}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.97 }}
+    className="flex items-center gap-3 px-8 py-4 font-medium text-white transition-all border rounded-full group border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-white/10"
+  >
+    <MessageCircle
+      size={18}
+      className="text-cyan-400"
+    />
+
+    Talk To Advisor
+  </motion.button>
+
 </div>
         </div>
       </div>
@@ -229,6 +266,11 @@ const toggleAccordion = (index) => {
     </div>
   </div>
 )}
+
+<AdvisorModal
+  open={advisorModalOpen}
+  onClose={() => setAdvisorModalOpen(false)}
+/>
     </section>
   );
 };
