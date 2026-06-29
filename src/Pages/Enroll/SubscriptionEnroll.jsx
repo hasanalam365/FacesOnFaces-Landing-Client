@@ -378,8 +378,8 @@ const SubscriptionEnroll = () => {
                   />
                   <label htmlFor="sub-terms" className="text-sm leading-relaxed cursor-pointer text-white/60">
                     I have read and agree to the{" "}
-                    <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer" className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2">
-                      Terms & Conditions
+                    <a href="/subscription-agreement" target="_blank" rel="noopener noreferrer" className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2">
+                     Subscription Agreement
                     </a>{" "}
                     and understand that a signed subscription agreement is required before enrollment is confirmed.
                   </label>

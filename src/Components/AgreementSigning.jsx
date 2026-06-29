@@ -4,31 +4,9 @@ import { CheckCircle2, RotateCcw, PenLine } from "lucide-react";
 const AGREEMENT_TEXT = `SUBSCRIPTION AGREEMENT
 Faces On Faces Academy
 
-This Subscription Agreement ("Agreement") is entered into between Faces On Faces Academy ("Academy") and the undersigned student ("Subscriber").
+ Please read subscripton agreement after payment  
 
-1. COURSE ENROLLMENT
-The Subscriber agrees to enroll in the 14 Certificate Fast-Track Course provided by Faces On Faces Academy.
-
-2. PAYMENT TERMS
-2.1 The Subscriber agrees to pay an initial payment of £250 upon signing this agreement.
-2.2 The Subscriber agrees to pay £100 per month for the remaining 11 months.
-2.3 Total course fee: £1,350.
-
-3. CANCELLATION POLICY
-3.1 The Subscriber may cancel within 14 days of signing for a full refund of the initial payment.
-3.2 After 14 days, the initial payment is non-refundable.
-3.3 Monthly payments already made are non-refundable.
-
-4. ACADEMY OBLIGATIONS
-4.1 Faces On Faces Academy will provide full course access from the confirmed start date.
-4.2 The Academy will assign a qualified trainer for all sessions.
-4.3 If a session is cancelled by the Academy, an alternative date will be offered.
-
-5. DIRECT DEBIT
-5.1 The Subscriber authorises Faces On Faces Academy to collect £100 monthly via direct debit for 11 months following the initial payment.
-
-6. AGREEMENT
-By signing below, the Subscriber confirms they have read, understood, and agreed to all terms of this Subscription Agreement.`;
+`;
 
 const SignaturePad = ({ onSigned }) => {
   const canvasRef = useRef(null);
