@@ -47,7 +47,7 @@ const Banner = () => {
 
             <h1 className="max-w-xl text-5xl font-light leading-tight text-white md:text-6xl lg:text-7xl">
               14
-              <br />
+           
               <span className="italic text-cyan-300">Certificate</span>
               <br />
               Fast-Track
@@ -56,9 +56,8 @@ const Banner = () => {
             </h1>
 
             <p className="max-w-md mt-8 mb-5 text-base leading-relaxed text-gray-400">
-              Professional training programs designed to help
-              ambitious students launch successful careers in
-              aesthetics and beauty.
+              • Successful careers in
+              aesthetics •
             </p>
 
             

@@ -6,6 +6,7 @@ import {
 import PaymentForm from "../../Components/PaymentForm";
 import IdentityVerification from "../../Components/IdentityVerification";
 import AgreementStatus from "../../Components/AgreementStatus";
+import AgreementSigning from "../../Components/AgreementSigning";
 
 
 const steps = [
@@ -150,44 +151,66 @@ const SubscriptionEnroll = () => {
 
   // Step 2 → Step 3: identity verified, send agreement via backend
   const handleIdentityConfirmed = async (data) => {
-    if (!data) return; // user clicked "Change"
-    setIdentityData(data);
-    setErrorMsg("");
+  if (!data) return;
+  setIdentityData(data);
+  setErrorMsg("");
 
-    try {
-      const body = new FormData();
-      body.append("name", formSnapshot.name);
-      body.append("email", formSnapshot.email);
-      body.append("phone", formSnapshot.phone);
-      body.append("documentType", data.documentType);
-      if (data.documentNumber) body.append("documentNumber", data.documentNumber);
-      body.append("frontFile", data.frontFile);
-      if (data.backFile) body.append("backFile", data.backFile);
+  try {
+    const body = new FormData();
+    body.append("name", formSnapshot.name);
+    body.append("email", formSnapshot.email);
+    body.append("phone", formSnapshot.phone);
+    body.append("documentType", data.documentType);
+    if (data.documentNumber) body.append("documentNumber", data.documentNumber);
+    body.append("frontFile", data.frontFile);
+    if (data.backFile) body.append("backFile", data.backFile);
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/create-subscription-pre-enrollment`,
-        { method: "POST", body }
-      );
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/create-subscription-pre-enrollment`,
+      { method: "POST", body }
+    );
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Failed to send agreement");
-      }
-
-      const result = await res.json();
-      if (!result.enrollmentId) throw new Error("No enrollment ID returned");
-      setEnrollmentId(result.enrollmentId);
-      setStep(STEP_AGREEMENT);
-    } catch (err) {
-      setErrorMsg(err.message || "Could not send agreement. Please try again.");
-      setIdentityData(null);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to create enrollment");
     }
-  };
+
+    const result = await res.json();
+    if (!result.enrollmentId) throw new Error("No enrollment ID returned");
+    setEnrollmentId(result.enrollmentId);
+    setStep(STEP_AGREEMENT); // Agreement signing step এ যাবে
+  } catch (err) {
+    setErrorMsg(err.message || "Something went wrong. Please try again.");
+    setIdentityData(null);
+  }
+};
 
   // Step 3 → Step 4: agreement signed
-  const handleAgreementSigned = () => {
+ const handleAgreementSigned = async (signatureDataUrl) => {
+  try {
+    setErrorMsg("");
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/save-subscription-signature`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          enrollmentId,
+          signature: signatureDataUrl,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to save signature");
+    }
+
     setTimeout(() => setStep(STEP_PAYMENT), 1200);
-  };
+  } catch (err) {
+    setErrorMsg(err.message || "Could not save signature. Please try again.");
+  }
+};
 
   // Step 4: payment success → enrollment complete
   const handlePaymentSuccess = async (paymentIntentId) => {
@@ -321,13 +344,13 @@ const SubscriptionEnroll = () => {
           </div>
         )}
 
-        {/* Step 3: Waiting for agreement signature */}
-        {step === STEP_AGREEMENT && enrollmentId && (
-          <AgreementStatus
-            enrollmentId={enrollmentId}
-            onSigned={handleAgreementSigned}
-          />
-        )}
+        {/* Step 3: Agreement signing */}
+{step === STEP_AGREEMENT && enrollmentId && (
+  <AgreementSigning
+    studentName={formSnapshot?.name}
+    onSigned={handleAgreementSigned}
+  />
+)}
 
         {/* Step 4: Payment */}
         {step === STEP_PAYMENT && (
