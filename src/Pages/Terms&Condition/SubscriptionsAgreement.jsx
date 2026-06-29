@@ -290,9 +290,34 @@ const SubscriptionsAgreement = () => {
   ],
 },
               {
-                clause: "3.3",
-                text: "<strong>Right to cancel (Consumer Contracts Regulations 2013)</strong> — Subscribers who sign via distance means have the right to cancel within <strong>14 days</strong> from the date of signing without giving any reason, by emailing support@facesonfaces.com. A full refund will be issued provided no part of the course has been accessed or attended. If digital content has been accessed prior to cancellation, this right may be forfeited under Regulation 37. To delay receipt of course manuals until after the 14-day period, you must notify us in writing immediately after payment.",
+                clause: "",
+                text: "Access to these modules is granted as part of the subscription model, subject to the terms and conditions outlined in this agreement.  ",
               },
+              {
+                clause: "3.2",
+                text: " The Subscriber agrees to pay an initial fee of £250 GBP upon signing this agreement, which covers administrative costs, model arrangements, and account setup. In addition, the first monthly subscription installment of £100 GBP is to be paid in advance.   ",
+              },
+               {
+                clause: "",
+                text: "Thereafter, a recurring monthly payment of £100 GBP will be collected via direct debit through the Provider’s authorised payment processor, GoCardless. The monthly collection date shall be set and confirmed upon subscription activation. Timely payments are a condition of continued access to the services provided under this agreement. ",
+              },
+               {
+                clause: "3.3",
+                text: "Right to Cancel Under Consumer Contracts Regulations  Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, Subscribers who enter into this agreement via distance means (such as online or over the phone) have the right to cancel this agreement within fourteen (14) days from the date of signing, without giving any reason.",
+              },
+               {
+                clause: "",
+                text: "To exercise the right to cancel, the Subscriber must notify Faces on Faces Academy in writing via email to support@facesonfaces.com before the 14-day cancellation period expires. In such cases, any payments made will be refunded in full, provided that no part of the course has been accessed or attended. If the Subscriber has already accessed digital course content or attended any part of the training before requesting cancellation, this right to cancel may be forfeited under regulation 37 of the Consumer Contracts Regulations. If the subscriber  wishes to hold out for 14 day before receiving the course manuals digitally, we must be informed in writing, by emailing to support@facesonfaces.com (we would need to be informed of this straight after paying the deposit or the full course payment of the course)",
+              },
+               {
+                clause: "",
+                text: "After this 14-day cooling-off period, all payments become non-refundable, and the terms outlined in this agreement will apply in full. ",
+              },
+               {
+                clause: "",
+                text: "Access to this agreement.  ",
+              },
+              
             ]} />
           </SectionCard>
 
@@ -300,48 +325,140 @@ const SubscriptionsAgreement = () => {
           <SectionCard id="s4" icon={<CreditCard size={18} />} iconColor="#2563eb" title="4. Payment & billing">
             <Warning>The £250 initial deposit is non-refundable and is not deducted from the main course fee.</Warning>
             <ClauseList items={[
-              { clause: "4.1", text: "The subscription fee is deducted automatically each month from the payment method provided." },
-              { clause: "4.2", text: "Payments are non-refundable once services have been delivered and are due regardless of course completion or dissatisfaction." },
-              { clause: "4.3", text: "If the Subscriber cancels the subscription at any time, the <strong>full remaining balance of £1,599</strong> becomes immediately due and payable." },
-              { clause: "4.4", text: "To begin, an initial deposit of £250 plus the first month's payment of £100 is required to secure a course booking." },
-              { clause: "4.5", text: "A late payment fee of <strong>£40</strong> will be added for any missed payment. If two consecutive monthly payments are missed, the Provider may cancel the agreement and the full outstanding balance becomes due immediately. If unpaid within 14 days of cancellation, a 20% penalty fee is added. If unpaid after 30 days, the matter will be referred to the legal team for Small Claims Court recovery. Any debt collection or bailiff charges will be added to the outstanding balance. Failure to settle may result in a County Court Judgment (CCJ) being recorded against the Subscriber." },
+              
+             {
+                clause: "4.1",
+                text: "The subscription fee shall be deducted automatically on a monthly basis from the payment method provided by the Subscriber.",
+              },
+             {
+                clause: "4.2",
+                text: "The subscription is non-refundable once services have been delivered” , and payments are due regardless of course completion or dissatisfaction with the service. ",
+              },
+             {
+                clause: "4.3",
+                text: "The Subscriber may choose to cancel the subscription at any time by providing written notice. However, upon cancellation, the full remaining balance of the course fee will become immediately due and payable. The total amount payable upon cancellation will be £1,599",
+              },
+             {
+                clause: "4.4",
+                text: "To begin the subscription process and secure a course booking, an initial deposit of £250 GBP along with the first subscription payment of £100 GBP is required. This fee covers administrative costs, model arrangements, and the setup of the subscription account. The £250 GBP is a non- refundable payment and will not be reduced from the main course fee.",
+              },
+             {
+                clause: "4.5",
+                text: "If the Subscriber fails to make a scheduled payment, a late payment fee of £40 GBP will be added to the next payment collection. In the event that two consecutive monthly payments are missed, the Provider reserves the right to cancel this agreement and the full outstanding balance of £250 shall become due. “Upon cancellation by the Subscriber, the Provider shall be entitled to recover  a cancellation charge reflecting the genuine loss suffered, including but not limited to loss of a reserved course place, administrative costs, and lost opportunity to resell the course at full value. ",
+              },
+             {
+                clause: "",
+                text: "The Subscriber acknowledges and agrees that, by securing a place in the course on a specific date, the course seat becomes unavailable for resale to other potential participants. As such, should the Subscriber access or reserve this place, and it cannot reasonably be reassigned, the company will incur a genuine loss equivalent to the full course fee. Therefore, the Subscriber will be liable for an amount up to the full course fee of £1,599 to cover this loss. ",
+              },
+             {
+                clause: "",
+                text: "”If the outstanding balance is not paid within fourteen (14) days from the cancellation date, a penalty fee amounting to 20% of the total balance will be added, this fee is charged due to an genuine loss of income caused by the additional time and effort spent on staff following up on late payments. If payment remains outstanding thirty (30) days after the cancellation date, the matter will be referred to the Provider’s legal team for recovery through the Small Claims Court. This action will incur additional legal costs, which will be added to the Subscriber’s outstanding balance. The Subscriber agrees that any changes occurring from a debt collection company or bailiff will be charged to the Subscriber and will be added to the outstanding balance for recovery.",
+              },
+             {
+                clause: "",
+                text: "The Subscriber acknowledges that failure to settle the debt may result in a County Court Judgment (CCJ) being recorded against their name, which could adversely affect their credit rating and ability to obtain future credit from financial institutions. ",
+              },
             ]} />
           </SectionCard>
 
           {/* 5 */}
-          <SectionCard id="s5" title="5. Course access & certification" muted>
+          <SectionCard id="s5" title="5. Course Access and Certification " muted>
             <ClauseList items={[
-              { clause: "5.1", text: "Course certificates remain the property of Faces on Faces Academy until the full amount of <strong>£1,599</strong> has been paid, at which point ownership transfers to the Subscriber. In the interim, Faces on Faces will provide certificates as proof to relevant governing bodies and insurers as required. Not holding a copy does not affect your right to practise for the above passed subjects." },
-              { clause: "5.2", text: "The subscription grants access to select courses, with additional courses available provided payments are uninterrupted. The subscription has a <strong>capped limit of £3,000</strong>; amounts above this must be paid in full before the subscription can begin." },
+              {
+                clause: "5.1",
+                text: "The Subscriber will have access to courses under this subscription model, with course certificates remaining the property of Faces on Faces Academy. Upon cancellation of the subscription in accordance with the subscription terms, ownership of the certificates will transfer to the Subscriber providing the full amount of £1,599 is paid. If the certificates are needed for insurance purposes or to obtain products, Faces On Faces will email the certificate as proof to the relevant governing bodies. By you not holding a copy of the certificates, doesn’t effect your rights to practice as a practitioner for the above passed subjects. Faces On Faces hold proof of you passing the above course, where and when needed Faces On Faces will provide proof of your certifications to the relevant bodies. ",
+              },
+              {
+                clause: "5.2",
+                text: "The subscription grants access to select courses, with the option to add additional courses provided that the Subscriber maintains an uninterrupted subscription with no missed payments. The Subscriber has a capped subscription limit of £3,000, anything above £3,000 would need to be paid in full before the subscription can start. ",
+              },
+             
             ]} />
           </SectionCard>
 
           {/* 6 */}
-          <SectionCard id="s6" title="6. Amendments & modifications">
+          <SectionCard id="s6" title="6. Amendments and Modifications ">
             <ClauseList items={[
-              { clause: "6.1", text: "The Provider reserves the right to amend these terms, including payment terms, dates, amounts (where additional courses are added), and course offerings. Amendments will be communicated with reasonable notice and are deemed binding unless objected to in writing within 7 days." },
-              { clause: "6.2–6.3", text: "All requests to change a course date must be submitted in writing to info@facesonfaces.com and will incur an additional <strong>£250 administration fee</strong> per course." },
-              { clause: "6.4", text: "Availability on an alternative date cannot be guaranteed. If no suitable date is available and the Subscriber has reasonable grounds for objection, a full refund of payments made will be offered and the subscription cancelled without penalty." },
-              { clause: "6.5", text: "In some cases, no new date may be available and the original booking date will remain." },
-              { clause: "6.6", text: "Course bookings are non-transferable to another practitioner." },
+               {
+                clause: "6.1",
+                text: "The Provider reserves the right to amend the terms of this Agreement as necessary, including but not limited to payment terms, payment dates, payment amounts where additional courses have been selected, and the scope of course offerings. In the event that the Subscriber opts to add any additional courses, the revised costs and associated details shall be communicated to the Subscriber in writing via email. Such correspondence shall constitute an official addendum to this Agreement. All amendments will be communicated to the Subscriber with reasonable notice and shall be deemed binding unless otherwise objected to in writing within seven (7) days of notification.",
+              },
+               {
+                clause: "6.2",
+                text: "If the Subscriber wishes to amend their course booking by changing the course dates, the following terms and conditions shall apply:",
+              },
+               {
+                clause: "6.3",
+                text: "All requests to change a course date must be submitted in writing to info@facesonfaces.com and will incur an additional £250 GPB administration fee per course. ",
+              },
+               {
+                clause: "6.4",
+                text: "Faces on Faces Academy does not guarantee availability for the Subscriber’s preferred alternative course date. In the event that a place cannot be secured on the agreed date, the Provider will offer an alternative course dates. If the alternative dates are not acceptable to the Subscriber, with a reasonable reason, the Subscriber shall be entitled to a full refund of any payments made under this agreement, and the subscription will be cancelled without penalty.",
+              },
+               {
+                clause: "6.5",
+                text: "In some cases, the provider may be unable to offer a new date, in which case the original date will remain booked.",
+              },
+               {
+                clause: "6.6",
+                text: "Course bookings are non-transferable to another practitioner.  ",
+              },
+               
             ]} />
           </SectionCard>
 
           {/* 7 */}
-          <SectionCard id="s7" title="7. Insurance & regulation" muted>
+          <SectionCard id="s7" title="7. Insurance Legislative and Regulatory Compliance" muted>
             <ClauseList items={[
-              { clause: "7.1", text: "While training on Academy premises, students are covered by the group insurance policy provided by <strong>Beauty Insured</strong>. It is solely the Subscriber's responsibility to obtain appropriate insurance to practise in their own country. No refunds will be issued if the Subscriber is unable to obtain, or has declined or terminated, suitable insurance." },
-              { clause: "7.2", text: "The Subscriber must provide a copy of their insurance certificate to the Provider within <strong>14 days</strong> of obtaining coverage. Failure to do so may result in suspension or cancellation of the subscription. If the Subscriber chooses to delay practising, they must notify us in writing at support@facesonfaces.com. If uninsured for more than <strong>3 months</strong>, the Provider reserves the right to cancel the subscription and the full outstanding balance becomes immediately payable." },
-              { clause: "7.3", text: "Subscribers are responsible for compliance with all statutory and legal obligations in the country where they practise, including but not limited to CQC, HIS, and HIW regulations." },
-              { clause: "7.4", text: "Faces on Faces shall not be held liable for any non-compliance by the Subscriber with current or future legislative or regulatory changes. The Subscriber must maintain all necessary licences, registrations, and insurance at all times." },
+             {
+                clause: "7.1",
+                text: "While learning on the premises at Faces on Faces Academy, Students will be covered by our group insurance policy provided by Beauty Insured. ",
+              },
+             {
+                clause: "",
+                text: "It is the Subscriber’s sole responsibility to obtain appropriate insurance coverage to legally practice in the country where they intend to operate. Faces on Faces Academy will not issue any refunds if the Subscriber is unable to secure suitable insurance, or if their insurance is declined or terminated by their provider.",
+              },
+             {
+                clause: "",
+                text: "This condition does not affect the validity of this Agreement, which will remain in force until formally cancelled in accordance with the terms outlined herein. The Subscriber agrees to provide a copy of their insurance certificate to the Provider within fourteen (14) days of obtaining coverage. Failure to submit this documentation within the stated timeframe may result in the suspension or cancellation of the subscription. ",
+              },
+             {
+                clause: "",
+                text: "Should the Subscriber choose to delay practicing and therefore not obtain insurance immediately, they must notify the Provider in writing by sending an email to support@facesonfaces.com.",
+              },
+             {
+                clause: "7.2",
+                text: "If the Subscriber remains uninsured for a period exceeding three (3) months, the Provider reserves the right to cancel the subscription, and the full outstanding balance shall become immediately payable under the cancellation terms of this Agreement.",
+              },
+             {
+                clause: "7.3",
+                text: "Subscribers are responsible for ensuring compliance with all statutory and legal obligations in the country where they practice, including, but not limited to, CQC, HIS, and HIW regulations. ",
+              },
+             {
+                clause: "7.4",
+                text: "The subscriber  acknowledges and agrees that it is their sole responsibility to remain informed of, and comply with, all applicable laws, regulations, and professional guidelines relevant to the provision of aesthetic treatments. Faces on Faces shall not be held liable for any non-compliance by the Practitioner with current or future legislative or regulatory changes. Any changes in law or regulation shall not impose any additional liability or obligation on Faces on Faces. The subscriber must ensure that their practice remains compliant at all times, including but not limited to obtaining and maintaining all necessary licences, registrations, and insurance.  ",
+              },
+            
+             
             ]} />
           </SectionCard>
 
           {/* 8 */}
-          <SectionCard id="s8" icon={<AlertCircle size={18} />} iconColor="#dc2626" title="8. Cancellation & termination">
+          <SectionCard id="s8" icon={<AlertCircle size={18} />} iconColor="#dc2626" title="8. Cancellation and Termination">
             <ClauseList items={[
-              { clause: "8.1", text: "The Subscriber may cancel at any time but must settle all outstanding balances for courses accessed before cancellation can be finalised. Upon cancellation, the Provider is entitled to recover a reasonable cancellation charge reflecting genuine loss, including loss of a reserved course place, administrative costs, and lost opportunity to resell. Where the Subscriber has accessed or been allocated a course place that cannot reasonably be resold, this charge will be up to the <strong>full course fee of £1,599</strong>." },
-              { clause: "8.2", text: "The subscription cannot be paused or terminated due to dissatisfaction. The only method of cancellation is by settling the full outstanding balance of <strong>£1,599.00</strong>." },
+              {
+                clause: "8.1",
+                text: "The Subscriber may cancel the subscription at any time but must settle any outstanding balance for all courses accessed before cancellation can be finalized. “Upon cancellation by the Subscriber, the Provider shall be entitled to recover a reasonable cancellation charge reflecting the genuine loss suffered, including but not limited to loss of a reserved course place, administrative costs, and lost opportunity to resell the course at full value.",
+              },
+               {
+                clause: "",
+                text: "Where the Subscriber has accessed or been allocated a course place that cannot reasonably be resold, this charge will be up to the full course fee of £1,599.” ",
+              },
+               {
+                clause: "8.2",
+                text: "The subscription must remain active and cannot be paused or terminated due to dissatisfaction with courses or any related issues. The only method of cancellation is by settling the full outstanding balance of £1 599.00 ",
+              },
+               
             ]} />
           </SectionCard>
 
@@ -368,28 +485,59 @@ const SubscriptionsAgreement = () => {
           </SectionCard>
 
           {/* 10 */}
-          <SectionCard id="s10" title="10. Data protection">
+          <SectionCard id="s10" title="10. Data Protection">
             <ClauseList items={[
-              { clause: "10.1", text: "By booking a training course, you agree to allow Faces on Faces Academy to use submitted data for processing your order and for future marketing purposes." },
-              { clause: "10.2", text: "Your details will not be shared with any third party without your written consent." },
+              {
+                clause: "10.1",
+                text: "By booking a training course with Faces on Faces Academy, the Subscriber agrees to allow Faces on Faces Academy to use any submitted data for processing the Subscribers order and for future marketing purposes.",
+              },
+              {
+                clause: "10.2",
+                text: "Subscriber details will not be shared with any third party without their written consent. ",
+              },
+              
             ]} />
           </SectionCard>
 
           {/* 11 */}
-          <SectionCard id="s11" title="11. Complaints" muted>
+          <SectionCard id="s11" title="11. Complaint Procedure" muted>
             <ClauseList items={[
-              { clause: "11.1", text: "Faces on Faces Academy is committed to providing high-quality service and will make every effort to resolve complaints promptly." },
-              { clause: "11.2", text: "Complaints must be submitted in writing to <a href='mailto:support@facesonfaces.com' style='color:#2563eb'>support@facesonfaces.com</a>" },
-              { clause: "11.3", text: "Written complaints will be acknowledged within <strong>14 working days</strong> from the date received." },
-              { clause: "11.4", text: "Faces on Faces Academy does not offer refunds for courses that have already been undertaken." },
+              {
+                clause: "11.1",
+                text: "Faces on Faces Academy is committed to providing high-quality service and will make every effort to resolve any complaints promptly.  ",
+              },
+              {
+                clause: "11.2",
+                text: "Any complaints regarding Faces on Faces Academy should be submitted in writing via email to support@facesonfaces.com ",
+              },
+              {
+                clause: "11.3",
+                text: "Complaints submitted in writing will be acknowledged by email or letter within 14 working days from the date the complaint was received. ",
+              },
+              {
+                clause: "11.4",
+                text: "Faces on Faces Academy does not offer refunds for courses that have already been undertaken.",
+              },
+              
             ]} />
           </SectionCard>
 
           {/* 12 */}
-          <SectionCard id="s12" title="12. Governing law">
+          <SectionCard id="s12" title="12. Governing Law">
             <ClauseList items={[
-              { clause: "12.1", text: "This Agreement is governed by and construed in accordance with the laws of England and Wales." },
-              { clause: "12.2", text: "Any disputes arising from this Agreement shall be resolved through the appropriate courts of jurisdiction in England and Wales." },
+              {
+                clause: "12.1",
+                text: "This Agreement shall be governed by and construed in accordance with the laws of [Jurisdiction].",
+              },
+              {
+                clause: "12.2",
+                text: "Any disputes arising from or related to this Agreement shall be resolved through [Dispute Resolution Method, e.g., Arbitration or Court Jurisdiction].",
+              },
+              {
+                clause: "",
+                text: "By signing below, both parties acknowledge and agree to the terms set forth in this Agreement.  ",
+              },
+              
             ]} />
 
             {/* Signature block */}

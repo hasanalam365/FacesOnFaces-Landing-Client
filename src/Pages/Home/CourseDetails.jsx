@@ -177,7 +177,7 @@ const toggleAccordion = (index) => {
 
         <div className="flex justify-center mt-10">
   <Link
-    to="/subscription-enroll"
+    to="/enroll"
     className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-black transition-all duration-300 bg-cyan-400 rounded-xl hover:bg-cyan-300 hover:scale-105"
   >
     Enroll Now
