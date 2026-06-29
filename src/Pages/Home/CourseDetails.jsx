@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { BookOpen, ChevronDown, MessageCircle,ArrowRight } from "lucide-react";
+import { BookOpen, ChevronDown, MessageCircle,ArrowRight, Info, ArrowDownNarrowWide } from "lucide-react";
 import { Link } from "react-router-dom";
 import {  X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AdvisorModal from "../../Components/AdvisorModal";
+
+
 
 
 const courseFeatures = [
@@ -169,21 +171,45 @@ const handleEnroll = () => {
   </h3>
 
   <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-    {courseFeatures.map((feature, index) => (
-      <button
-        key={index}
-        onClick={() => setSelectedCourse(feature)}
-        className="group flex items-center gap-4 rounded-2xl border border-cyan-400/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-400/5 hover:shadow-[0_0_25px_rgba(34,211,238,.12)]"
-      >
-        <div className="flex items-center justify-center w-12 h-12 transition rounded-xl bg-cyan-400/10 text-cyan-400 group-hover:bg-cyan-400 group-hover:text-black">
-          <BookOpen size={20} />
-        </div>
+  {courseFeatures.map((feature, index) => (
+  <button
+    key={index}
+    onClick={() => setSelectedCourse(feature)}
+    className="group relative flex  items-center gap-3 rounded-2xl border border-cyan-400/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-400/5 hover:shadow-[0_0_25px_rgba(34,211,238,.12)] cursor-pointer"
+  >
+    {/* Top row: icon + "tap" hint */}
+    <div className="flex items-center w-full gap-4">
+  {/* Left Icon */}
+  <div className="flex items-center justify-center border w-11 h-11 rounded-xl bg-cyan-400/10 border-cyan-400/20 shrink-0">
+    <BookOpen size={20} className="text-cyan-400" />
+  </div>
 
-        <h4 className="font-semibold text-white group-hover:text-cyan-300">
-          {feature.title}
-        </h4>
-      </button>
-    ))}
+  {/* Title */}
+  <h4 className="flex-1 text-[17px] font-semibold text-white leading-snug transition-colors duration-300 group-hover:text-cyan-300">
+    {feature.title}
+  </h4>
+
+  {/* Arrow */}
+  <motion.div
+  animate={{
+    y: [0, -5, 0],
+  }}
+  transition={{
+    duration: 1.5,
+    repeat: Infinity,
+    repeatType: "mirror",
+    ease: "easeInOut",
+  }}
+  className="flex items-center justify-center w-8 shrink-0"
+>
+  <ChevronDown
+    size={20}
+    className="text-white transition-colors duration-300 group-hover:text-cyan-400"
+  />
+</motion.div>
+</div>
+  </button>
+))}
   </div>
 </div>
 
