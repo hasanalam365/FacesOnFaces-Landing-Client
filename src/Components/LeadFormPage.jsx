@@ -211,22 +211,7 @@ const LeadFormPage = ({ onBack }) => {
                 )}
               </div>
 
-              {/* Preferred Contact */}
-              <div>
-                <label className="block mb-2 text-sm text-gray-300">
-                  Preferred Contact Method
-                </label>
-                <select
-                  name="preferredContact"
-                  value={formData.preferredContact}
-                  onChange={handleChange}
-                  className="w-full px-4 py-4 text-white border outline-none rounded-xl border-white/10 bg-white/5"
-                >
-                  <option value="Phone" className="bg-[#091017]">Phone</option>
-                  <option value="WhatsApp" className="bg-[#091017]">WhatsApp</option>
-                  <option value="Email" className="bg-[#091017]">Email</option>
-                </select>
-              </div>
+             
 
               {/* Best Time */}
               <div>

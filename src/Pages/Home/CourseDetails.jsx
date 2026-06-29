@@ -181,7 +181,19 @@ const handleEnroll = () => {
     <div className="flex items-center w-full gap-4">
   {/* Left Icon */}
   <div className="flex items-center justify-center border w-11 h-11 rounded-xl bg-cyan-400/10 border-cyan-400/20 shrink-0">
-    <BookOpen size={20} className="text-cyan-400" />
+    <motion.div
+  animate={{
+    rotate: [0, -6, 0, 6, 0],
+    scale: [1, 1.05, 1],
+  }}
+  transition={{
+    duration: 2,
+    repeat: Infinity,
+    ease: "easeInOut",
+  }}
+>
+  <BookOpen size={20} className="text-cyan-400" />
+</motion.div>
   </div>
 
   {/* Title */}
