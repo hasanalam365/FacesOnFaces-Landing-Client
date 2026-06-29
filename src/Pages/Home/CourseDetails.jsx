@@ -90,7 +90,7 @@ const handleEnroll = () => {
 
 
   return (
-    <section className="py-20">
+    <section className="py-10">
       <div className="max-w-6xl mx-auto overflow-hidden border shadow-2xl rounded-3xl border-cyan-400/20 bg-[#0f1519]">
 
         <div className="p-6 lg:p-10">

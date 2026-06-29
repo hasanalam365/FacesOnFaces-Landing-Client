@@ -29,7 +29,7 @@ const stats = [
 
 const Stats = () => {
   return (
-    <section className="relative py-20 bg-[#05090A]">
+    <section className="relative py-5">
       {/* Background Glow */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-[500px] h-[500px] bg-cyan-500/5 blur-[180px] left-1/2 -translate-x-1/2"></div>
