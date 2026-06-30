@@ -63,7 +63,7 @@ const courseFeatures = [
 
 const courseSchedules = [
   { location: "London", dates: ["3rd–5th October", "7th–9th November"] },
-  { location: "Upminster", dates: ["17th–19th October"] },
+  { location: "Upminster", dates: ["17th–19th October","20th–22th October"] },
   { location: "Edinburgh", dates: ["21st–23rd November"] },
   { location: "Belfast", dates: ["10th–12th October"] },
   { location: "Dublin", dates: ["31st Oct–3rd Nov"] },
@@ -170,7 +170,7 @@ const CourseModal = ({ course, onClose }) => {
   );
 };
 
-const LeftSide = () => {
+const LeftSide = ({ onDateClick }) => {
   const [activeLocation, setActiveLocation] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
@@ -296,14 +296,15 @@ const LeftSide = () => {
               </div>
               <div className="p-4 space-y-3">
                 {activeLocation.dates.map((date, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-4 border rounded-xl bg-white/[0.03] border-white/10"
-                  >
-                    <Calendar size={16} className="text-cyan-400" />
-                    <span className="text-white">{date}</span>
-                  </div>
-                ))}
+  <div
+    key={i}
+    onClick={() => onDateClick && onDateClick(date)}
+    className="flex items-center gap-3 p-4 border rounded-xl bg-white/[0.03] border-white/10 cursor-pointer transition-all duration-200 hover:border-cyan-400/50 hover:bg-cyan-400/5"
+  >
+    <Calendar size={16} className="text-cyan-400" />
+    <span className="text-white">{date}</span>
+  </div>
+))}
               </div>
             </div>
           )}

@@ -428,7 +428,7 @@ const Enroll = () => {
         </div>
 
         <div ref={formRef} className="grid gap-10 lg:grid-cols-2">
-          <LeftSide />
+        <LeftSide onDateClick={() => setModalOpen(true)} />
 
           <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10 backdrop-blur-xl">
             {errorMsg && (
