@@ -13,7 +13,7 @@ const courseFeatures = [
   },
   {
     title: "Anatomy and Physiology",
-    description: "In this course, we ensure every student masters facial anatomy, understanding the underlying structures critical for safe, effective treatments. We guide them through key anatomical landmarks, and at the end, they’ll demonstrate their knowledge in both a written and practical anatomy test, ensuring confidence and precision in their future procedures."
+    description: "In this course, we ensure every student masters facial anatomy, understanding the underlying structures critical for safe, effective treatments. We guide them through key anatomical landmarks, and at the end, they'll demonstrate their knowledge in both a written and practical anatomy test, ensuring confidence and precision in their future procedures."
   },
   {
     title: "Complications Management",
@@ -25,11 +25,11 @@ const courseFeatures = [
   },
   {
     title: "Skin Booster",
-    description: "A skin booster is a revitalizing injectable treatment designed to deeply hydrate and improve facial skin quality from within. In this course, students will learn what makes skin boosters unique and how to safely administer them, focusing solely on facial application. They’ll gain hands-on experience in correct product placement, dosage, and technique, ensuring glowing, natural results every time."
+    description: "A skin booster is a revitalizing injectable treatment designed to deeply hydrate and improve facial skin quality from within. In this course, students will learn what makes skin boosters unique and how to safely administer them, focusing solely on facial application. They'll gain hands-on experience in correct product placement, dosage, and technique, ensuring glowing, natural results every time."
   },
   {
     title: "Lumi Eyes",
-    description: "Lumi Eyes is a specialized under-eye treatment designed to rejuvenate and brighten the delicate eye area. In this course, we teach students the unique properties of Lumi Eyes and how to administer it safely. They’ll learn precise injection techniques tailored to the eye region, ensuring natural, refreshed, and safe results for every client."
+    description: "Lumi Eyes is a specialized under-eye treatment designed to rejuvenate and brighten the delicate eye area. In this course, we teach students the unique properties of Lumi Eyes and how to administer it safely. They'll learn precise injection techniques tailored to the eye region, ensuring natural, refreshed, and safe results for every client."
   },
   {
     title: "Polynucleotide",
@@ -41,7 +41,7 @@ const courseFeatures = [
   },
   {
     title: "Fat Dissolver",
-    description: "In this course, we focus on fat dissolving techniques tailored to common areas like the chin, jawline, underarms, and belly. We teach you how to safely and effectively treat these areas, ensuring natural-looking results. Once you complete the course, you’ll be ready to use any fat dissolver confidently, as long as you carefully follow each product’s label and instructions."
+    description: "In this course, we focus on fat dissolving techniques tailored to common areas like the chin, jawline, underarms, and belly. We teach you how to safely and effectively treat these areas, ensuring natural-looking results. Once you complete the course, you'll be ready to use any fat dissolver confidently, as long as you carefully follow each product's label and instructions."
   },
   {
     title: "Vitamin B12",
@@ -49,29 +49,27 @@ const courseFeatures = [
   },
   {
     title: "Foundation Dermal Filler",
-    description: "In our Foundation Dermal Filler, we set you up for success in three key areas: lips, nasolabial folds, and marionette lines. You'll learn to craft beautifully balanced lips using careful volumizing techniques. We guide you step-by-step to soften nasolabial lines, restoring a youthful look, and refine marionette lines for a harmonious lower face. With hands-on practice and expert guidance, you’ll leave confident in delivering natural, stunning results."
+    description: "In our Foundation Dermal Filler, we set you up for success in three key areas: lips, nasolabial folds, and marionette lines. You'll learn to craft beautifully balanced lips using careful volumizing techniques. We guide you step-by-step to soften nasolabial lines, restoring a youthful look, and refine marionette lines for a harmonious lower face. With hands-on practice and expert guidance, you'll leave confident in delivering natural, stunning results."
   },
   {
     title: "Foundation Anti-Wrinkle",
-    description: "Our Foundation Anti-Wrinkle course prepares you for safe, effective treatments in three key areas: forehead, frown lines, and crow’s feet. As a prescription-only treatment, we teach you how to work with a prescriber and conduct required face-to-face consultations. We emphasize proper local protocols and teach you the correct dosage, mixture ratios, and precise injection points, ensuring every client receives the right balance for a natural, refreshed appearance. With hands-on guidance, you'll feel confident and compliant from start to finish."
+    description: "Our Foundation Anti-Wrinkle course prepares you for safe, effective treatments in three key areas: forehead, frown lines, and crow's feet. As a prescription-only treatment, we teach you how to work with a prescriber and conduct required face-to-face consultations. We emphasize proper local protocols and teach you the correct dosage, mixture ratios, and precise injection points, ensuring every client receives the right balance for a natural, refreshed appearance. With hands-on guidance, you'll feel confident and compliant from start to finish."
   },
   {
     title: "Use of Hyaluronidase",
-    description: "In our Use of Hyaluronidase training, we equip you with the essential skill of safely dissolving hyaluronic acid fillers. You’ll learn both emergency dissolving, in cases of complications, and elective dissolving to fine-tune results. We teach correct dosage, precise techniques, and safety protocols, ensuring you can confidently handle any situation. By mastering both proactive and corrective applications, you’ll ensure safe, confident, and tailored results for your clients."
+    description: "In our Use of Hyaluronidase training, we equip you with the essential skill of safely dissolving hyaluronic acid fillers. You'll learn both emergency dissolving, in cases of complications, and elective dissolving to fine-tune results. We teach correct dosage, precise techniques, and safety protocols, ensuring you can confidently handle any situation. By mastering both proactive and corrective applications, you'll ensure safe, confident, and tailored results for your clients."
   },
 ];
 
 const courseSchedules = [
   { location: "London", dates: ["3rd–5th October", "7th–9th November"] },
-  { location: "Upminster", dates: ["17th–19th October","20th–22th October"] },
+  { location: "Upminster", dates: ["17th–19th October", "20th–22th October"] },
   { location: "Edinburgh", dates: ["21st–23rd November"] },
   { location: "Belfast", dates: ["10th–12th October"] },
   { location: "Dublin", dates: ["31st Oct–3rd Nov"] },
 ];
 
 // ─── Shared body-scroll-lock hook ──────────────────────────────
-// Locks the page in place (no jump, no background scroll) while
-// `active` is true, and restores the exact scroll position after.
 function useScrollLock(active) {
   useLayoutEffect(() => {
     if (!active) return;
@@ -170,6 +168,9 @@ const CourseModal = ({ course, onClose }) => {
   );
 };
 
+// ─── LeftSide Component ────────────────────────────────────────
+// Props:
+//   onDateClick(date, location) — called when user clicks a schedule date
 const LeftSide = ({ onDateClick }) => {
   const [activeLocation, setActiveLocation] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -181,10 +182,15 @@ const LeftSide = ({ onDateClick }) => {
   };
 
   const handleFeatureClick = (e, feature) => {
-    // Prevent the browser's native focus-scroll from jumping the page
-    // before our scroll-lock effect has a chance to run.
     e.currentTarget.blur();
     setSelectedCourse(feature);
+  };
+
+  // Called when user clicks a specific date — opens plan modal in parent
+  const handleDateClick = (date, location) => {
+    if (onDateClick) {
+      onDateClick(date, location);
+    }
   };
 
   return (
@@ -294,17 +300,28 @@ const LeftSide = ({ onDateClick }) => {
                   <X size={16} />
                 </button>
               </div>
+
               <div className="p-4 space-y-3">
                 {activeLocation.dates.map((date, i) => (
-  <div
-    key={i}
-    onClick={() => onDateClick && onDateClick(date)}
-    className="flex items-center gap-3 p-4 border rounded-xl bg-white/[0.03] border-white/10 cursor-pointer transition-all duration-200 hover:border-cyan-400/50 hover:bg-cyan-400/5"
-  >
-    <Calendar size={16} className="text-cyan-400" />
-    <span className="text-white">{date}</span>
-  </div>
-))}
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handleDateClick(date, activeLocation.location)}
+                    className="w-full flex items-center gap-3 p-4 border rounded-xl text-left
+                      bg-white/[0.03] border-white/10
+                      transition-all duration-200
+                      hover:border-cyan-400/50 hover:bg-cyan-400/5
+                      hover:shadow-[0_0_20px_rgba(34,211,238,0.1)]
+                      group cursor-pointer"
+                  >
+                    <Calendar size={16} className="text-cyan-400 shrink-0" />
+                    <span className="flex-1 text-white">{date}</span>
+                    {/* subtle "enroll" hint on hover */}
+                    <span className="text-xs font-medium transition-all duration-200 text-cyan-400/0 group-hover:text-cyan-400/70">
+                      Enroll →
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           )}

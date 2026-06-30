@@ -100,7 +100,9 @@ const SubscriptionEnroll = () => {
   const [identityData, setIdentityData] = useState(null);
   const [enrollmentId, setEnrollmentId] = useState(null);
   const [formSnapshot, setFormSnapshot] = useState(null);
+const [fieldErrors, setFieldErrors] = useState({});
 
+  
   const createPaymentIntent = async () => {
     try {
       setLoading(true);
@@ -265,6 +267,30 @@ const SubscriptionEnroll = () => {
       );
     }
 
+const handleFormNext = () => {
+  const f = form.current;
+
+  const name = f.querySelector('[name="name"]').value.trim();
+  const email = f.querySelector('[name="email"]').value.trim();
+  const phone = f.querySelector('[name="phone"]').value.trim();
+
+  const errors = {};
+
+  if (!name) errors.name = "Full name is required";
+  if (!email) errors.email = "Email is required";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    errors.email = "Please enter a valid email address";
+
+  if (!phone) errors.phone = "Phone number is required";
+
+  setFieldErrors(errors);
+
+  if (Object.keys(errors).length > 0) return;
+
+  setErrorMsg("");
+  setFormSnapshot({ name, email, phone });
+  setStep(STEP_IDENTITY);
+};
     return (
       <>
         {errorMsg && (
@@ -284,21 +310,53 @@ const SubscriptionEnroll = () => {
                 <label className="block mb-2 text-sm text-white/70">Full Name</label>
                 <div className="relative">
                   <User size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                  <input type="text" name="name" required placeholder="Enter your full name" maxLength={100} className={inputClass} />
+                 <input
+  type="text"
+  name="name"
+  required
+  placeholder="Enter your full name"
+  maxLength={100}
+  className={inputClass}
+/>
+
+{fieldErrors.name && (
+  <p className="mt-1 text-xs text-red-400">{fieldErrors.name}</p>
+)}
                 </div>
               </div>
               <div>
                 <label className="block mb-2 text-sm text-white/70">Email Address</label>
                 <div className="relative">
                   <Mail size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                  <input type="email" name="email" required placeholder="Enter your email" className={inputClass} />
+                 <input
+  type="email"
+  name="email"
+  required
+  placeholder="Enter your email"
+  className={inputClass}
+/>
+
+{fieldErrors.email && (
+  <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
+)}
                 </div>
               </div>
               <div>
                 <label className="block mb-2 text-sm text-white/70">Phone Number</label>
                 <div className="relative">
                   <Phone size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                  <input type="tel" name="phone" required placeholder="Enter your phone number" maxLength={20} className={inputClass} />
+                 <input
+  type="tel"
+  name="phone"
+  required
+  placeholder="Enter your phone number"
+  maxLength={20}
+  className={inputClass}
+/>
+
+{fieldErrors.phone && (
+  <p className="mt-1 text-xs text-red-400">{fieldErrors.phone}</p>
+)}
                 </div>
               </div>
               <div>

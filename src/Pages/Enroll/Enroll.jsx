@@ -10,14 +10,14 @@ import {
   ArrowRight,
   ChevronDown,
   X,
+  Calendar,
+  MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PaymentForm from "../../Components/PaymentForm";
 import LeftSide from "./LeftSide";
 
 // ─── Shared body-scroll-lock hook ──────────────────────────────
-// Locks the page in place (no jump, no background scroll) while
-// `active` is true, and restores the exact scroll position after.
 function useScrollLock(active) {
   useLayoutEffect(() => {
     if (!active) return;
@@ -109,7 +109,6 @@ const plans = [
 const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
   useScrollLock(isOpen);
 
-  // ESC key to close
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e) => {
@@ -308,8 +307,11 @@ const Enroll = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
-
   const [modalOpen, setModalOpen] = useState(false);
+
+  // ── NEW: selected schedule from date click ──────────────────
+  // { date: "3rd–5th October", location: "London" } | null
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
 
   const createPaymentIntent = async () => {
     try {
@@ -333,15 +335,28 @@ const Enroll = () => {
     }
   };
 
+  // ── Called when user picks a plan from the modal ────────────
   const handlePlanSelect = (planId) => {
     if (planId === "deposit") {
-      navigate("/deposit-enroll");
+      // Pass schedule via query params so deposit page can also save it
+      const params = new URLSearchParams();
+      if (selectedSchedule) {
+        params.set("date", selectedSchedule.date);
+        params.set("location", selectedSchedule.location);
+      }
+      navigate(`/deposit-enroll${params.toString() ? `?${params}` : ""}`);
       return;
     }
     if (planId === "subscription") {
-      navigate("/subscription-enroll");
+      const params = new URLSearchParams();
+      if (selectedSchedule) {
+        params.set("date", selectedSchedule.date);
+        params.set("location", selectedSchedule.location);
+      }
+      navigate(`/subscription-enroll${params.toString() ? `?${params}` : ""}`);
       return;
     }
+    // "full" plan — stay on this page
     setModalOpen(false);
     setSelectedPlan("full");
     setTimeout(() => {
@@ -353,11 +368,18 @@ const Enroll = () => {
     setModalOpen(false);
   }, []);
 
+  // ── Course Fee field click → open modal ─────────────────────
   const handleFeeFieldClick = (e) => {
     if (paymentCompleted) return;
     e.currentTarget.blur();
     setModalOpen(true);
   };
+
+  // ── Date click from LeftSide → save schedule + open modal ───
+  const handleDateClick = useCallback((date, location) => {
+    setSelectedSchedule({ date, location });
+    setModalOpen(true);
+  }, []);
 
   useEffect(() => {
     if (selectedPlan === "full" && !hasFetched.current) {
@@ -366,6 +388,7 @@ const Enroll = () => {
     }
   }, [selectedPlan]);
 
+  // ── Payment success → POST to backend (with schedule) ───────
   const handlePaymentSuccess = async (paymentIntentId) => {
     try {
       setErrorMsg("");
@@ -375,6 +398,9 @@ const Enroll = () => {
         name: formData.get("name"),
         email: formData.get("email"),
         phone: formData.get("phone"),
+        // ── schedule fields ──────────────────────────────────
+        selectedDate: selectedSchedule?.date || null,
+        selectedLocation: selectedSchedule?.location || null,
       };
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/create-enrollment`,
@@ -428,7 +454,8 @@ const Enroll = () => {
         </div>
 
         <div ref={formRef} className="grid gap-10 lg:grid-cols-2">
-        <LeftSide onDateClick={() => setModalOpen(true)} />
+          {/* LeftSide gets the date-click handler */}
+          <LeftSide onDateClick={handleDateClick} />
 
           <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10 backdrop-blur-xl">
             {errorMsg && (
@@ -495,6 +522,29 @@ const Enroll = () => {
                   className="w-full px-4 py-4 text-white border cursor-not-allowed rounded-xl bg-white/5 border-white/10 opacity-60"
                 />
               </div>
+
+              {/* ── Selected Schedule display (if any) ────────── */}
+              {selectedSchedule && (
+                <div className="flex items-center gap-3 p-4 border rounded-xl border-cyan-400/30 bg-cyan-400/5">
+                  <Calendar size={16} className="text-cyan-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-white/40 mb-0.5">Selected Date & Location</p>
+                    <p className="text-sm font-medium text-white">
+                      {selectedSchedule.date}
+                      <span className="mx-2 text-white/30">·</span>
+                      <span className="text-cyan-400">{selectedSchedule.location}</span>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSchedule(null)}
+                    className="transition-colors text-white/30 hover:text-white shrink-0"
+                    aria-label="Clear selected date"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
 
               <div>
                 <label className="block mb-2 text-sm text-white/70">Course Fee</label>
