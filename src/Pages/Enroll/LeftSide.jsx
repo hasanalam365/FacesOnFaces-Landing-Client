@@ -74,16 +74,8 @@ function useScrollLock(active) {
   useLayoutEffect(() => {
     if (!active) return;
 
+    const body = document.body;
     const scrollY = window.scrollY;
-    const { body } = document;
-    const prev = {
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
-      overflow: body.style.overflow,
-    };
 
     body.style.position = "fixed";
     body.style.top = `-${scrollY}px`;
@@ -93,17 +85,18 @@ function useScrollLock(active) {
     body.style.overflow = "hidden";
 
     return () => {
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.left = prev.left;
-      body.style.right = prev.right;
-      body.style.width = prev.width;
-      body.style.overflow = prev.overflow;
-      window.scrollTo(0, scrollY);
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      body.style.overflow = "";
+
+      // 👇 এই লাইনটাই আসল fix — scroll position ঠিক জায়গায় ফিরিয়ে দিচ্ছে
+       window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
     };
   }, [active]);
 }
-
 // ─── Course Detail Modal ───────────────────────────────────────
 const CourseModal = ({ course, onClose }) => {
   useScrollLock(!!course);
@@ -174,6 +167,7 @@ const CourseModal = ({ course, onClose }) => {
 const LeftSide = ({ onDateClick }) => {
   const [activeLocation, setActiveLocation] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const lastClickedRef = React.useRef(null);
 
   const handleLocationClick = (locationName) => {
     const found = courseSchedules.find((s) => s.location === locationName);
@@ -181,10 +175,7 @@ const LeftSide = ({ onDateClick }) => {
     setActiveLocation(activeLocation?.location === locationName ? null : found);
   };
 
-  const handleFeatureClick = (e, feature) => {
-    e.currentTarget.blur();
-    setSelectedCourse(feature);
-  };
+ 
 
   // Called when user clicks a specific date — opens plan modal in parent
   const handleDateClick = (date, location) => {
@@ -192,6 +183,13 @@ const LeftSide = ({ onDateClick }) => {
       onDateClick(date, location);
     }
   };
+
+
+  const handleFeatureClick = (e, feature) => {
+  e.currentTarget.blur();
+  lastClickedRef.current = e.currentTarget; 
+  setSelectedCourse(feature);
+};
 
   return (
     <div className="overflow-hidden border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
@@ -329,9 +327,9 @@ const LeftSide = ({ onDateClick }) => {
       </div>
 
       <CourseModal
-        course={selectedCourse}
-        onClose={() => setSelectedCourse(null)}
-      />
+  course={selectedCourse}
+  onClose={() => setSelectedCourse(null)}
+/>
     </div>
   );
 };
