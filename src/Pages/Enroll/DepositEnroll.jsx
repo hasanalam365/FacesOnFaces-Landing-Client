@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   User,
   Mail,
@@ -229,11 +230,12 @@ Course
             />
 
             <p className="text-sm text-white/60">
-              I agree to the Terms &
-              Conditions and understand
-              that the £250 deposit secures
-              my place on the course.
-            </p>
+  I agree to the{" "}
+  <Link to="/terms-and-conditions" className="text-blue-400 underline">
+    Terms & Conditions
+  </Link>
+  {" "}and understand that the £250 deposit secures my place on the course.
+</p>
           </div>
 
           <div className="mt-8">

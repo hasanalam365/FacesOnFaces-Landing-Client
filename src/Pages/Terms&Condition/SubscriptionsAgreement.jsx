@@ -323,7 +323,7 @@ const SubscriptionsAgreement = () => {
 
           {/* 4 */}
           <SectionCard id="s4" icon={<CreditCard size={18} />} iconColor="#2563eb" title="4. Payment & billing">
-            <Warning>The £250 initial deposit is non-refundable and is not deducted from the main course fee.</Warning>
+            <Warning>The £250 initial deposit is non-refundable and is  deducted from the main course fee.</Warning>
             <ClauseList items={[
               
              {
