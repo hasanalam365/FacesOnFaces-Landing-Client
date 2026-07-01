@@ -231,9 +231,23 @@ Course
 
             <p className="text-sm text-white/60">
   I agree to the{" "}
-  <Link to="/terms-and-conditions" className="text-blue-400 underline">
-    Terms & Conditions
-  </Link>
+  <a
+                          href="/terms-and-conditions"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                        >
+                          Terms & Conditions
+                        </a>{" "}
+                        and{" "}
+                        <a
+                          href="/privacy-policy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                        >
+                          Privacy Policy
+                        </a>
   {" "}and understand that the £250 deposit secures my place on the course.
 </p>
           </div>
