@@ -1,12 +1,24 @@
 import React, { useRef, useState, useEffect } from "react";
 import { CheckCircle2, RotateCcw, PenLine } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const AGREEMENT_TEXT = `SUBSCRIPTION AGREEMENT
-Faces On Faces Academy
+const AGREEMENT_TEXT = (
+  <>
+    SUBSCRIPTION AGREEMENT
+    <br />
+    Faces On Faces Academy
+    <br />
+    <br />
 
- Please read subscripton agreement after payment  
+    Please read subscription agreement after payment
+    <br />
+    <br />
 
-`;
+    <Link to="/subscription-agreement" className="underline text-cyan-400">
+      Subscription Agreement
+    </Link>
+  </>
+);
 
 const SignaturePad = ({ onSigned }) => {
   const canvasRef = useRef(null);
@@ -175,7 +187,9 @@ const AgreementSigning = ({ studentName, onSigned }) => {
         onScroll={handleScroll}
         className="h-48 p-4 overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre-line border border-white/10 rounded-xl bg-white/5 text-white/50"
       >
-        {AGREEMENT_TEXT.replace("[STUDENT_NAME]", studentName || "Student")}
+       <div className="text-xs leading-relaxed text-white/50">
+  {AGREEMENT_TEXT}
+</div>
         <div className="pt-4 mt-4 border-t border-white/10">
           <p className="text-white/70">
             Student Name: <span className="font-medium text-white">{studentName}</span>
