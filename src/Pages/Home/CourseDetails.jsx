@@ -98,7 +98,7 @@ function useScrollLock(active) {
       body.style.right = prev.right;
       body.style.width = prev.width;
       body.style.overflow = prev.overflow;
-      window.scrollTo(0, scrollY);
+      window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
     };
   }, [active]);
 }

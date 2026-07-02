@@ -69,7 +69,7 @@ export default function Footer() {
                 to="/terms-and-conditions"
                 className="text-gray-400 transition hover:text-cyan-300"
               >
-                Terms of Conditions
+                Terms and Conditions
               </Link>
                <span className="text-gray-600">•</span>
               <Link

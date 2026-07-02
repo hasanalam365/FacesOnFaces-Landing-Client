@@ -5,8 +5,9 @@ import {
 } from "lucide-react";
 import PaymentForm from "../../Components/PaymentForm";
 import IdentityVerification from "../../Components/IdentityVerification";
-import AgreementStatus from "../../Components/AgreementStatus";
-import AgreementSigning from "../../Components/AgreementSigning";
+// import AgreementStatus from "../../Components/AgreementStatus";
+// import AgreementSigning from "../../Components/AgreementSigning";
+
 
 
 const steps = [
@@ -101,6 +102,8 @@ const SubscriptionEnroll = () => {
   const [enrollmentId, setEnrollmentId] = useState(null);
   const [formSnapshot, setFormSnapshot] = useState(null);
 const [fieldErrors, setFieldErrors] = useState({});
+const [agreementSigned, setAgreementSigned] = useState(false);
+const [checkingAgreement, setCheckingAgreement] = useState(false);
 
   
   const createPaymentIntent = async () => {
@@ -188,31 +191,31 @@ const [fieldErrors, setFieldErrors] = useState({});
 };
 
   // Step 3 → Step 4: agreement signed
- const handleAgreementSigned = async (signatureDataUrl) => {
-  try {
-    setErrorMsg("");
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/save-subscription-signature`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          enrollmentId,
-          signature: signatureDataUrl,
-        }),
-      }
-    );
+//  const handleAgreementSigned = async (signatureDataUrl) => {
+//   try {
+//     setErrorMsg("");
+//     const res = await fetch(
+//       `${import.meta.env.VITE_API_URL}/save-subscription-signature`,
+//       {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           enrollmentId,
+//           signature: signatureDataUrl,
+//         }),
+//       }
+//     );
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Failed to save signature");
-    }
+//     if (!res.ok) {
+//       const err = await res.json();
+//       throw new Error(err.message || "Failed to save signature");
+//     }
 
-    setTimeout(() => setStep(STEP_PAYMENT), 1200);
-  } catch (err) {
-    setErrorMsg(err.message || "Could not save signature. Please try again.");
-  }
-};
+//     setTimeout(() => setStep(STEP_PAYMENT), 1200);
+//   } catch (err) {
+//     setErrorMsg(err.message || "Could not save signature. Please try again.");
+//   }
+// };
 
   // Step 4: payment success → enrollment complete
   const handlePaymentSuccess = async (paymentIntentId) => {
@@ -404,10 +407,70 @@ const handleFormNext = () => {
 
         {/* Step 3: Agreement signing */}
 {step === STEP_AGREEMENT && enrollmentId && (
-  <AgreementSigning
-    studentName={formSnapshot?.name}
-    onSigned={handleAgreementSigned}
-  />
+  <div className="space-y-6 text-center">
+    
+    <div>
+      <h3 className="text-lg font-semibold text-white">
+        Sign Your Subscription Agreement
+      </h3>
+      <p className="mt-2 text-sm text-white/40">
+        You will be redirected to SignWell to complete your contract signing.
+      </p>
+    </div>
+
+    <a
+      href="https://www.signwell.com/new_doc/M1VclHdm8CVBF7W5"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center justify-center w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
+      onClick={() => {
+        setCheckingAgreement(true);
+        setTimeout(() => setCheckingAgreement(false), 60000);
+      }}
+    >
+      Open Contract in SignWell →
+    </a>
+
+    <p className="text-xs text-white/30">
+      After signing, return here and continue.
+    </p>
+
+    {checkingAgreement && (
+      <p className="text-xs text-amber-400">
+        Checking agreement status...
+      </p>
+    )}
+
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          setCheckingAgreement(true);
+
+          const res = await fetch(
+            `${import.meta.env.VITE_API_URL}/check-agreement-status/${enrollmentId}`
+          );
+
+          const data = await res.json();
+
+          if (data.signed === true) {
+            setAgreementSigned(true);
+            setStep(STEP_PAYMENT);
+          } else {
+            alert("Agreement not signed yet. Please complete signing first.");
+          }
+        } catch (err) {
+          alert("Unable to verify agreement. Try again.");
+        } finally {
+          setCheckingAgreement(false);
+        }
+      }}
+      className="w-full py-3 text-sm transition border text-cyan-400 border-cyan-400/30 rounded-xl hover:bg-cyan-400/10"
+    >
+      I’ve Signed → Verify & Continue
+    </button>
+
+  </div>
 )}
 
         {/* Step 4: Payment */}
