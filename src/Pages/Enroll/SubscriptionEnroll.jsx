@@ -96,6 +96,7 @@ const SubscriptionEnroll = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [canVerify, setCanVerify] = useState(false);
 
   // Collected data across steps
   const [identityData, setIdentityData] = useState(null);
@@ -406,9 +407,10 @@ const handleFormNext = () => {
         )}
 
         {/* Step 3: Agreement signing */}
+{/* Step 3: Agreement signing */}
 {step === STEP_AGREEMENT && enrollmentId && (
   <div className="space-y-6 text-center">
-    
+
     <div>
       <h3 className="text-lg font-semibold text-white">
         Sign Your Subscription Agreement
@@ -418,14 +420,18 @@ const handleFormNext = () => {
       </p>
     </div>
 
-    <a
-      href="https://www.signwell.com/new_doc/mJqGWFFh9guBx8e5"
+    
+      <a href="https://www.signwell.com/new_doc/mJqGWFFh9guBx8e5"
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center justify-center w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
       onClick={() => {
         setCheckingAgreement(true);
-        setTimeout(() => setCheckingAgreement(false), 60000);
+        setCanVerify(false);
+        setTimeout(() => {
+          setCheckingAgreement(false);
+          setCanVerify(true);
+        }, 60000); // 1 minute delay
       }}
     >
       Open Contract in SignWell →
@@ -437,38 +443,25 @@ const handleFormNext = () => {
 
     {checkingAgreement && (
       <p className="text-xs text-amber-400">
-        Checking agreement status...
+        Please wait a moment while we prepare your verification...
       </p>
     )}
 
-    <button
-      type="button"
-      onClick={async () => {
-        try {
-          setCheckingAgreement(true);
-
-          const res = await fetch(
-            `${import.meta.env.VITE_API_URL}/check-agreement-status/${enrollmentId}`
-          );
-
-          const data = await res.json();
-
-          if (data.signed === true) {
-            setAgreementSigned(true);
-            setStep(STEP_PAYMENT);
-          } else {
-            alert("Agreement not signed yet. Please complete signing first.");
-          }
-        } catch (err) {
-          alert("Unable to verify agreement. Try again.");
-        } finally {
-          setCheckingAgreement(false);
-        }
-      }}
-      className="w-full py-3 text-sm transition border text-cyan-400 border-cyan-400/30 rounded-xl hover:bg-cyan-400/10"
-    >
-      I’ve Signed → Verify & Continue
-    </button>
+ <button
+  type="button"
+  disabled={!canVerify}
+  onClick={() => {
+    setAgreementSigned(true);
+    setStep(STEP_PAYMENT);
+  }}
+  className={`w-full py-3 text-sm transition border rounded-xl ${
+    canVerify
+      ? "text-cyan-400 border-cyan-400/30 hover:bg-cyan-400/10 cursor-pointer"
+      : "text-white/20 border-white/10 cursor-not-allowed"
+  }`}
+>
+  I’ve Signed → Verify & Continue
+</button>
 
   </div>
 )}
