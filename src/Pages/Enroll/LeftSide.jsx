@@ -235,7 +235,7 @@ const LeftSide = ({ onDateClick }) => {
               key={index}
               type="button"
               onClick={(e) => handleFeatureClick(e, feature)}
-              className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4 text-left transition-all duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/5"
+              className="group flex items-center justify-between rounded-xl border border-cyan-400 bg-white/[0.03] p-4 text-left transition-all duration-300 hover:border-cyan-400/40 hover:bg-cyan-400/5"
             >
               <div className="flex items-center gap-3">
                 <BookOpen size={18} className="text-cyan-400 shrink-0" />
