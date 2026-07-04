@@ -238,7 +238,7 @@ const [openQuestion, setOpenQuestion] = useState({});
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.05 }}
-              className="overflow-hidden transition-all duration-300 border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl hover:border-cyan-400/30 hover:shadow-[0_0_40px_rgba(34,211,238,0.08)]"
+              className="overflow-hidden transition-all duration-300 border rounded-3xl border-cyan-600 bg-white/[0.03] backdrop-blur-xl hover:border-cyan-400/30 hover:shadow-[0_0_40px_rgba(34,211,238,0.08)]"
             >
               <button
                 onClick={() => toggleCategory(index)}
