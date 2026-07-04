@@ -15,7 +15,8 @@ const navigate = useNavigate();
   };
 
               return (
-                <div className="flex items-center justify-center gap-5">
+                
+                <div className="flex items-center justify-center gap-5 relative  py-4 overflow-hidden text-white bg-[#0a0e12]">
                   {/* Enroll */}
             <motion.button
               onClick={handleEnroll}

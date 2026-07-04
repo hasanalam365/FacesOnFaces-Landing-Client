@@ -48,7 +48,8 @@ const steps = [
 
 const LearningExperience = () => {
   return (
-    <section className="py-24 overflow-hidden bg-black">
+    <section className="relative px-6 py-8 overflow-hidden text-white bg-[#0a0e12]">
+      <div className="divider"></div>
       <div className="px-6 mx-auto max-w-7xl">
         {/* Heading */}
         <motion.div

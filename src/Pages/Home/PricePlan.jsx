@@ -76,7 +76,7 @@ const PricePlan = ({ onSelectPlan }) => {
 
 
   return (
-    <section className="relative px-6 py-16 overflow-hidden text-white bg-black">
+   <section className="relative px-6 py-16 overflow-hidden text-white bg-[#0a0e12]">
       {/* Background Glow */}
       <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[150px] rounded-full"></div>
 

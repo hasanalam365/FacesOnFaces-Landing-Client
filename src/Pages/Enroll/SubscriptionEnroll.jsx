@@ -6,9 +6,6 @@ import {
 import PaymentForm from "../../Components/PaymentForm";
 import IdentityVerification from "../../Components/IdentityVerification";
 
-
-
-
 const steps = [
   {
     icon: <FileSignature size={20} className="text-cyan-400" />,
@@ -34,20 +31,21 @@ const steps = [
 
 // Step IDs
 const STEP_FORM = "form";
-const STEP_IDENTITY = "identity";
 const STEP_AGREEMENT = "agreement";
+const STEP_IDENTITY = "identity";
 const STEP_PAYMENT = "payment";
 const STEP_DONE = "done";
 
 const STEP_LABELS = {
   [STEP_FORM]: "Your Details",
-  [STEP_IDENTITY]: "Identity",
   [STEP_AGREEMENT]: "Agreement",
+  [STEP_IDENTITY]: "Identity",
   [STEP_PAYMENT]: "Payment",
 };
 
 const StepIndicator = ({ current }) => {
-  const order = [STEP_FORM, STEP_IDENTITY, STEP_AGREEMENT, STEP_PAYMENT];
+  // New order: Details -> Agreement -> Identity -> Payment
+  const order = [STEP_FORM, STEP_AGREEMENT, STEP_IDENTITY, STEP_PAYMENT];
   const currentIdx = order.indexOf(current);
   return (
     <div className="flex items-center justify-center gap-2 mb-8">
@@ -101,11 +99,10 @@ const SubscriptionEnroll = () => {
   const [identityData, setIdentityData] = useState(null);
   const [enrollmentId, setEnrollmentId] = useState(null);
   const [formSnapshot, setFormSnapshot] = useState(null);
-const [fieldErrors, setFieldErrors] = useState({});
-const [agreementSigned, setAgreementSigned] = useState(false);
-const [checkingAgreement, setCheckingAgreement] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [agreementSigned, setAgreementSigned] = useState(false);
+  const [checkingAgreement, setCheckingAgreement] = useState(false);
 
-  
   const createPaymentIntent = async () => {
     try {
       setLoading(true);
@@ -134,63 +131,74 @@ const [checkingAgreement, setCheckingAgreement] = useState(false);
     createPaymentIntent();
   }, []);
 
-  // Step 1 → Step 2: validate form fields then proceed to identity
+  // Step 1 → Step 2: validate form fields then proceed to Agreement
   const handleFormNext = () => {
     const f = form.current;
+
     const name = f.querySelector('[name="name"]').value.trim();
     const email = f.querySelector('[name="email"]').value.trim();
     const phone = f.querySelector('[name="phone"]').value.trim();
 
-    if (!name || !email || !phone) {
-      setErrorMsg("Please fill in all required fields.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMsg("Please enter a valid email address.");
-      return;
-    }
+    const errors = {};
+
+    if (!name) errors.name = "Full name is required";
+    if (!email) errors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      errors.email = "Please enter a valid email address";
+
+    if (!phone) errors.phone = "Phone number is required";
+
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) return;
+
     setErrorMsg("");
     setFormSnapshot({ name, email, phone });
+    setStep(STEP_AGREEMENT);
+  };
+
+  // Step 2 → Step 3: agreement signed, proceed to Identity verification
+  const handleAgreementConfirmed = () => {
+    setAgreementSigned(true);
+    setErrorMsg("");
     setStep(STEP_IDENTITY);
   };
 
-  // Step 2 → Step 3: identity verified, send agreement via backend
+  // Step 3 → Step 4: identity verified, create pre-enrollment, then go to Payment
   const handleIdentityConfirmed = async (data) => {
-  if (!data) return;
-  setIdentityData(data);
-  setErrorMsg("");
+    if (!data) return;
+    setIdentityData(data);
+    setErrorMsg("");
 
-  try {
-    const body = new FormData();
-    body.append("name", formSnapshot.name);
-    body.append("email", formSnapshot.email);
-    body.append("phone", formSnapshot.phone);
-    body.append("documentType", data.documentType);
-    if (data.documentNumber) body.append("documentNumber", data.documentNumber);
-    body.append("frontFile", data.frontFile);
-    if (data.backFile) body.append("backFile", data.backFile);
+    try {
+      const body = new FormData();
+      body.append("name", formSnapshot.name);
+      body.append("email", formSnapshot.email);
+      body.append("phone", formSnapshot.phone);
+      body.append("documentType", data.documentType);
+      if (data.documentNumber) body.append("documentNumber", data.documentNumber);
+      body.append("frontFile", data.frontFile);
+      if (data.backFile) body.append("backFile", data.backFile);
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/create-subscription-pre-enrollment`,
-      { method: "POST", body }
-    );
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/create-subscription-pre-enrollment`,
+        { method: "POST", body }
+      );
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Failed to create enrollment");
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to create enrollment");
+      }
+
+      const result = await res.json();
+      if (!result.enrollmentId) throw new Error("No enrollment ID returned");
+      setEnrollmentId(result.enrollmentId);
+      setStep(STEP_PAYMENT);
+    } catch (err) {
+      setErrorMsg(err.message || "Something went wrong. Please try again.");
+      setIdentityData(null);
     }
-
-    const result = await res.json();
-    if (!result.enrollmentId) throw new Error("No enrollment ID returned");
-    setEnrollmentId(result.enrollmentId);
-    setStep(STEP_AGREEMENT); // Agreement signing step এ যাবে
-  } catch (err) {
-    setErrorMsg(err.message || "Something went wrong. Please try again.");
-    setIdentityData(null);
-  }
-};
-
-
+  };
 
   // Step 4: payment success → enrollment complete
   const handlePaymentSuccess = async (paymentIntentId) => {
@@ -245,30 +253,6 @@ const [checkingAgreement, setCheckingAgreement] = useState(false);
       );
     }
 
-const handleFormNext = () => {
-  const f = form.current;
-
-  const name = f.querySelector('[name="name"]').value.trim();
-  const email = f.querySelector('[name="email"]').value.trim();
-  const phone = f.querySelector('[name="phone"]').value.trim();
-
-  const errors = {};
-
-  if (!name) errors.name = "Full name is required";
-  if (!email) errors.email = "Email is required";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    errors.email = "Please enter a valid email address";
-
-  if (!phone) errors.phone = "Phone number is required";
-
-  setFieldErrors(errors);
-
-  if (Object.keys(errors).length > 0) return;
-
-  setErrorMsg("");
-  setFormSnapshot({ name, email, phone });
-  setStep(STEP_IDENTITY);
-};
     return (
       <>
         {errorMsg && (
@@ -288,53 +272,50 @@ const handleFormNext = () => {
                 <label className="block mb-2 text-sm text-white/70">Full Name</label>
                 <div className="relative">
                   <User size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                 <input
-  type="text"
-  name="name"
-  required
-  placeholder="Enter your full name"
-  maxLength={100}
-  className={inputClass}
-/>
-
-{fieldErrors.name && (
-  <p className="mt-1 text-xs text-red-400">{fieldErrors.name}</p>
-)}
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    placeholder="Enter your full name"
+                    maxLength={100}
+                    className={inputClass}
+                  />
+                  {fieldErrors.name && (
+                    <p className="mt-1 text-xs text-red-400">{fieldErrors.name}</p>
+                  )}
                 </div>
               </div>
               <div>
                 <label className="block mb-2 text-sm text-white/70">Email Address</label>
                 <div className="relative">
                   <Mail size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                 <input
-  type="email"
-  name="email"
-  required
-  placeholder="Enter your email"
-  className={inputClass}
-/>
-
-{fieldErrors.email && (
-  <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
-)}
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="Enter your email"
+                    className={inputClass}
+                  />
+                  {fieldErrors.email && (
+                    <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
+                  )}
                 </div>
               </div>
               <div>
                 <label className="block mb-2 text-sm text-white/70">Phone Number</label>
                 <div className="relative">
                   <Phone size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                 <input
-  type="tel"
-  name="phone"
-  required
-  placeholder="Enter your phone number"
-  maxLength={20}
-  className={inputClass}
-/>
-
-{fieldErrors.phone && (
-  <p className="mt-1 text-xs text-red-400">{fieldErrors.phone}</p>
-)}
+                  <input
+                    type="tel"
+                    name="phone"
+                    required
+                    placeholder="Enter your phone number"
+                    maxLength={20}
+                    className={inputClass}
+                  />
+                  {fieldErrors.phone && (
+                    <p className="mt-1 text-xs text-red-400">{fieldErrors.phone}</p>
+                  )}
                 </div>
               </div>
               <div>
@@ -351,12 +332,74 @@ const handleFormNext = () => {
               onClick={handleFormNext}
               className="w-full py-4 mt-5 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
             >
-              Continue to Identity Verification →
+              Continue to Agreement →
             </button>
           </>
         )}
 
-        {/* Step 2: Identity verification */}
+        {/* Step 2: Agreement signing */}
+        {step === STEP_AGREEMENT && (
+          <div className="space-y-6 text-center">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                Sign Your Subscription Agreement
+              </h3>
+              <p className="mt-2 text-sm text-white/40">
+                You will be redirected to SignWell to complete your contract signing.
+              </p>
+            </div>
+
+            <a
+              href="https://www.signwell.com/new_doc/mJqGWFFh9guBx8e5"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
+              onClick={() => {
+                setCheckingAgreement(true);
+                setCanVerify(false);
+                setTimeout(() => {
+                  setCheckingAgreement(false);
+                  setCanVerify(true);
+                }, 60000); // 1 minute delay
+              }}
+            >
+              Open Contract in SignWell →
+            </a>
+
+            <p className="text-xs text-white/30">
+              After signing, return here and continue.
+            </p>
+<div/>
+            {checkingAgreement && (
+              <p className="text-xs text-amber-400">
+                Please wait a moment while we prepare your verification...
+              </p>
+            )}
+
+            <button
+              type="button"
+              disabled={!canVerify}
+              onClick={handleAgreementConfirmed}
+              className={`w-full py-3 text-sm transition border rounded-xl ${
+                canVerify
+                  ? "text-cyan-400 border-cyan-400/30 hover:bg-cyan-400/10 cursor-pointer"
+                  : "text-white/20 border-white/10 cursor-not-allowed"
+              }`}
+            >
+              I’ve Signed → Verify & Continue
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setStep(STEP_FORM); setErrorMsg(""); }}
+              className="text-sm transition-colors text-white/30 hover:text-white/60"
+            >
+              ← Back to details
+            </button>
+          </div>
+        )}
+
+        {/* Step 3: Identity verification */}
         {step === STEP_IDENTITY && (
           <div className="space-y-5">
             <div>
@@ -372,73 +415,13 @@ const handleFormNext = () => {
             />
             <button
               type="button"
-              onClick={() => { setStep(STEP_FORM); setErrorMsg(""); }}
+              onClick={() => { setStep(STEP_AGREEMENT); setErrorMsg(""); }}
               className="text-sm transition-colors text-white/30 hover:text-white/60"
             >
-              ← Back to details
+              ← Back to agreement
             </button>
           </div>
         )}
-
-        {/* Step 3: Agreement signing */}
-{/* Step 3: Agreement signing */}
-{step === STEP_AGREEMENT && enrollmentId && (
-  <div className="space-y-6 text-center">
-
-    <div>
-      <h3 className="text-lg font-semibold text-white">
-        Sign Your Subscription Agreement
-      </h3>
-      <p className="mt-2 text-sm text-white/40">
-        You will be redirected to SignWell to complete your contract signing.
-      </p>
-    </div>
-
-    
-      <a href="https://www.signwell.com/new_doc/mJqGWFFh9guBx8e5"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center justify-center w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
-      onClick={() => {
-        setCheckingAgreement(true);
-        setCanVerify(false);
-        setTimeout(() => {
-          setCheckingAgreement(false);
-          setCanVerify(true);
-        }, 60000); // 1 minute delay
-      }}
-    >
-      Open Contract in SignWell →
-    </a>
-
-    <p className="text-xs text-white/30">
-      After signing, return here and continue.
-    </p>
-
-    {checkingAgreement && (
-      <p className="text-xs text-amber-400">
-        Please wait a moment while we prepare your verification...
-      </p>
-    )}
-
- <button
-  type="button"
-  disabled={!canVerify}
-  onClick={() => {
-    setAgreementSigned(true);
-    setStep(STEP_PAYMENT);
-  }}
-  className={`w-full py-3 text-sm transition border rounded-xl ${
-    canVerify
-      ? "text-cyan-400 border-cyan-400/30 hover:bg-cyan-400/10 cursor-pointer"
-      : "text-white/20 border-white/10 cursor-not-allowed"
-  }`}
->
-  I’ve Signed → Verify & Continue
-</button>
-
-  </div>
-)}
 
         {/* Step 4: Payment */}
         {step === STEP_PAYMENT && (
@@ -446,7 +429,7 @@ const handleFormNext = () => {
             <div>
               <h3 className="mb-1 text-lg font-semibold text-white">Complete Payment</h3>
               <p className="text-sm text-white/40">
-                Your agreement is signed. Pay £250 to secure your place.
+                Your identity is verified. Pay £250 to secure your place.
               </p>
             </div>
             {loading ? (
@@ -467,7 +450,7 @@ const handleFormNext = () => {
                   <label htmlFor="sub-terms" className="text-sm leading-relaxed cursor-pointer text-white/60">
                     I have read and agree to the{" "}
                     <a href="/subscription-agreement" target="_blank" rel="noopener noreferrer" className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2">
-                     Subscription Agreement
+                      Subscription Agreement
                     </a>{" "}
                     and understand that a signed subscription agreement is required before enrollment is confirmed.
                   </label>
