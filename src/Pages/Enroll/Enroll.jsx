@@ -16,6 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import PaymentForm from "../../Components/PaymentForm";
 import LeftSide from "./LeftSide";
+import PricePlan from "../Home/PricePlan";
 
 // ─── Shared body-scroll-lock hook ──────────────────────────────
 function useScrollLock(active) {
@@ -227,74 +228,12 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
             <X size={16} />
           </button>
 
-          {/* Modal header */}
-          <div className="mb-10 text-center" style={{ position: "relative", zIndex: 1 }}>
-            <p className="text-cyan-400 text-xs tracking-[4px] uppercase mb-4">
-              Enrollment Options
-            </p>
-            <h2 className="font-serif text-3xl font-light text-white md:text-4xl">
-              Choose Your{" "}
-              <span className="italic text-cyan-300">Payment Plan</span>
-            </h2>
-            <p className="max-w-xl mx-auto mt-3 text-sm text-gray-400">
-              Flexible ways to start your journey — pay in full, leave a
-              deposit, or subscribe monthly via direct debit.
-            </p>
-          </div>
+         
 
-          {/* Plan cards */}
-          <div style={{ position: "relative", zIndex: 1 }} className="grid gap-6 lg:grid-cols-3">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className={`relative rounded-3xl p-7 flex flex-col
-                  transition-all duration-500 cursor-pointer border border-cyan-400
-                  ${
-                    plan.featured
-                      ? "bg-[#0f1519] border border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.15)] hover:-translate-y-3 hover:scale-[1.02] hover:shadow-[0_20px_60px_rgba(34,211,238,0.3)]"
-                      : selectedPlan === plan.id
-                      ? "bg-[#0c1014] border border-cyan-400 scale-[1.02]"
-                      : "bg-[#0c1014] border border-cyan-400 hover:-translate-y-2 hover:scale-[1.01] hover:border-cyan-400/60 hover:shadow-[0_12px_40px_rgba(34,211,238,0.12)]"
-                  }`}
-              >
-                <div className={plan.featured ? "mt-5" : ""}>
-                  <h3 className="mb-2 text-xl font-medium text-white">{plan.title}</h3>
-                  <p className="mb-6 text-sm leading-relaxed text-gray-400">
-                    {plan.description}
-                  </p>
-                  <div className="mb-6">
-                    <h2 className="text-4xl font-light text-white">{plan.price}</h2>
-                    <p
-                      className={`text-sm mt-1 ${
-                        plan.featured ? "text-cyan-400" : "text-gray-500"
-                      }`}
-                    >
-                      {plan.subText}
-                    </p>
-                  </div>
-                  <ul className="flex-grow mb-6 space-y-3">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm text-gray-300">
-                        <Check size={14} className="flex-shrink-0 text-cyan-400" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.currentTarget.blur();
-                    onSelectPlan(plan.id);
-                  }}
-                  className="mt-auto w-full py-3.5 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all duration-300 bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
-                
-                >
-                  {plan.buttonText}
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            ))}
+        
+         {/* Plan cards */}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <PricePlan onSelectPlan={onSelectPlan} />
           </div>
         </div>
       </div>

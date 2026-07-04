@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
  const plans = [
     {
-      
+      id: "full payment",
       title: "Pay in Full",
       description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
       
@@ -24,7 +24,7 @@ import { useNavigate } from "react-router-dom";
       link: '/enroll'
     },
     {
-      
+      id:"deposit",
       title: "Deposit",
       description:
         "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
@@ -41,6 +41,7 @@ import { useNavigate } from "react-router-dom";
       link: '/deposit-enroll'
     },
     {
+       id:"subscription",
       badge: "Flexible",
       title: "Subscription",
       description:
@@ -61,17 +62,17 @@ import { useNavigate } from "react-router-dom";
     },
   ];
 
-const PricePlan = () => {
- 
-const navigate=useNavigate()
+const PricePlan = ({ onSelectPlan }) => {
 
+  const navigate = useNavigate();
 
-const handleEnroll=(link)=>{
-
-    navigate(link)
-
-}
-
+  const handleEnroll = (plan) => {
+    if (onSelectPlan) {
+      onSelectPlan(plan.id);
+    } else {
+      navigate(plan.link);
+    }
+  };
 
 
   return (
@@ -163,7 +164,7 @@ transition-all duration-500 cursor-pointer
               </div>
 
               {/* Button */}
-              <button onClick={()=>handleEnroll(plan?.link)}
+              <button onClick={() => handleEnroll(plan)}
                 className={`mt-auto w-full py-4 rounded-full flex items-center justify-center gap-2 font-medium 
                   transition-all duration-300 bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] `}
               > 
