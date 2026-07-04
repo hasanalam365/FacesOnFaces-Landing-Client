@@ -56,56 +56,62 @@ function useScrollLock(active) {
 
 // ─── Price Plans ───────────────────────────────────────────────
 const plans = [
-  {
-    id: "full",
-    title: "Pay in Full",
-    description:
-      "One simple payment — no ongoing commitments. Unlock full course materials and lifetime access.",
-    price: "£1,099",
-    subText: "Save £500",
-    buttonText: "Enroll & Pay in Full",
-    featured: false,
-    features: [
-      "Full course access immediately",
-      "Lifetime Support",
-      "Save £500 vs other plans",
-      "Priority scheduling",
-    ],
-  },
-  {
-    id: "deposit",
-    title: "Deposit",
-    description:
-      "Reserve your spot with a deposit now and pay the remaining balance before your course start date.",
-    price: "£250",
-    subText: "Deposit today, then £849",
-    buttonText: "Pay Deposit Now",
-    featured: true,
-    features: [
-      "Secure your place instantly",
-      "Balance due 14 days before start",
-      "Full course access on day one",
-      "Dedicated enrollment advisor",
-      "Balance due on the day of the course",
-      "Manuals sent out after deposit",
-    ],
-  },
-  {
-    id: "subscription",
-    title: "Subscription",
-    description:
-      "Spread the cost with a monthly direct debit. Requires a signed subscription agreement before enrolment.",
-    price: "£100",
-    subText: "per month",
-    buttonText: "Start Subscription",
-    featured: false,
-    features: [
-      "Direct debit setup",
-      "Signed subscription agreement",
-      "Cancel terms apply",
-    ],
-  },
-];
+    {
+      
+      title: "Pay in Full",
+      description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
+      
+      price: "£1,099",
+      subText: "Save £500",
+      buttonText: "Enroll & Pay in Full",
+      featured: false,
+      features: [
+        "Secure your place instantly",
+        "Dedicated enrollment advisor",
+        "Balance due on the day of the course",
+        "Manuals sent out after payment",
+        
+        
+      ],
+      link: '/enroll'
+    },
+    {
+      
+      title: "Deposit",
+      description:
+        "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
+      price: "£250",
+      subText: "Deposit today, then £849",
+      buttonText: "Pay Deposit Now",
+      featured: true,
+      features: [
+         "Secure your place instantly",
+        "Dedicated enrollment advisor",
+        "Balance due on the day of the course",
+        "Manuals sent out after payment",
+      ],
+      link: '/deposit-enroll'
+    },
+    {
+      badge: "Flexible",
+      title: "Subscription",
+      description:
+        "One simple monthly subscription payment, no large upfront amount to pay",
+      price: "£100",
+      subText: "per month",
+      buttonText: "Start Subscription",
+      featured: false,
+      features: [
+       
+        "Direct debit setup",
+        "Signed subscription agreement",
+        "Ongoing Support",
+        "Add course with no additional monthly cost",
+        "No long term contract, cancel anytime"
+      ],
+      link: '/subscription-enroll'
+    },
+  ];
 
 // ─── Plan Modal ────────────────────────────────────────────────
 const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
