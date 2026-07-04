@@ -1,9 +1,12 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Play, Pause } from "lucide-react";
 
 const Banner = () => {
 
   const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showIcon, setShowIcon] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -23,6 +26,24 @@ const Banner = () => {
     observer.observe(video);
     return () => observer.disconnect();
   }, []);
+
+  // ── Video click → pause/resume ───────────────────────────────
+  const handleVideoClick = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().catch(() => {});
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+
+    // ছোট একটা icon flash দেখানোর জন্য
+    setShowIcon(true);
+    setTimeout(() => setShowIcon(false), 500);
+  };
 
  
   return (
@@ -65,7 +86,10 @@ const Banner = () => {
 
           {/* RIGHT VIDEO SECTION */}
           <div className="relative flex justify-center order-1 md:order-2 lg:justify-end">
-            <div className="relative overflow-hidden border rounded-[30px] border-white/10 bg-white/5 backdrop-blur-xl w-[320px] md:w-[420px]">
+            <div
+              className="relative overflow-hidden border rounded-[30px] border-white/10 bg-white/5 backdrop-blur-xl w-[320px] md:w-[420px] cursor-pointer"
+              onClick={handleVideoClick}
+            >
               <video
                 ref={videoRef}
                 autoPlay
@@ -80,6 +104,19 @@ const Banner = () => {
                 />
                 Your browser does not support the video tag.
               </video>
+
+              {/* Play/Pause flash icon */}
+              {showIcon && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm animate-ping-once">
+                    {isPlaying ? (
+                      <Play size={28} className="ml-1 text-white" fill="white" />
+                    ) : (
+                      <Pause size={28} className="text-white" fill="white" />
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Floating Bottom */}
