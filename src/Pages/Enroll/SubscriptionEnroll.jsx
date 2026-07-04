@@ -5,8 +5,7 @@ import {
 } from "lucide-react";
 import PaymentForm from "../../Components/PaymentForm";
 import IdentityVerification from "../../Components/IdentityVerification";
-// import AgreementStatus from "../../Components/AgreementStatus";
-// import AgreementSigning from "../../Components/AgreementSigning";
+
 
 
 
@@ -191,32 +190,7 @@ const [checkingAgreement, setCheckingAgreement] = useState(false);
   }
 };
 
-  // Step 3 → Step 4: agreement signed
-//  const handleAgreementSigned = async (signatureDataUrl) => {
-//   try {
-//     setErrorMsg("");
-//     const res = await fetch(
-//       `${import.meta.env.VITE_API_URL}/save-subscription-signature`,
-//       {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           enrollmentId,
-//           signature: signatureDataUrl,
-//         }),
-//       }
-//     );
 
-//     if (!res.ok) {
-//       const err = await res.json();
-//       throw new Error(err.message || "Failed to save signature");
-//     }
-
-//     setTimeout(() => setStep(STEP_PAYMENT), 1200);
-//   } catch (err) {
-//     setErrorMsg(err.message || "Could not save signature. Please try again.");
-//   }
-// };
 
   // Step 4: payment success → enrollment complete
   const handlePaymentSuccess = async (paymentIntentId) => {

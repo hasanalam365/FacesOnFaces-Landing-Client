@@ -288,6 +288,7 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
                     onSelectPlan(plan.id);
                   }}
                   className="mt-auto w-full py-3.5 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all duration-300 bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]"
+                
                 >
                   {plan.buttonText}
                   <ArrowRight size={16} />
