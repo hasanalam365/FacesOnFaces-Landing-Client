@@ -11,6 +11,7 @@ import LearningExperience from "./LearningExperience";
 import Location from "./Location";
 import PricePlan from "./PricePlan";
 import CourseDetails from "./CourseDetails";
+import CallToAction from "../../Components/CallToAction";
 
 
 const Homes = () => {
@@ -55,7 +56,7 @@ const Homes = () => {
       <PricePlan/>
       </section>
 
-
+<CallToAction/>
 
 
       <LearningExperience />

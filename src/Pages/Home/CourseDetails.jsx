@@ -242,7 +242,7 @@ const CourseDetails = () => {
                   key={index}
                   type="button"
                   onClick={(e) => handleFeatureClick(e, feature)}
-                  className="group relative flex items-center gap-3 rounded-2xl border border-cyan-400/10 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-400/5 hover:shadow-[0_0_25px_rgba(34,211,238,.12)] cursor-pointer"
+                  className="group relative flex items-center gap-3 rounded-2xl border border-cyan-400 bg-white/[0.03] p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:bg-cyan-400/5 hover:shadow-[0_0_25px_rgba(34,211,238,.12)] cursor-pointer"
                 >
                   <div className="flex items-center w-full gap-4">
                     {/* Left Icon */}

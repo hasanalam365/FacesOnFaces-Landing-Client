@@ -72,8 +72,9 @@ const WhyChoose = () => {
             </h2>
 
             <p className="max-w-md leading-relaxed text-gray-400">
-              We don't just teach aesthetics — we craft practitioners who
-              redefine the standard of clinical excellence.
+              {/* We don't just teach aesthetics — we craft practitioners who
+              redefine the standard of clinical excellence. */}
+              Stay updated with this summit
             </p>
           </motion.div>
 

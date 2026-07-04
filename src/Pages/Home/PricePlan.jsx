@@ -2,21 +2,22 @@ import React from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
  const plans = [
     {
       
       title: "Pay in Full",
-      description:"One simple payment — no ongoing commitments. Unlock full course materials and lifetime access.",
+      description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
       
       price: "£1,099",
       subText: "Save £500",
       buttonText: "Enroll & Pay in Full",
       featured: false,
       features: [
-        "Full course access immediately",
-        "Lifetime support",
-        "Save £500 vs other plans",
-        "Priority scheduling",
+        "Secure your place instantly",
+        "Dedicated enrollment advisor",
+        "Balance due on the day of the course",
+        "Manuals sent out after payment",
         
         
       ],
@@ -26,18 +27,16 @@ import { useNavigate } from "react-router-dom";
       
       title: "Deposit",
       description:
-        "Reserve your spot with a deposit now and pay the remaining balance before your course start date.",
+        "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
       price: "£250",
       subText: "Deposit today, then £849",
       buttonText: "Pay Deposit Now",
       featured: true,
       features: [
-        "Secure your place instantly",
-        "Balance due 14 days before start",
-        "Full course access on day one",
+         "Secure your place instantly",
         "Dedicated enrollment advisor",
-         "Balance due on the day of the course ",
-        "Manuals sent out after deposit",
+        "Balance due on the day of the course",
+        "Manuals sent out after payment",
       ],
       link: '/deposit-enroll'
     },
@@ -45,7 +44,7 @@ import { useNavigate } from "react-router-dom";
       badge: "Flexible",
       title: "Subscription",
       description:
-        "Spread the cost with a monthly direct debit. Requires a signed subscription agreement before enrolment.",
+        "One simple monthly subscription payment, no large upfront amount to pay",
       price: "£100",
       subText: "per month",
       buttonText: "Start Subscription",
@@ -54,8 +53,11 @@ import { useNavigate } from "react-router-dom";
        
         "Direct debit setup",
         "Signed subscription agreement",
-        "Cancel terms apply",
+        "Ongoing Support",
+        "Add course with no additional monthly cost",
+        "No long term contract, cancel anytime"
       ],
+      link: '/subscription-enroll'
     },
   ];
 
@@ -73,7 +75,7 @@ const handleEnroll=(link)=>{
 
 
   return (
-    <section className="relative px-6 py-24 overflow-hidden text-white bg-black">
+    <section className="relative px-6 py-16 overflow-hidden text-white bg-black">
       {/* Background Glow */}
       <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[150px] rounded-full"></div>
 
@@ -172,6 +174,8 @@ transition-all duration-500 cursor-pointer
           ))}
         </div>
       </div>
+
+      
     </section>
   );
 };
