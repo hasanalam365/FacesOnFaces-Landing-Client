@@ -8,7 +8,7 @@ const instructors = [
   },
   {
     id: 2,
-    name: "Advanced Practitioner Mobina",
+    name: "Advance Practitioner Mobina",
     image: "https://i.ibb.co.com/tTbDmTL8/mobina.jpg",
   },
   {

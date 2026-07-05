@@ -13,6 +13,7 @@ import DepositEnroll from "../../Pages/Enroll/DepositEnroll";
 import SubscriptionEnroll from "../../Pages/Enroll/SubscriptionEnroll";
 import SubscriptionsAgreement from "../../Pages/Terms&Condition/SubscriptionsAgreement";
 import LeadFormPage from "../../Components/LeadFormPage";
+import SubscriptionSuccess from "../../Pages/Subscription/Success/SubscriptionSuccess";
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ export const router = createBrowserRouter([
         path: '/lead-form',
         element: <LeadFormPage/>
       },
+      {
+  path: "/subscription/success",
+  element: <SubscriptionSuccess />
+}
     ],
   },
 ]);

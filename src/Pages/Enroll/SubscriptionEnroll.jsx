@@ -3,8 +3,8 @@ import {
   User, Mail, Phone, CheckCircle, ShieldCheck,
   CalendarDays, BadgeCheck, FileSignature, AlertCircle,
 } from "lucide-react";
-import PaymentForm from "../../Components/PaymentForm";
 import IdentityVerification from "../../Components/IdentityVerification";
+import PaymentForm from "../../Components/PaymentForm";
 
 const steps = [
   {
@@ -33,19 +33,20 @@ const steps = [
 const STEP_FORM = "form";
 const STEP_AGREEMENT = "agreement";
 const STEP_IDENTITY = "identity";
-const STEP_PAYMENT = "payment";
+const STEP_PAYMENT = "payment";     // £250 Stripe card payment
+const STEP_MANDATE = "mandate";     // £100/month GoCardless Direct Debit
 const STEP_DONE = "done";
 
 const STEP_LABELS = {
   [STEP_FORM]: "Your Details",
   [STEP_AGREEMENT]: "Agreement",
   [STEP_IDENTITY]: "Identity",
-  [STEP_PAYMENT]: "Payment",
+  [STEP_PAYMENT]: "First Payment",
+  [STEP_MANDATE]: "Direct Debit",
 };
 
 const StepIndicator = ({ current }) => {
-  // New order: Details -> Agreement -> Identity -> Payment
-  const order = [STEP_FORM, STEP_AGREEMENT, STEP_IDENTITY, STEP_PAYMENT];
+  const order = [STEP_FORM, STEP_AGREEMENT, STEP_IDENTITY, STEP_PAYMENT, STEP_MANDATE];
   const currentIdx = order.indexOf(current);
   return (
     <div className="flex items-center justify-center gap-2 mb-8">
@@ -86,14 +87,17 @@ const StepIndicator = ({ current }) => {
 
 const SubscriptionEnroll = () => {
   const form = useRef(null);
-  const hasFetched = useRef(false);
 
   const [step, setStep] = useState(STEP_FORM);
-  const [clientSecret, setClientSecret] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [canVerify, setCanVerify] = useState(false);
+
+  // Stripe (£250 first payment)
+  const hasFetchedIntent = useRef(false);
+  const [clientSecret, setClientSecret] = useState("");
+  const [stripeLoading, setStripeLoading] = useState(true);
 
   // Collected data across steps
   const [identityData, setIdentityData] = useState(null);
@@ -105,7 +109,7 @@ const SubscriptionEnroll = () => {
 
   const createPaymentIntent = async () => {
     try {
-      setLoading(true);
+      setStripeLoading(true);
       setErrorMsg("");
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/create-subscription-payment-intent`,
@@ -121,15 +125,16 @@ const SubscriptionEnroll = () => {
     } catch {
       setErrorMsg("Payment setup failed. Please refresh and try again.");
     } finally {
-      setLoading(false);
+      setStripeLoading(false);
     }
   };
 
+  // Fetch the Stripe payment intent once we reach the payment step
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
+    if (step !== STEP_PAYMENT || hasFetchedIntent.current) return;
+    hasFetchedIntent.current = true;
     createPaymentIntent();
-  }, []);
+  }, [step]);
 
   // Step 1 → Step 2: validate form fields then proceed to Agreement
   const handleFormNext = () => {
@@ -200,7 +205,7 @@ const SubscriptionEnroll = () => {
     }
   };
 
-  // Step 4: payment success → enrollment complete
+  // Step 4: Stripe card payment success → mark enrollment paid, move to mandate step
   const handlePaymentSuccess = async (paymentIntentId) => {
     try {
       setErrorMsg("");
@@ -224,13 +229,53 @@ const SubscriptionEnroll = () => {
       }
       const result = await response.json();
       if (result.success) {
-        setStep(STEP_DONE);
-        setClientSecret("");
+        setIsTermsAccepted(false);
+        setStep(STEP_MANDATE);
       } else {
         throw new Error("Enrollment failed. Please contact support.");
       }
     } catch (err) {
       setErrorMsg(err.message || "Something went wrong. Please contact support.");
+    }
+  };
+
+  // Step 5: kick off the GoCardless Direct Debit setup (redirects to the bank)
+  const handleGoCardlessPayment = async () => {
+    if (!enrollmentId) {
+      setErrorMsg("Missing enrollment reference. Please restart the process.");
+      return;
+    }
+    try {
+      setLoading(true);
+      setErrorMsg("");
+
+      // Needed on the success page after the bank redirect brings the user back
+      localStorage.setItem("enrollmentId", enrollmentId);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/gc/create-redirect-flow`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            enrollmentId,
+            name: formSnapshot.name,
+            email: formSnapshot.email,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok || !data.redirectUrl) {
+        throw new Error(data.message || "Failed to start bank payment setup.");
+      }
+
+      window.location.href = data.redirectUrl; // 🚀 redirect to bank page
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || "Something went wrong starting your bank setup.");
+      setLoading(false);
     }
   };
 
@@ -369,7 +414,7 @@ const SubscriptionEnroll = () => {
             <p className="text-xs text-white/30">
               After signing, return here and continue.
             </p>
-<div/>
+
             {checkingAgreement && (
               <p className="text-xs text-amber-400">
                 Please wait a moment while we prepare your verification...
@@ -423,16 +468,16 @@ const SubscriptionEnroll = () => {
           </div>
         )}
 
-        {/* Step 4: Payment */}
+        {/* Step 4: Stripe £250 first payment */}
         {step === STEP_PAYMENT && (
           <div className="space-y-5">
             <div>
-              <h3 className="mb-1 text-lg font-semibold text-white">Complete Payment</h3>
+              <h3 className="mb-1 text-lg font-semibold text-white">Complete First Payment</h3>
               <p className="text-sm text-white/40">
-                Your identity is verified. Pay £250 to secure your place.
+                Your identity is verified. Pay £250 by card to secure your place.
               </p>
             </div>
-            {loading ? (
+            {stripeLoading ? (
               <div className="flex items-center justify-center p-5">
                 <div className="w-6 h-6 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
                 <span className="ml-3 text-sm text-white/50">Setting up payment...</span>
@@ -452,7 +497,8 @@ const SubscriptionEnroll = () => {
                     <a href="/subscription-agreement" target="_blank" rel="noopener noreferrer" className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2">
                       Subscription Agreement
                     </a>{" "}
-                    and understand that a signed subscription agreement is required before enrollment is confirmed.
+                    and understand that a Direct Debit mandate for £100/month
+                    will be set up after this first payment.
                   </label>
                 </div>
                 <div className="relative">
@@ -466,6 +512,57 @@ const SubscriptionEnroll = () => {
                 </div>
               </>
             ) : null}
+          </div>
+        )}
+
+        {/* Step 5: GoCardless Direct Debit mandate for the £100/month */}
+        {step === STEP_MANDATE && (
+          <div className="space-y-5">
+            <div>
+              <h3 className="mb-1 text-lg font-semibold text-white">Set Up Direct Debit</h3>
+              <p className="text-sm text-white/40">
+                First payment received. Now set up your bank Direct Debit for
+                the remaining £100/month — you'll be redirected to your bank to authorise it.
+              </p>
+            </div>
+
+            <div className={`flex items-start gap-3 p-4 mb-5 border rounded-xl transition-colors duration-200 ${isTermsAccepted ? "border-cyan-400/30 bg-cyan-400/5" : "border-white/10 bg-white/5"}`}>
+              <input
+                type="checkbox"
+                id="mandate-terms"
+                checked={isTermsAccepted}
+                onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
+              />
+              <label htmlFor="mandate-terms" className="text-sm leading-relaxed cursor-pointer text-white/60">
+                I authorise Faces On Faces Academy to collect £100 per
+                month by Direct Debit via GoCardless, in line with the{" "}
+                <a href="/subscription-agreement" target="_blank" rel="noopener noreferrer" className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2">
+                  Subscription Agreement
+                </a>.
+              </label>
+            </div>
+
+            <div className="relative">
+              {!isTermsAccepted && (
+                <div className="absolute inset-0 z-10 rounded-xl bg-black/60 backdrop-blur-sm" />
+              )}
+              <button
+                type="button"
+                onClick={handleGoCardlessPayment}
+                disabled={!isTermsAccepted || loading}
+                className="flex items-center justify-center w-full gap-2 py-4 text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 rounded-full border-black/40 border-t-transparent animate-spin" />
+                    Redirecting to your bank...
+                  </>
+                ) : (
+                  "Continue to Bank Payment →"
+                )}
+              </button>
+            </div>
           </div>
         )}
       </>
