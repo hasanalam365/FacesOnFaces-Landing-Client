@@ -106,6 +106,8 @@ const SubscriptionEnroll = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [agreementSigned, setAgreementSigned] = useState(false);
   const [checkingAgreement, setCheckingAgreement] = useState(false);
+  const [agreementSigned2, setAgreementSigned2] = useState(false); 
+const pollRef = useRef(null);
 
   const createPaymentIntent = async () => {
     try {
@@ -129,38 +131,71 @@ const SubscriptionEnroll = () => {
     }
   };
 
-  // Fetch the Stripe payment intent once we reach the payment step
-  useEffect(() => {
-    if (step !== STEP_PAYMENT || hasFetchedIntent.current) return;
-    hasFetchedIntent.current = true;
-    createPaymentIntent();
-  }, [step]);
+
+
+
+useEffect(() => {
+  if (step !== STEP_AGREEMENT || !enrollmentId) return;
+
+  const check = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/subscription-agreement-status/${enrollmentId}`
+      );
+      const data = await res.json();
+      if (data.signed) {
+        clearInterval(pollRef.current);
+        setAgreementSigned(true);
+        setStep(STEP_IDENTITY);
+      }
+    } catch {
+      // silently retry on next tick
+    }
+  };
+
+  check();
+  pollRef.current = setInterval(check, 8000);
+  return () => clearInterval(pollRef.current);
+}, [step, enrollmentId]);
 
   // Step 1 → Step 2: validate form fields then proceed to Agreement
-  const handleFormNext = () => {
-    const f = form.current;
+  const handleFormNext = async () => {
+  const f = form.current;
+  const name = f.querySelector('[name="name"]').value.trim();
+  const email = f.querySelector('[name="email"]').value.trim();
+  const phone = f.querySelector('[name="phone"]').value.trim();
 
-    const name = f.querySelector('[name="name"]').value.trim();
-    const email = f.querySelector('[name="email"]').value.trim();
-    const phone = f.querySelector('[name="phone"]').value.trim();
+  const errors = {};
+  if (!name) errors.name = "Full name is required";
+  if (!email) errors.email = "Email is required";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    errors.email = "Please enter a valid email address";
+  if (!phone) errors.phone = "Phone number is required";
 
-    const errors = {};
+  setFieldErrors(errors);
+  if (Object.keys(errors).length > 0) return;
 
-    if (!name) errors.name = "Full name is required";
-    if (!email) errors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      errors.email = "Please enter a valid email address";
-
-    if (!phone) errors.phone = "Phone number is required";
-
-    setFieldErrors(errors);
-
-    if (Object.keys(errors).length > 0) return;
-
-    setErrorMsg("");
+  setErrorMsg("");
+  setLoading(true);
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/create-subscription-agreement`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, phone }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Could not start the agreement process.");
+    }
     setFormSnapshot({ name, email, phone });
+    setEnrollmentId(data.enrollmentId);
     setStep(STEP_AGREEMENT);
-  };
+  } catch (err) {
+    setErrorMsg(err.message || "Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Step 2 → Step 3: agreement signed, proceed to Identity verification
   const handleAgreementConfirmed = () => {
@@ -177,13 +212,14 @@ const SubscriptionEnroll = () => {
 
     try {
       const body = new FormData();
-      body.append("name", formSnapshot.name);
-      body.append("email", formSnapshot.email);
-      body.append("phone", formSnapshot.phone);
-      body.append("documentType", data.documentType);
-      if (data.documentNumber) body.append("documentNumber", data.documentNumber);
-      body.append("frontFile", data.frontFile);
-      if (data.backFile) body.append("backFile", data.backFile);
+body.append("name", formSnapshot.name);
+body.append("email", formSnapshot.email);
+body.append("phone", formSnapshot.phone);
+body.append("enrollmentId", enrollmentId); // ⬅️ নতুন লাইন — same record update হবে
+body.append("documentType", data.documentType);
+if (data.documentNumber) body.append("documentNumber", data.documentNumber);
+body.append("frontFile", data.frontFile);
+if (data.backFile) body.append("backFile", data.backFile);
 
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/create-subscription-pre-enrollment`,
@@ -383,66 +419,32 @@ const SubscriptionEnroll = () => {
         )}
 
         {/* Step 2: Agreement signing */}
-        {step === STEP_AGREEMENT && (
-          <div className="space-y-6 text-center">
-            <div>
-              <h3 className="text-lg font-semibold text-white">
-                Sign Your Subscription Agreement
-              </h3>
-              <p className="mt-2 text-sm text-white/40">
-                You will be redirected to SignWell to complete your contract signing.
-              </p>
-            </div>
+      {step === STEP_AGREEMENT && (
+  <div className="space-y-6 text-center">
+    <div>
+      <h3 className="text-lg font-semibold text-white">
+        Sign Your Subscription Agreement
+      </h3>
+      <p className="mt-2 text-sm text-white/40">
+        We've emailed the agreement to <span className="text-cyan-400">{formSnapshot?.email}</span> via SignWell.
+        Please open it and sign — this page will continue automatically once it's confirmed.
+      </p>
+    </div>
 
-            <a
-              href="https://www.signwell.com/new_doc/mJqGWFFh9guBx8e5"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
-              onClick={() => {
-                setCheckingAgreement(true);
-                setCanVerify(false);
-                setTimeout(() => {
-                  setCheckingAgreement(false);
-                  setCanVerify(true);
-                }, 60000); // 1 minute delay
-              }}
-            >
-              Open Contract in SignWell →
-            </a>
+    <div className="flex flex-col items-center gap-3 py-4">
+      <div className="w-8 h-8 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
+      <p className="text-xs text-white/30">Waiting for signature confirmation…</p>
+    </div>
 
-            <p className="text-xs text-white/30">
-              After signing, return here and continue.
-            </p>
-
-            {checkingAgreement && (
-              <p className="text-xs text-amber-400">
-                Please wait a moment while we prepare your verification...
-              </p>
-            )}
-
-            <button
-              type="button"
-              disabled={!canVerify}
-              onClick={handleAgreementConfirmed}
-              className={`w-full py-3 text-sm transition border rounded-xl ${
-                canVerify
-                  ? "text-cyan-400 border-cyan-400/30 hover:bg-cyan-400/10 cursor-pointer"
-                  : "text-white/20 border-white/10 cursor-not-allowed"
-              }`}
-            >
-              I’ve Signed → Verify & Continue
-            </button>
-
-            <button
-              type="button"
-              onClick={() => { setStep(STEP_FORM); setErrorMsg(""); }}
-              className="text-sm transition-colors text-white/30 hover:text-white/60"
-            >
-              ← Back to details
-            </button>
-          </div>
-        )}
+    <button
+      type="button"
+      onClick={() => setStep(STEP_FORM)}
+      className="text-sm transition-colors text-white/30 hover:text-white/60"
+    >
+      ← Back to details
+    </button>
+  </div>
+)}
 
         {/* Step 3: Identity verification */}
         {step === STEP_IDENTITY && (
