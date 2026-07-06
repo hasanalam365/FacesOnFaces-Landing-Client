@@ -135,28 +135,60 @@ const pollRef = useRef(null);
 
 
 useEffect(() => {
-  if (step !== STEP_AGREEMENT || !enrollmentId) return;
+  if (step !== STEP_AGREEMENT || !enrollmentId || agreementSigned) return;
 
-  const check = async () => {
+  let timeoutId = null;
+  let isMounted = true; // Component active ache কিনা track korbe
+
+  const checkStatus = async () => {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/subscription-agreement-status/${enrollmentId}`
       );
+
+      // Backend jodi 429 dey, tahole loop ektu dhire chalabo (15 second opekka korbo)
+      if (res.status === 429) {
+        console.warn("Rate limited! Retrying in 15 seconds...");
+        if (isMounted) timeoutId = setTimeout(checkStatus, 15000);
+        return;
+      }
+
+      if (!res.ok) {
+        // Onno kono error hole 8 second por abar try korbe
+        if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
+        return;
+      }
+
       const data = await res.json();
+
+console.log("Backend response data:", data); // <-- Ei line-ti jog kore browser console dekhun
+
+if (data.signed || data.status === 'completed') { // <-- Data format dekhe eikhane condition thik korte hobe
+  setAgreementSigned(true);
+  setStep(STEP_IDENTITY);
+}
       if (data.signed) {
-        clearInterval(pollRef.current);
         setAgreementSigned(true);
         setStep(STEP_IDENTITY);
+      } else {
+        // User jodi ekhono sign na kore, tobe thik 8 second por porer request-ta jabe
+        if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
       }
-    } catch {
-      // silently retry on next tick
+    } catch (error) {
+      console.error("Polling error:", error);
+      // Network crash ba onno error-eও 8 second por try korbe
+      if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
     }
   };
 
-  check();
-  pollRef.current = setInterval(check, 8000);
-  return () => clearInterval(pollRef.current);
-}, [step, enrollmentId]);
+  // Prothom request-ta 3 second por shuru hobe, jate mount hobar sathe sathe hit na khay
+  timeoutId = setTimeout(checkStatus, 3000);
+
+  return () => {
+    isMounted = false;
+    clearTimeout(timeoutId); // Component unmount ba step change hole loop ekbare bondho!
+  };
+}, [step, enrollmentId, agreementSigned]);
 
   // Step 1 → Step 2: validate form fields then proceed to Agreement
   const handleFormNext = async () => {
