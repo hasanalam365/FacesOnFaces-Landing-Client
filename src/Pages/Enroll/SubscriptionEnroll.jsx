@@ -108,6 +108,7 @@ const SubscriptionEnroll = () => {
   const [checkingAgreement, setCheckingAgreement] = useState(false);
   const [agreementSigned2, setAgreementSigned2] = useState(false); 
 const pollRef = useRef(null);
+const [signingUrl, setSigningUrl] = useState(null);
 
   const createPaymentIntent = async () => {
     try {
@@ -161,19 +162,21 @@ useEffect(() => {
 
       const data = await res.json();
 
-console.log("Backend response data:", data); // <-- Ei line-ti jog kore browser console dekhun
+      console.log("Backend response data:", data);
 
-if (data.signed || data.status === 'completed') { // <-- Data format dekhe eikhane condition thik korte hobe
-  setAgreementSigned(true);
-  setStep(STEP_IDENTITY);
-}
-      if (data.signed) {
+      if (data.signed || data.status === 'completed') {
         setAgreementSigned(true);
         setStep(STEP_IDENTITY);
-      } else {
-        // User jodi ekhono sign na kore, tobe thik 8 second por porer request-ta jabe
-        if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
+        return; // stop here, no need to touch signingUrl or reschedule
       }
+
+      // Not signed yet — grab/refresh the Client's embedded signing URL if we don't have one
+      if (data.signingUrl && !signingUrl) {
+        setSigningUrl(data.signingUrl);
+      }
+
+      // User jodi ekhono sign na kore, tobe thik 8 second por porer request-ta jabe
+      if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
     } catch (error) {
       console.error("Polling error:", error);
       // Network crash ba onno error-eও 8 second por try korbe
@@ -188,10 +191,10 @@ if (data.signed || data.status === 'completed') { // <-- Data format dekhe eikha
     isMounted = false;
     clearTimeout(timeoutId); // Component unmount ba step change hole loop ekbare bondho!
   };
-}, [step, enrollmentId, agreementSigned]);
+}, [step, enrollmentId, agreementSigned, signingUrl]);
 
   // Step 1 → Step 2: validate form fields then proceed to Agreement
-  const handleFormNext = async () => {
+ const handleFormNext = async () => {
   const f = form.current;
   const name = f.querySelector('[name="name"]').value.trim();
   const email = f.querySelector('[name="email"]').value.trim();
@@ -221,6 +224,7 @@ if (data.signed || data.status === 'completed') { // <-- Data format dekhe eikha
     }
     setFormSnapshot({ name, email, phone });
     setEnrollmentId(data.enrollmentId);
+    if (data.signingUrl) setSigningUrl(data.signingUrl); // <-- new: embedded signing URL for the Client
     setStep(STEP_AGREEMENT);
   } catch (err) {
     setErrorMsg(err.message || "Something went wrong. Please try again.");
@@ -228,7 +232,6 @@ if (data.signed || data.status === 'completed') { // <-- Data format dekhe eikha
     setLoading(false);
   }
 };
-
   // Step 2 → Step 3: agreement signed, proceed to Identity verification
   const handleAgreementConfirmed = () => {
     setAgreementSigned(true);
@@ -244,8 +247,8 @@ if (data.signed || data.status === 'completed') { // <-- Data format dekhe eikha
 
     try {
       const body = new FormData();
-body.append("name", formSnapshot.name);
-body.append("email", formSnapshot.email);
+    body.append("name", formSnapshot.name);
+      body.append("email", formSnapshot.email);
 body.append("phone", formSnapshot.phone);
 body.append("enrollmentId", enrollmentId); // ⬅️ নতুন লাইন — same record update হবে
 body.append("documentType", data.documentType);
@@ -451,20 +454,36 @@ if (data.backFile) body.append("backFile", data.backFile);
         )}
 
         {/* Step 2: Agreement signing */}
-      {step === STEP_AGREEMENT && (
-  <div className="space-y-6 text-center">
+ {step === STEP_AGREEMENT && (
+  <div className="space-y-4 text-center">
     <div>
       <h3 className="text-lg font-semibold text-white">
         Sign Your Subscription Agreement
       </h3>
       <p className="mt-2 text-sm text-white/40">
-        We've emailed the agreement to <span className="text-cyan-400">{formSnapshot?.email}</span> via SignWell.
-        Please open it and sign — this page will continue automatically once it's confirmed.
+        Open your agreement below and sign it — this page will continue
+        automatically once it's confirmed.
       </p>
     </div>
 
-    <div className="flex flex-col items-center gap-3 py-4">
-      <div className="w-8 h-8 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
+    {signingUrl ? (
+       <a
+        href={signingUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
+      >
+        Open Agreement to Sign →
+      </a>
+    ) : (
+      <div className="flex flex-col items-center gap-3 py-6">
+        <div className="w-8 h-8 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
+        <p className="text-xs text-white/30">Preparing your agreement…</p>
+      </div>
+    )}
+
+    <div className="flex flex-col items-center gap-3 pt-2">
+      <div className="w-6 h-6 border-2 rounded-full border-cyan-400/50 border-t-transparent animate-spin" />
       <p className="text-xs text-white/30">Waiting for signature confirmation…</p>
     </div>
 
@@ -618,7 +637,7 @@ if (data.backFile) body.append("backFile", data.backFile);
             <span className="italic font-light text-cyan-300">Enrollment</span>
           </h1>
           <p className="max-w-xl mx-auto mt-4 text-white/50">
-            Pay your first month today and spread the remaining cost over equal every month payments.
+            Start your subscription today with your first monthly payment. Your subscription will continue with regular monthly payments of £100.
           </p>
         </div>
 
@@ -664,14 +683,7 @@ if (data.backFile) body.append("backFile", data.backFile);
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-5 border rounded-2xl border-amber-400/20 bg-amber-400/5">
-              <ShieldCheck size={18} className="text-amber-400 mt-0.5 shrink-0" />
-              <p className="text-xs leading-relaxed text-amber-300/80">
-                A signed subscription agreement is required before enrollment is confirmed.
-                Our team will send this to you after your first payment. Cancellation terms
-                apply as per our Terms & Conditions.
-              </p>
-            </div>
+          
           </div>
 
           {/* Right */}
