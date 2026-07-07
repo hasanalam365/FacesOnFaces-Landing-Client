@@ -232,12 +232,12 @@ useEffect(() => {
     setLoading(false);
   }
 };
-  // Step 2 → Step 3: agreement signed, proceed to Identity verification
-  const handleAgreementConfirmed = () => {
-    setAgreementSigned(true);
-    setErrorMsg("");
-    setStep(STEP_IDENTITY);
-  };
+  // // Step 2 → Step 3: agreement signed, proceed to Identity verification
+  // const handleAgreementConfirmed = () => {
+  //   setAgreementSigned(true);
+  //   setErrorMsg("");
+  //   setStep(STEP_IDENTITY);
+  // };
 
 
 
@@ -632,6 +632,8 @@ useEffect(() => {
       </>
     );
   };
+
+
 
   return (
     <section className="min-h-screen bg-[#050505] py-20 px-6">

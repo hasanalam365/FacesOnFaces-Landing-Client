@@ -6,20 +6,21 @@ export default function SignContract() {
   const sigRef = useRef();
   const [contracts, setContracts] = useState([]);
 
-  useEffect(() => {
-    axios.get("http://localhost:5000/contracts")
-      .then(res => setContracts(res.data));
-  }, []);
+ useEffect(() => {
+  axios
+    .get(`${import.meta.env.VITE_API_URL}/contracts`)
+    .then((res) => setContracts(res.data));
+}, []);
 
   const sign = async (id) => {
     const signatureBase64 = sigRef.current
       .getTrimmedCanvas()
       .toDataURL("image/png");
 
-    await axios.post("http://localhost:5000/contracts/sign", {
-      contractId: id,
-      signatureBase64,
-    });
+    await axios.post(`${import.meta.env.VITE_API_URL}/contracts/sign`, {
+  contractId: id,
+  signatureBase64,
+});
 
     alert("Signed!");
   };

@@ -164,10 +164,10 @@ const SubscriptionSuccess = () => {
         </div>
 
         <button
-          onClick={() => (window.location.href = "/dashboard")}
+          onClick={() => (window.location.href = "/")}
           className="w-full py-3 font-medium text-black transition bg-cyan-400 rounded-xl hover:bg-cyan-300"
         >
-          Go to Dashboard →
+          Go to Home →
         </button>
       </div>
     </div>

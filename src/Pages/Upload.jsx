@@ -15,10 +15,10 @@ export default function UploadContract() {
   const handleUpload = async () => {
     const pdfBase64 = await toBase64(file);
 
-    await axios.post("http://localhost:5000/contracts", {
-      title,
-      pdfBase64,
-    });
+    await axios.post(`${import.meta.env.VITE_API_URL}/contracts`, {
+  title,
+  pdfBase64,
+});
 
     alert("Contract uploaded");
   };
