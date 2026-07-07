@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router-dom";
 
 // Module-level store — SPA-তে যতক্ষণ full page reload না হয়, ততক্ষণ এটা বেঁচে থাকবে।
-// (sessionStorage দরকার নেই, কারণ পুরো পেজ reload হচ্ছে না)
 const scrollPositions = new Map();
 
 const ScrollToTop = () => {
@@ -20,7 +19,6 @@ const ScrollToTop = () => {
   }, []);
 
   // প্রতিটা scroll event এ current page এর position টা continuously save করা হচ্ছে
-  // (শুধু unmount/cleanup এর উপর নির্ভর না করে — এটাই মূল fix)
   useEffect(() => {
     currentKeyRef.current = location.key;
 
@@ -45,8 +43,7 @@ const ScrollToTop = () => {
           window.scrollTo(0, savedY);
           attempts += 1;
 
-          // Page height এখনো বাড়ছে (image/video load হচ্ছে) কিনা চেক করে
-          // যতক্ষণ না ঠিক জায়গায় পৌঁছায়, ততক্ষণ পরের frame এ আবার try করবে
+          // Page height এখনো বাড়ছে কিনা চেক করে
           if (attempts < maxAttempts && Math.abs(window.scrollY - savedY) > 2) {
             requestAnimationFrame(tryRestore);
           }
@@ -55,8 +52,8 @@ const ScrollToTop = () => {
         requestAnimationFrame(tryRestore);
       }
     } else {
-      // নতুন navigation (PUSH/REPLACE) — top এ যান
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      // নতুন navigation (PUSH/REPLACE) — instant টপে নিয়ে যাবে (কোনো স্ক্রল অ্যানিমেশন হবে না)
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
   }, [location.key, navigationType]);
 
