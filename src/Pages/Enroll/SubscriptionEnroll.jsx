@@ -239,6 +239,9 @@ useEffect(() => {
     setStep(STEP_IDENTITY);
   };
 
+
+
+
   // Step 3 → Step 4: identity verified, create pre-enrollment, then go to Payment
   const handleIdentityConfirmed = async (data) => {
     if (!data) return;
@@ -309,6 +312,14 @@ if (data.backFile) body.append("backFile", data.backFile);
       setErrorMsg(err.message || "Something went wrong. Please contact support.");
     }
   };
+
+// Step 4-এ ঢোকার সাথে সাথে একবার Stripe payment intent তৈরি করা
+useEffect(() => {
+  if (step !== STEP_PAYMENT || hasFetchedIntent.current) return;
+  hasFetchedIntent.current = true;
+  createPaymentIntent();
+}, [step]);
+
 
   // Step 5: kick off the GoCardless Direct Debit setup (redirects to the bank)
   const handleGoCardlessPayment = async () => {
