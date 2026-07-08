@@ -171,8 +171,12 @@ const LeftSide = ({ onDateClick }) => {
 
   const handleLocationClick = (locationName) => {
     const found = courseSchedules.find((s) => s.location === locationName);
+    
+   
+
     if (!found) return;
     setActiveLocation(activeLocation?.location === locationName ? null : found);
+    
   };
 
  
@@ -189,6 +193,7 @@ const LeftSide = ({ onDateClick }) => {
   e.currentTarget.blur();
   lastClickedRef.current = e.currentTarget; 
   setSelectedCourse(feature);
+  
 };
 
   return (

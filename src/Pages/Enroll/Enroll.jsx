@@ -56,63 +56,63 @@ function useScrollLock(active) {
 }
 
 // ─── Price Plans ───────────────────────────────────────────────
-const plans = [
-    {
+// const plans = [
+//     {
       
-      title: "Pay in Full",
-      description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
+//       title: "Pay in Full",
+//       description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
       
-      price: "£1,099",
-      subText: "Save £500",
-      buttonText: "Enroll & Pay in Full",
-      featured: false,
-      features: [
-        "Secure your place instantly",
-        "Dedicated enrollment advisor",
-        "Balance due on the day of the course",
-        "Manuals sent out after payment",
+//       price: "£1,099",
+//       subText: "Save £500",
+//       buttonText: "Enroll & Pay in Full",
+//       featured: false,
+//       features: [
+//         "Secure your place instantly",
+//         "Dedicated enrollment advisor",
+//         "Balance due on the day of the course",
+//         "Manuals sent out after payment",
         
         
-      ],
-      link: '/enroll'
-    },
-    {
+//       ],
+//       link: '/enroll'
+//     },
+//     {
       
-      title: "Deposit",
-      description:
-        "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
-      price: "£250",
-      subText: "Deposit today, then £849",
-      buttonText: "Pay Deposit Now",
-      featured: true,
-      features: [
-         "Secure your place instantly",
-        "Dedicated enrollment advisor",
-        "Balance due on the day of the course",
-        "Manuals sent out after payment",
-      ],
-      link: '/deposit-enroll'
-    },
-    {
-      badge: "Flexible",
-      title: "Subscription",
-      description:
-        "One simple monthly subscription payment, no large upfront amount to pay",
-      price: "£100",
-      subText: "per month",
-      buttonText: "Start Subscription",
-      featured: false,
-      features: [
+//       title: "Deposit",
+//       description:
+//         "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
+//       price: "£250",
+//       subText: "Deposit today, then £849",
+//       buttonText: "Pay Deposit Now",
+//       featured: true,
+//       features: [
+//          "Secure your place instantly",
+//         "Dedicated enrollment advisor",
+//         "Balance due on the day of the course",
+//         "Manuals sent out after payment",
+//       ],
+//       link: '/deposit-enroll'
+//     },
+//     {
+//       badge: "Flexible",
+//       title: "Subscription",
+//       description:
+//         "One simple monthly subscription payment, no large upfront amount to pay",
+//       price: "£100",
+//       subText: "per month",
+//       buttonText: "Start Subscription",
+//       featured: false,
+//       features: [
        
-        "Direct debit setup",
-        "Signed subscription agreement",
-        "Ongoing Support",
-        "Add course with no additional monthly cost",
-        "No long term contract, cancel anytime"
-      ],
-      link: '/subscription-enroll'
-    },
-  ];
+//         "Direct debit setup",
+//         "Signed subscription agreement",
+//         "Ongoing Support",
+//         "Add course with no additional monthly cost",
+//         "No long term contract, cancel anytime"
+//       ],
+//       link: '/subscription-enroll'
+//     },
+//   ];
 
 // ─── Plan Modal ────────────────────────────────────────────────
 const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
@@ -323,11 +323,24 @@ const Enroll = () => {
     setModalOpen(true);
   };
 
-  // ── Date click from LeftSide → save schedule + open modal ───
-  const handleDateClick = useCallback((date, location) => {
-    setSelectedSchedule({ date, location });
-    setModalOpen(true);
-  }, []);
+const handleDateClick = useCallback((date, location) => {
+
+  const schedule = {
+    date,
+    location
+  };
+
+
+  setSelectedSchedule(schedule);
+
+  localStorage.setItem(
+    "selectedSchedule",
+    JSON.stringify(schedule)
+  );
+
+  setModalOpen(true);
+
+}, []);
 
   useEffect(() => {
     if (selectedPlan === "full" && !hasFetched.current) {
@@ -341,15 +354,21 @@ const Enroll = () => {
     try {
       setErrorMsg("");
       const formData = new FormData(form.current);
-      const enrollmentData = {
-        paymentIntentId,
-        name: formData.get("name"),
-        email: formData.get("email"),
-        phone: formData.get("phone"),
-        // ── schedule fields ──────────────────────────────────
-        selectedDate: selectedSchedule?.date || null,
-        selectedLocation: selectedSchedule?.location || null,
-      };
+     const savedSchedule = JSON.parse(
+  localStorage.getItem("selectedSchedule") || "null"
+);
+
+
+const enrollmentData = {
+  paymentIntentId,
+  name: formData.get("name"),
+  email: formData.get("email"),
+  phone: formData.get("phone"),
+
+  selectedDate: savedSchedule?.date || null,
+  selectedLocation: savedSchedule?.location || null,
+};
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/create-enrollment`,
         {
