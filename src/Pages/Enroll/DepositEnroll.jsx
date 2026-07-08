@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   User,
   Mail,
@@ -20,6 +20,18 @@ const DepositEnroll = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const date = searchParams.get("date");
+    const location = searchParams.get("location");
+
+    console.log("date:", date);
+    console.log("location:", location);
+  }, [searchParams]);
+
+  console.log('searchParams'.searchParams)
 
   const createPaymentIntent = async () => {
     try {

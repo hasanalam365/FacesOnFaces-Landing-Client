@@ -320,6 +320,7 @@ const Enroll = () => {
   const handleFeeFieldClick = (e) => {
     if (paymentCompleted) return;
     e.currentTarget.blur();
+    
     setModalOpen(true);
   };
 
