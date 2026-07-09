@@ -62,11 +62,61 @@ const courseFeatures = [
 ];
 
 const courseSchedules = [
-  { location: "London", dates: ["3rd–5th October", "7th–9th November"] },
-  { location: "Upminster", dates: ["17th–19th October", "20th–22th October"] },
-  { location: "Edinburgh", dates: ["21st–23rd November"] },
-  { location: "Belfast", dates: ["10th–12th October"] },
-  { location: "Dublin", dates: ["31st Oct–3rd Nov"] },
+  { 
+    location: "London", 
+    dates: [
+      "17th–19th July", 
+      "21st–23rd August", 
+      "18th–20th September", 
+      "16th–18th October", 
+      "20th–22nd November", 
+      "18th–20th December"
+    ] 
+  },
+  { 
+    location: "Upminster", 
+    dates: [
+      "24th–26th July", 
+      "28th–30th August", 
+      "25th–27th September", 
+      "23rd–25th October", 
+      "27th–29th November", 
+      "28th–30th December"
+    ] 
+  },
+  { 
+    location: "Edinburgh", 
+    dates: [
+      "10th–12th July", 
+      "14th–16th August", 
+      "11th–13th September", 
+      "9th–11th October", 
+      "13th–15th November", 
+      "10th–12th December"
+    ] 
+  },
+  { 
+    location: "Belfast", 
+    dates: [
+      "24th–26th July", 
+      "28th–30th August", 
+      "25th–27th September", 
+      "23rd–25th October", 
+      "27th–29th November", 
+      "28th–30th December"
+    ] 
+  },
+  { 
+    location: "Dublin", 
+    dates: [
+      "17th–19th July", 
+      "21st–23rd August", 
+      "18th–20th September", 
+      "16th–18th October", 
+      "20th–22nd November", 
+      "18th–20th December"
+    ] 
+  },
 ];
 
 // ─── Shared body-scroll-lock hook ──────────────────────────────
