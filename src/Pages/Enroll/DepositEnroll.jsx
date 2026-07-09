@@ -7,6 +7,7 @@ import {
   CheckCircle,
   AlertCircle,
   ShieldCheck,
+  X,
 } from "lucide-react";
 
 import PaymentForm from "../../Components/PaymentForm";
@@ -20,18 +21,36 @@ const DepositEnroll = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
 
   const [searchParams] = useSearchParams();
+  
+useEffect(() => {
+  const date = searchParams.get("date");
+  const location = searchParams.get("location");
 
-  useEffect(() => {
-    const date = searchParams.get("date");
-    const location = searchParams.get("location");
+  if (date && location) {
+    const schedule = {
+      date,
+      location,
+    };
 
-    console.log("date:", date);
-    console.log("location:", location);
-  }, [searchParams]);
+    localStorage.setItem(
+      "selectedSchedule",
+      JSON.stringify(schedule)
+    );
+  }
+}, [searchParams]);
 
-  console.log('searchParams'.searchParams)
+ useEffect(() => {
+  const savedSchedule = JSON.parse(
+    localStorage.getItem("selectedSchedule") || "null"
+  );
+
+  if (savedSchedule) {
+    setSelectedSchedule(savedSchedule);
+  }
+}, []);
 
   const createPaymentIntent = async () => {
     try {
@@ -70,20 +89,26 @@ const DepositEnroll = () => {
     try {
       const formData = new FormData(form.current);
 
-      const enrollmentData = {
-        paymentIntentId,
-        enrollmentType: "Deposit",
+     const savedSchedule = JSON.parse(
+  localStorage.getItem("selectedSchedule") || "null"
+);
 
-        name: formData.get("name"),
-        email: formData.get("email"),
-        phone: formData.get("phone"),
+const enrollmentData = {
+  paymentIntentId,
+  enrollmentType: "Deposit",
 
-        course:
-          "14 Certificate Fast-Track Course",
+  name: formData.get("name"),
+  email: formData.get("email"),
+  phone: formData.get("phone"),
 
-        depositPaid: "£250",
-        remainingBalance: "£849",
-      };
+  course: "14 Certificate Fast-Track Course",
+
+  depositPaid: "£250",
+  remainingBalance: "£849",
+
+  selectedDate: savedSchedule?.date || null,
+  selectedLocation: savedSchedule?.location || null,
+};
 
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/create-deposit-enrollment`,
@@ -100,15 +125,24 @@ const DepositEnroll = () => {
       const result = await response.json();
 
       if (result.success) {
-        setPaymentCompleted(true);
-        form.current.reset();
-      }
+  setPaymentCompleted(true);
+  form.current.reset();
+
+  localStorage.removeItem("selectedSchedule");
+  setSelectedSchedule(null);
+}
     } catch (err) {
       setErrorMsg(
         "Enrollment failed. Please contact support."
       );
     }
   };
+
+
+  const handleRemoveSchedule = () => {
+  localStorage.removeItem("selectedSchedule");
+  setSelectedSchedule(null);
+};
 
   const inputClass =
     "w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none";
@@ -166,6 +200,39 @@ Course
               </div>
             </div>
           </div>
+
+{selectedSchedule && (
+  <div className="flex items-center gap-3 p-4 mb-8 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
+    <div className="flex-1">
+      <p className="text-xs text-white/40">
+        Selected Course Date
+      </p>
+
+      <p className="mt-1 font-semibold text-white">
+        {selectedSchedule.date}
+      </p>
+    </div>
+
+    <div className="text-right">
+      <p className="text-xs text-white/40">
+        Location
+      </p>
+
+      <p className="mt-1 font-semibold text-cyan-400">
+        {selectedSchedule.location}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      onClick={handleRemoveSchedule}
+      title="Remove selected schedule"
+      className="ml-3 transition-all duration-200 text-white/30 hover:text-red-400 shrink-0"
+    >
+      <X size={16} />
+    </button>
+  </div>
+)}
 
           {errorMsg && (
             <div className="flex gap-3 p-4 mb-6 border rounded-xl border-red-500/30 bg-red-500/10">

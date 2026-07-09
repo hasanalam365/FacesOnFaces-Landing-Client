@@ -261,6 +261,16 @@ const Enroll = () => {
   // { date: "3rd–5th October", location: "London" } | null
   const [selectedSchedule, setSelectedSchedule] = useState(null);
 
+  useEffect(() => {
+  const savedSchedule = JSON.parse(
+    localStorage.getItem("selectedSchedule") || "null"
+  );
+
+  if (savedSchedule) {
+    setSelectedSchedule(savedSchedule);
+  }
+}, []);
+
   const createPaymentIntent = async () => {
     try {
       setLoading(true);
@@ -325,22 +335,19 @@ const Enroll = () => {
   };
 
 const handleDateClick = useCallback((date, location) => {
-
   const schedule = {
     date,
-    location
+    location,
   };
-
-
-  setSelectedSchedule(schedule);
 
   localStorage.setItem(
     "selectedSchedule",
     JSON.stringify(schedule)
   );
 
-  setModalOpen(true);
+  setSelectedSchedule(schedule);
 
+  setModalOpen(true);
 }, []);
 
   useEffect(() => {
@@ -351,54 +358,81 @@ const handleDateClick = useCallback((date, location) => {
   }, [selectedPlan]);
 
   // ── Payment success → POST to backend (with schedule) ───────
-  const handlePaymentSuccess = async (paymentIntentId) => {
-    try {
-      setErrorMsg("");
-      const formData = new FormData(form.current);
-     const savedSchedule = JSON.parse(
-  localStorage.getItem("selectedSchedule") || "null"
-);
+ const handlePaymentSuccess = async (paymentIntentId) => {
+  try {
+    setErrorMsg("");
 
+    const formData = new FormData(form.current);
 
-const enrollmentData = {
-  paymentIntentId,
-  name: formData.get("name"),
-  email: formData.get("email"),
-  phone: formData.get("phone"),
+    const savedSchedule = JSON.parse(
+      localStorage.getItem("selectedSchedule") || "null"
+    );
 
-  selectedDate: savedSchedule?.date || null,
-  selectedLocation: savedSchedule?.location || null,
+    const enrollmentData = {
+      paymentIntentId,
+
+      name: formData.get("name")?.trim(),
+      email: formData.get("email")?.trim(),
+      phone: formData.get("phone")?.trim(),
+
+      selectedDate: savedSchedule?.date || "",
+      selectedLocation: savedSchedule?.location || "",
+    };
+
+    console.log("Sending Enrollment:", enrollmentData);
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/create-enrollment`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(enrollmentData),
+      }
+    );
+
+    const result = await response.json();
+
+    console.log("Status:", response.status);
+    console.log("Result:", result);
+
+    if (!response.ok) {
+      throw new Error(
+        result.message ||
+          result.errors?.[0]?.msg ||
+          "Enrollment failed"
+      );
+    }
+
+    if (result.success) {
+      setPaymentCompleted(true);
+      setClientSecret("");
+
+      form.current.reset();
+
+      localStorage.removeItem("selectedSchedule");
+      setSelectedSchedule(null);
+    }
+  } catch (err) {
+    console.error(err);
+
+    setErrorMsg(err.message);
+  }
 };
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/create-enrollment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(enrollmentData),
-        }
-      );
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Enrollment failed");
-      }
-      const result = await response.json();
-      if (result.success) {
-        setPaymentCompleted(true);
-        setClientSecret("");
-        form.current.reset();
-      } else {
-        throw new Error("Enrollment failed. Please contact support.");
-      }
-    } catch (err) {
-      setErrorMsg(err.message || "Something went wrong. Please contact support.");
-    }
-  };
+const handleRemoveSchedule = () => {
+  localStorage.removeItem("selectedSchedule");
+  setSelectedSchedule(null);
+};
 
-  const inputClass =
-    "w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed";
+
+  const inputClass = "w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed";
 
   const feeSelectorLabel = selectedPlan === "full" ? "£1,099" : null;
+
+
+
 
   return (
     <section className="min-h-screen bg-[#050505] py-20">
@@ -504,13 +538,13 @@ const enrollmentData = {
                     </p>
                   </div>
                   <button
-                    type="button"
-                    onClick={() => setSelectedSchedule(null)}
-                    className="transition-colors text-white/30 hover:text-white shrink-0"
-                    aria-label="Clear selected date"
-                  >
-                    <X size={14} />
-                  </button>
+  type="button"
+  onClick={handleRemoveSchedule}
+  className="transition-all duration-200 text-white/30 hover:text-red-400 shrink-0"
+  title="Remove selected schedule"
+>
+  <X size={15} />
+</button>
                 </div>
               )}
 
