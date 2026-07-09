@@ -2,9 +2,11 @@ import React, { useRef, useState, useEffect } from "react";
 import {
   User, Mail, Phone, CheckCircle, ShieldCheck,
   CalendarDays, BadgeCheck, FileSignature, AlertCircle, X,
+  Calendar,
 } from "lucide-react";
 import IdentityVerification from "../../Components/IdentityVerification";
 import PaymentForm from "../../Components/PaymentForm";
+import { useSearchParams } from "react-router-dom";
 
 const steps = [
   {
@@ -131,6 +133,7 @@ const SubscriptionEnroll = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [canVerify, setCanVerify] = useState(false);
+  
 
   // Modal shown before moving from the details form into the agreement step
   const [showAgreementNotice, setShowAgreementNotice] = useState(false);
@@ -150,6 +153,34 @@ const SubscriptionEnroll = () => {
   const [agreementSigned2, setAgreementSigned2] = useState(false);
   const pollRef = useRef(null);
   const [signingUrl, setSigningUrl] = useState(null);
+  const [searchParams] = useSearchParams();
+
+const [selectedSchedule, setSelectedSchedule] = useState(null);
+
+useEffect(() => {
+  const date = searchParams.get("date");
+  const location = searchParams.get("location");
+
+  if (date && location) {
+    localStorage.setItem(
+      "selectedSchedule",
+      JSON.stringify({
+        date,
+        location,
+      })
+    );
+  }
+}, [searchParams]);
+
+useEffect(() => {
+  const savedSchedule = JSON.parse(
+    localStorage.getItem("selectedSchedule") || "null"
+  );
+
+  if (savedSchedule) {
+    setSelectedSchedule(savedSchedule);
+  }
+}, []);
 
   const createPaymentIntent = async () => {
     try {
@@ -324,37 +355,58 @@ const SubscriptionEnroll = () => {
 
   // Step 4: Stripe card payment success → mark enrollment paid, move to mandate step
   const handlePaymentSuccess = async (paymentIntentId) => {
-    try {
-      setErrorMsg("");
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/create-subscription-enrollment`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentIntentId,
-            enrollmentId,
-            name: formSnapshot.name,
-            email: formSnapshot.email,
-            phone: formSnapshot.phone,
-          }),
-        }
-      );
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Enrollment failed");
+  try {
+    setErrorMsg("");
+
+    const savedSchedule = JSON.parse(
+      localStorage.getItem("selectedSchedule") || "null"
+    );
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/create-subscription-enrollment`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          paymentIntentId,
+          enrollmentId,
+
+          name: formSnapshot.name,
+          email: formSnapshot.email,
+          phone: formSnapshot.phone,
+
+          selectedDate: savedSchedule?.date || null,
+          selectedLocation: savedSchedule?.location || null,
+        }),
       }
-      const result = await response.json();
-      if (result.success) {
-        setIsTermsAccepted(false);
-        setStep(STEP_MANDATE);
-      } else {
-        throw new Error("Enrollment failed. Please contact support.");
-      }
-    } catch (err) {
-      setErrorMsg(err.message || "Something went wrong. Please contact support.");
+    );
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.message || "Enrollment failed");
     }
-  };
+
+    const result = await response.json();
+
+    if (result.success) {
+      setIsTermsAccepted(false);
+
+      localStorage.removeItem("selectedSchedule");
+      setSelectedSchedule(null);
+
+      setStep(STEP_MANDATE);
+    } else {
+      throw new Error("Enrollment failed. Please contact support.");
+    }
+  } catch (err) {
+    setErrorMsg(
+      err.message || "Something went wrong. Please contact support."
+    );
+  }
+};
 
   // Step 4-এ ঢোকার সাথে সাথে একবার Stripe payment intent তৈরি করা
   useEffect(() => {
@@ -491,6 +543,50 @@ const SubscriptionEnroll = () => {
                 <label className="block mb-2 text-sm text-white/70">Course</label>
                 <input type="text" value="14 Certificate Fast-Track Course" readOnly className="w-full px-4 py-4 text-white border opacity-50 cursor-not-allowed rounded-xl bg-white/5 border-white/10" />
               </div>
+             {selectedSchedule && (
+  <div className="p-4 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
+    <div className="flex items-start justify-between gap-4">
+
+      <div className="flex-1">
+        <div className="flex justify-between">
+
+          <div>
+            <p className="text-xs text-white/40">
+              Selected Course Date
+            </p>
+
+            <p className="mt-1 font-semibold text-white">
+              {selectedSchedule.date}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.removeItem("selectedSchedule");
+              setSelectedSchedule(null);
+            }}
+            className="transition-colors text-white/40 hover:text-red-400"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-xs text-white/40">
+            Location
+          </p>
+
+          <p className="mt-1 font-semibold text-cyan-400">
+            {selectedSchedule.location}
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+)}
               <div>
                 <label className="block mb-2 text-sm text-white/70">First Payment</label>
                 <input type="text" value="£250 — First Payment" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
@@ -704,7 +800,13 @@ const SubscriptionEnroll = () => {
             <span className="italic font-light text-cyan-300">Enrollment</span>
           </h1>
           <p className="max-w-xl mx-auto mt-4 text-white/50">
-            Start your subscription today with your first monthly payment. Your subscription will continue with regular monthly payments of £100.
+           So you've decided to go down the subscription route, thats fantastic! Let me break 
+           down exactly how ours works. It’s £100 per month, with a £250 upfront fee, covering 
+           academy operations. You’ll get lifetime support, take a break, come back, retrain 
+           free. If you face complications, we step in. You have a course credit allowance, 
+           add courses, your fee stays £100. If regulations change, we’ll adapt, any needed 
+           upgrades just add a small extra monthly cost. Many return for this flexible, 
+           ongoing support. Please read the agreement for full details!
           </p>
         </div>
 
