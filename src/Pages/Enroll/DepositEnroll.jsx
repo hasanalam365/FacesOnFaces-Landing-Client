@@ -8,9 +8,35 @@ import {
   AlertCircle,
   ShieldCheck,
   X,
+  ClipboardList,
+  CalendarCheck,
+  CreditCard,
 } from "lucide-react";
 
 import PaymentForm from "../../Components/PaymentForm";
+
+const steps = [
+  {
+    icon: <ClipboardList size={20} className="text-cyan-400" />,
+    title: "Fill Your Details",
+    desc: "Enter your name, email and phone number to get started.",
+  },
+  {
+    icon: <CalendarCheck size={20} className="text-cyan-400" />,
+    title: "Confirm Your Schedule",
+    desc: "Review your selected course date and location.",
+  },
+  {
+    icon: <CreditCard size={20} className="text-cyan-400" />,
+    title: "Pay Your Deposit",
+    desc: "Secure your seat instantly with a £250 deposit.",
+  },
+  {
+    icon: <CheckCircle size={20} className="text-cyan-400" />,
+    title: "Seat Reserved",
+    desc: "You're confirmed! We'll be in touch with next steps.",
+  },
+];
 
 const DepositEnroll = () => {
   const form = useRef(null);
@@ -149,9 +175,9 @@ const enrollmentData = {
 
   return (
     <section className="min-h-screen px-6 py-20 bg-black">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="mb-10 text-center">
+        <div className="text-center mb-14">
           <span className="px-4 py-1 text-sm border rounded-full border-cyan-400/30 text-cyan-400">
             Deposit Enrollment
           </span>
@@ -160,216 +186,238 @@ const enrollmentData = {
             Secure Your Place
           </h1>
 
-          <p className="mt-4 text-white/60">
+          <p className="max-w-xl mx-auto mt-4 text-white/60">
             Pay your deposit today and reserve
             your seat instantly.
           </p>
         </div>
 
-        {/* Card */}
-        <div className="border border-cyan-500/20 rounded-3xl bg-white/[0.03] backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(34,211,238,0.08)]">
-
-          {/* Course Summary */}
-          <div className="p-6 mb-8 border rounded-2xl border-cyan-500/20 bg-cyan-500/5">
-            <h3 className="text-xl font-semibold text-white">
-              14
+        <div className="grid gap-10 lg:grid-cols-2">
+          {/* Left — course details + how it works */}
+          <div className="space-y-6">
+            <div className="p-7 border rounded-3xl border-cyan-500/20 bg-white/[0.03] backdrop-blur-xl">
+              <h3 className="text-xl font-semibold text-white">
+                14
 Certificate
 Fast-Track
 Course
-            </h3>
+              </h3>
 
-            <div className="mt-5 space-y-3">
-              <div className="flex justify-between">
-                <span className="text-white/60">
-                  Deposit Today
-                </span>
+              <div className="mt-5 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-white/60">
+                    Deposit Today
+                  </span>
 
-                <span className="text-xl font-bold text-cyan-400">
-                  £250
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-white/60">
-                  Remaining Balance
-                </span>
-
-                <span className="text-white">
-                  £849
-                </span>
-              </div>
-            </div>
-          </div>
-
-{selectedSchedule && (
-  <div className="flex items-center gap-3 p-4 mb-8 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
-    <div className="flex-1">
-      <p className="text-xs text-white/40">
-        Selected Course Date
-      </p>
-
-      <p className="mt-1 font-semibold text-white">
-        {selectedSchedule.date}
-      </p>
-    </div>
-
-    <div className="text-right">
-      <p className="text-xs text-white/40">
-        Location
-      </p>
-
-      <p className="mt-1 font-semibold text-cyan-400">
-        {selectedSchedule.location}
-      </p>
-    </div>
-
-    <button
-      type="button"
-      onClick={handleRemoveSchedule}
-      title="Remove selected schedule"
-      className="ml-3 transition-all duration-200 text-white/30 hover:text-red-400 shrink-0"
-    >
-      <X size={16} />
-    </button>
-  </div>
-)}
-
-          {errorMsg && (
-            <div className="flex gap-3 p-4 mb-6 border rounded-xl border-red-500/30 bg-red-500/10">
-              <AlertCircle
-                size={18}
-                className="text-red-400 shrink-0"
-              />
-              <p className="text-sm text-red-400">
-                {errorMsg}
-              </p>
-            </div>
-          )}
-
-          <form
-            ref={form}
-            className="space-y-5"
-          >
-            <div className="relative">
-              <User
-                size={18}
-                className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
-              />
-
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                required
-                className={inputClass}
-              />
-            </div>
-
-            <div className="relative">
-              <Mail
-                size={18}
-                className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                required
-                className={inputClass}
-              />
-            </div>
-
-            <div className="relative">
-              <Phone
-                size={18}
-                className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
-              />
-
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                required
-                className={inputClass}
-              />
-            </div>
-          </form>
-
-          <div className="flex gap-3 p-4 mt-6 border rounded-xl border-cyan-400/20 bg-cyan-400/5">
-            <input
-              type="checkbox"
-              checked={isTermsAccepted}
-              onChange={(e) =>
-                setIsTermsAccepted(
-                  e.target.checked
-                )
-              }
-              className="mt-1 accent-cyan-400"
-            />
-
-            <p className="text-sm text-white/60">
-  I agree to the{" "}
-  <a
-                          href="/terms-and-conditions"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
-                        >
-                          Terms & Conditions
-                        </a>{" "}
-                        and{" "}
-                        <a
-                          href="/privacy-policy"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
-                        >
-                          Privacy Policy
-                        </a>
-  {" "}and understand that the £250 deposit secures my place on the course.
-</p>
-          </div>
-
-          <div className="mt-8">
-            {paymentCompleted ? (
-              <div className="flex items-center justify-center gap-3 p-5 border rounded-xl border-green-500/20 bg-green-500/10">
-                <CheckCircle
-                  className="text-green-400"
-                />
-                <span className="font-semibold text-green-400">
-                  Deposit Paid Successfully
-                </span>
-              </div>
-            ) : loading ? (
-              <div className="flex justify-center py-8">
-                <div className="w-8 h-8 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
-              </div>
-            ) : (
-              <>
-                {!isTermsAccepted && (
-                  <div className="flex items-center gap-2 mb-4 text-sm text-amber-400">
-                    <ShieldCheck size={16} />
-                    Accept terms to continue.
-                  </div>
-                )}
-
-                <div
-                  className={
-                    !isTermsAccepted
-                      ? "pointer-events-none opacity-40"
-                      : ""
-                  }
-                >
-                  <PaymentForm
-                    clientSecret={clientSecret}
-                    onPaymentSuccess={
-                      handlePaymentSuccess
-                    }
-                  />
+                  <span className="text-xl font-bold text-cyan-400">
+                    £250
+                  </span>
                 </div>
-              </>
+
+                <div className="flex justify-between">
+                  <span className="text-white/60">
+                    Remaining Balance
+                  </span>
+
+                  <span className="text-white">
+                    £849
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="p-7 border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
+              <h3 className="mb-6 text-lg font-semibold text-white">How It Works</h3>
+              <div className="space-y-5">
+                {steps.map((step, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="flex items-center justify-center flex-shrink-0 rounded-full w-9 h-9 bg-cyan-400/10">
+                      {step.icon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{step.title}</p>
+                      <p className="mt-0.5 text-xs text-white/40 leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right — form */}
+          <div className="border border-cyan-500/20 rounded-3xl bg-white/[0.03] backdrop-blur-xl p-8 shadow-[0_0_60px_rgba(34,211,238,0.08)]">
+
+            {errorMsg && (
+              <div className="flex gap-3 p-4 mb-6 border rounded-xl border-red-500/30 bg-red-500/10">
+                <AlertCircle
+                  size={18}
+                  className="text-red-400 shrink-0"
+                />
+                <p className="text-sm text-red-400">
+                  {errorMsg}
+                </p>
+              </div>
             )}
+
+            <form
+              ref={form}
+              className="space-y-5"
+            >
+              <div className="relative">
+                <User
+                  size={18}
+                  className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
+                />
+
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  required
+                  className={inputClass}
+                />
+              </div>
+
+              <div className="relative">
+                <Mail
+                  size={18}
+                  className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
+                />
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  required
+                  className={inputClass}
+                />
+              </div>
+
+              <div className="relative">
+                <Phone
+                  size={18}
+                  className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
+                />
+
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  required
+                  className={inputClass}
+                />
+              </div>
+              
+              {selectedSchedule && (
+                <div className="flex items-center gap-3 p-4 mt-6 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
+                  <div className="flex-1">
+                    <p className="text-xs text-white/40">
+                      Selected Course Date
+                    </p>
+
+                    <p className="mt-1 font-semibold text-white">
+                      {selectedSchedule.date}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-xs text-white/40">
+                      Location
+                    </p>
+
+                    <p className="mt-1 font-semibold text-cyan-400">
+                      {selectedSchedule.location}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleRemoveSchedule}
+                    title="Remove selected schedule"
+                    className="ml-3 transition-all duration-200 text-white/30 hover:text-red-400 shrink-0"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+            </form>
+
+            <div className="flex gap-3 p-4 mt-6 border rounded-xl border-cyan-400/20 bg-cyan-400/5">
+              <input
+                type="checkbox"
+                checked={isTermsAccepted}
+                onChange={(e) =>
+                  setIsTermsAccepted(
+                    e.target.checked
+                  )
+                }
+                className="mt-1 accent-cyan-400"
+              />
+
+              <p className="text-sm text-white/60">
+    I agree to the{" "}
+    <a
+                            href="/terms-and-conditions"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                          >
+                            Terms & Conditions
+                          </a>{" "}
+                          and{" "}
+                          <a
+                            href="/privacy-policy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+                          >
+                            Privacy Policy
+                          </a>
+    {" "}and understand that the £250 deposit secures my place on the course.
+  </p>
+            </div>
+
+            <div className="mt-8">
+              {paymentCompleted ? (
+                <div className="flex items-center justify-center gap-3 p-5 border rounded-xl border-green-500/20 bg-green-500/10">
+                  <CheckCircle
+                    className="text-green-400"
+                  />
+                  <span className="font-semibold text-green-400">
+                    Deposit Paid Successfully
+                  </span>
+                </div>
+              ) : loading ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-8 h-8 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
+                </div>
+              ) : (
+                <>
+                  {!isTermsAccepted && (
+                    <div className="flex items-center gap-2 mb-4 text-sm text-amber-400">
+                      <ShieldCheck size={16} />
+                      Accept terms to continue.
+                    </div>
+                  )}
+
+                  <div
+                    className={
+                      !isTermsAccepted
+                        ? "pointer-events-none opacity-40"
+                        : ""
+                    }
+                  >
+                    <PaymentForm
+                      clientSecret={clientSecret}
+                      onPaymentSuccess={
+                        handlePaymentSuccess
+                      }
+                    />
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
