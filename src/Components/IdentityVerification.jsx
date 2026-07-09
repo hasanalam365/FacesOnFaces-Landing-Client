@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   CreditCard, BookOpen, Car, Zap,
   Upload, X, FileText, AlertCircle, CheckCircle2,
@@ -68,26 +68,41 @@ const FileUploadSlot = ({ label, file, onFileChange, onRemove, error }) => {
     onFileChange(f, null);
   };
 
-  const previewUrl = file ? URL.createObjectURL(file) : null;
+  const [previewUrl, setPreviewUrl] = useState(null);
   const isPdf = file?.type === "application/pdf";
 
+  useEffect(() => {
+    if (!file || isPdf) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file, isPdf]);
+
   return (
-    <div>
+    <div className="w-full max-w-full min-w-0">
       <p className="mb-2 text-sm text-white/70">{label}</p>
       {file ? (
-        <div className="relative flex items-center gap-3 p-3 border rounded-xl border-cyan-400/30 bg-cyan-400/5">
+        <div className="relative flex items-center w-full min-w-0 gap-3 p-3 overflow-hidden border rounded-xl border-cyan-400/30 bg-cyan-400/5">
           {isPdf ? (
             <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-lg bg-white/10">
               <FileText size={22} className="text-cyan-400" />
             </div>
-          ) : (
+          ) : previewUrl ? (
             <img
               src={previewUrl}
               alt="Document preview"
               className="flex-shrink-0 object-cover w-12 h-12 rounded-lg"
             />
+          ) : (
+            <div className="flex items-center justify-center flex-shrink-0 w-12 h-12 rounded-lg bg-white/10">
+              <FileText size={22} className="text-cyan-400" />
+            </div>
           )}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <p className="text-sm font-medium text-white truncate">{file.name}</p>
             <p className="text-xs text-white/40">
               {(file.size / 1024 / 1024).toFixed(2)} MB
@@ -107,7 +122,7 @@ const FileUploadSlot = ({ label, file, onFileChange, onRemove, error }) => {
           onClick={() => inputRef.current?.click()}
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          className={`flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+          className={`flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors w-full min-w-0 ${
             error
               ? "border-red-500/50 bg-red-500/5"
               : "border-white/10 hover:border-cyan-400/40 hover:bg-cyan-400/5"
@@ -220,7 +235,7 @@ const IdentityVerification = ({ onVerified }) => {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="w-full max-w-full min-w-0 space-y-5 overflow-x-hidden">
       {/* Document type selector */}
       <div>
         <p className="mb-3 text-sm text-white/70">Select document type</p>
@@ -284,27 +299,31 @@ const IdentityVerification = ({ onVerified }) => {
           )}
 
           {docConfig.hasTwoSides ? (
-            <div className="grid grid-cols-2 gap-4">
-              <FileUploadSlot
-                label="Front side"
-                file={frontFile}
-                error={errors.front}
-                onFileChange={(f, err) => {
-                  setFrontFile(f);
-                  setErrors((p) => ({ ...p, front: err }));
-                }}
-                onRemove={() => setFrontFile(null)}
-              />
-              <FileUploadSlot
-                label="Back side"
-                file={backFile}
-                error={errors.back}
-                onFileChange={(f, err) => {
-                  setBackFile(f);
-                  setErrors((p) => ({ ...p, back: err }));
-                }}
-                onRemove={() => setBackFile(null)}
-              />
+            <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="min-w-0">
+                <FileUploadSlot
+                  label="Front side"
+                  file={frontFile}
+                  error={errors.front}
+                  onFileChange={(f, err) => {
+                    setFrontFile(f);
+                    setErrors((p) => ({ ...p, front: err }));
+                  }}
+                  onRemove={() => setFrontFile(null)}
+                />
+              </div>
+              <div className="min-w-0">
+                <FileUploadSlot
+                  label="Back side"
+                  file={backFile}
+                  error={errors.back}
+                  onFileChange={(f, err) => {
+                    setBackFile(f);
+                    setErrors((p) => ({ ...p, back: err }));
+                  }}
+                  onRemove={() => setBackFile(null)}
+                />
+              </div>
             </div>
           ) : (
             <FileUploadSlot

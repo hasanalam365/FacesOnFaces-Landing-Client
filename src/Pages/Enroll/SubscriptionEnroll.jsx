@@ -587,10 +587,10 @@ useEffect(() => {
     </div>
   </div>
 )}
-              <div>
-                <label className="block mb-2 text-sm text-white/70">First Payment</label>
-                <input type="text" value="£250 — First Payment" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
-              </div>
+              {/* <div>
+                <label className="block mb-2 text-sm text-white/70">Deposit Today</label>
+                <input type="text" value="£250 — Deposit Today" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
+              </div> */}
             </form>
             <button
               type="button"
@@ -779,7 +779,7 @@ useEffect(() => {
   };
 
   return (
-    <section className="min-h-screen bg-[#050505] py-20 px-6">
+   <section className="min-h-screen bg-[#050505] py-20 px-6 overflow-x-hidden">
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 blur-[180px] rounded-full pointer-events-none" />
 
       {showAgreementNotice && (
@@ -821,11 +821,11 @@ useEffect(() => {
               <p className="text-sm text-cyan-400">Then £100 / month</p>
               <div className="pt-5 mt-6 space-y-3 border-t border-white/10">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/50">First Payment (Today)</span>
+                  <span className="text-white/50">Deposit Today</span>
                   <span className="font-medium text-cyan-400">£250</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-white/50">Remaining Payments</span>
+                  <span className="text-white/50">First Payments</span>
                   <span className="text-white">£100 /month</span>
                 </div>
                 <div className="flex justify-between text-sm">
