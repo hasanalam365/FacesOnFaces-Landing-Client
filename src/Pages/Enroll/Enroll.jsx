@@ -12,11 +12,96 @@ import {
   X,
   Calendar,
   MapPin,
+  ClipboardList,
+  CalendarCheck,
+  CreditCard,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PaymentForm from "../../Components/PaymentForm";
-import LeftSide from "./LeftSide";
 import PricePlan from "../Home/PricePlan";
+
+// ─── Course Schedules (moved here from LeftSide) ───────────────
+const courseSchedules = [
+  {
+    location: "London",
+    dates: [
+      "17th–19th July",
+      "21st–23rd August",
+      "18th–20th September",
+      "16th–18th October",
+      "20th–22nd November",
+      "18th–20th December",
+    ],
+  },
+  {
+    location: "Upminster",
+    dates: [
+      "24th–26th July",
+      "28th–30th August",
+      "25th–27th September",
+      "23rd–25th October",
+      "27th–29th November",
+      "28th–30th December",
+    ],
+  },
+  {
+    location: "Edinburgh",
+    dates: [
+      "10th–12th July",
+      "14th–16th August",
+      "11th–13th September",
+      "9th–11th October",
+      "13th–15th November",
+      "10th–12th December",
+    ],
+  },
+  {
+    location: "Belfast",
+    dates: [
+      "24th–26th July",
+      "28th–30th August",
+      "25th–27th September",
+      "23rd–25th October",
+      "27th–29th November",
+      "28th–30th December",
+    ],
+  },
+  {
+    location: "Dublin",
+    dates: [
+      "17th–19th July",
+      "21st–23rd August",
+      "18th–20th September",
+      "16th–18th October",
+      "20th–22nd November",
+      "18th–20th December",
+    ],
+  },
+];
+
+// ─── How It Works Steps ─────────────────────────────────────────
+const steps = [
+  {
+    icon: <ClipboardList size={20} className="text-cyan-400" />,
+    title: "Fill Your Details",
+    desc: "Enter your name, email and phone number to get started.",
+  },
+  {
+    icon: <CalendarCheck size={20} className="text-cyan-400" />,
+    title: "Choose Your Schedule",
+    desc: "Select your preferred course date and location.",
+  },
+  {
+    icon: <CreditCard size={20} className="text-cyan-400" />,
+    title: "Select Payment Plan",
+    desc: "Pay in full, put down a deposit, or start a subscription.",
+  },
+  {
+    icon: <CheckCircle size={20} className="text-cyan-400" />,
+    title: "Enrollment Confirmed",
+    desc: "You're all set! We'll be in touch with next steps.",
+  },
+];
 
 // ─── Shared body-scroll-lock hook ──────────────────────────────
 function useScrollLock(active) {
@@ -54,65 +139,6 @@ function useScrollLock(active) {
     };
   }, [active]);
 }
-
-// ─── Price Plans ───────────────────────────────────────────────
-// const plans = [
-//     {
-      
-//       title: "Pay in Full",
-//       description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
-      
-//       price: "£1,099",
-//       subText: "Save £500",
-//       buttonText: "Enroll & Pay in Full",
-//       featured: false,
-//       features: [
-//         "Secure your place instantly",
-//         "Dedicated enrollment advisor",
-//         "Balance due on the day of the course",
-//         "Manuals sent out after payment",
-        
-        
-//       ],
-//       link: '/enroll'
-//     },
-//     {
-      
-//       title: "Deposit",
-//       description:
-//         "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
-//       price: "£250",
-//       subText: "Deposit today, then £849",
-//       buttonText: "Pay Deposit Now",
-//       featured: true,
-//       features: [
-//          "Secure your place instantly",
-//         "Dedicated enrollment advisor",
-//         "Balance due on the day of the course",
-//         "Manuals sent out after payment",
-//       ],
-//       link: '/deposit-enroll'
-//     },
-//     {
-//       badge: "Flexible",
-//       title: "Subscription",
-//       description:
-//         "One simple monthly subscription payment, no large upfront amount to pay",
-//       price: "£100",
-//       subText: "per month",
-//       buttonText: "Start Subscription",
-//       featured: false,
-//       features: [
-       
-//         "Direct debit setup",
-//         "Signed subscription agreement",
-//         "Ongoing Support",
-//         "Add course with no additional monthly cost",
-//         "No long term contract, cancel anytime"
-//       ],
-//       link: '/subscription-enroll'
-//     },
-//   ];
 
 // ─── Plan Modal ────────────────────────────────────────────────
 const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
@@ -257,9 +283,13 @@ const Enroll = () => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // ── NEW: selected schedule from date click ──────────────────
+  // ── Selected schedule (from location/date select fields) ────
   // { date: "3rd–5th October", location: "London" } | null
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+
+  // ── NEW: values bound to the Location / Date select inputs ──
+  const [scheduleLocation, setScheduleLocation] = useState("");
+  const [scheduleDate, setScheduleDate] = useState("");
 
   useEffect(() => {
   const savedSchedule = JSON.parse(
@@ -268,6 +298,8 @@ const Enroll = () => {
 
   if (savedSchedule) {
     setSelectedSchedule(savedSchedule);
+    setScheduleLocation(savedSchedule.location || "");
+    setScheduleDate(savedSchedule.date || "");
   }
 }, []);
 
@@ -334,21 +366,32 @@ const Enroll = () => {
     setModalOpen(true);
   };
 
-const handleDateClick = useCallback((date, location) => {
-  const schedule = {
-    date,
-    location,
+  // ── NEW: Location select change ──────────────────────────────
+  const handleLocationChange = (e) => {
+    const location = e.target.value;
+    setScheduleLocation(location);
+    setScheduleDate("");
+
+    if (!location) {
+      localStorage.removeItem("selectedSchedule");
+      setSelectedSchedule(null);
+    }
   };
 
-  localStorage.setItem(
-    "selectedSchedule",
-    JSON.stringify(schedule)
-  );
+  // ── NEW: Date select change ──────────────────────────────────
+  const handleDateChange = (e) => {
+    const date = e.target.value;
+    setScheduleDate(date);
 
-  setSelectedSchedule(schedule);
+    if (date && scheduleLocation) {
+      const schedule = { date, location: scheduleLocation };
+      localStorage.setItem("selectedSchedule", JSON.stringify(schedule));
+      setSelectedSchedule(schedule);
+    }
+  };
 
-  setModalOpen(true);
-}, []);
+  const availableDates =
+    courseSchedules.find((s) => s.location === scheduleLocation)?.dates || [];
 
   useEffect(() => {
     if (selectedPlan === "full" && !hasFetched.current) {
@@ -424,6 +467,8 @@ const handleDateClick = useCallback((date, location) => {
 const handleRemoveSchedule = () => {
   localStorage.removeItem("selectedSchedule");
   setSelectedSchedule(null);
+  setScheduleLocation("");
+  setScheduleDate("");
 };
 
 
@@ -456,8 +501,55 @@ const handleRemoveSchedule = () => {
         </div>
 
         <div ref={formRef} className="grid gap-10 lg:grid-cols-2">
-          {/* LeftSide gets the date-click handler */}
-          <LeftSide onDateClick={handleDateClick} />
+          {/* Left — course details + how it works */}
+          <div className="space-y-6">
+            <div className="p-7 border rounded-3xl border-cyan-500/20 bg-white/[0.03] backdrop-blur-xl">
+              <span className="px-4 py-1 text-sm border rounded-full border-cyan-400/30 text-cyan-400">
+                Course Details
+              </span>
+
+              <h3 className="mt-4 text-xl font-semibold text-white">
+                14 Certificate Fast-Track Course
+              </h3>
+
+              <div className="mt-5 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-white/60">Course Fee</span>
+                  <div className="flex items-center gap-3">
+                    <span className="line-through text-white/40">£1,599</span>
+                    <span className="text-xl font-bold text-cyan-400">£1,099</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-white/60">Duration</span>
+                  <span className="text-white">3 Day Intensive Training</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-white/60">Certifications</span>
+                  <span className="text-white">14 Included</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-7 border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
+              <h3 className="mb-6 text-lg font-semibold text-white">How It Works</h3>
+              <div className="space-y-5">
+                {steps.map((step, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="flex items-center justify-center flex-shrink-0 rounded-full w-9 h-9 bg-cyan-400/10">
+                      {step.icon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{step.title}</p>
+                      <p className="mt-0.5 text-xs text-white/40 leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <div className="border rounded-3xl border-white/10 bg-white/[0.03] p-8 lg:p-10 backdrop-blur-xl">
             {errorMsg && (
@@ -523,6 +615,56 @@ const handleRemoveSchedule = () => {
                   readOnly
                   className="w-full px-4 py-4 text-white border cursor-not-allowed rounded-xl bg-white/5 border-white/10 opacity-60"
                 />
+              </div>
+
+              {/* ── NEW: Location select field ─────────────────── */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">Location</label>
+                <div className="relative">
+                  <MapPin size={18} className="absolute -translate-y-1/2 pointer-events-none text-white/40 left-4 top-1/2" />
+                  <select
+                    value={scheduleLocation}
+                    onChange={handleLocationChange}
+                    disabled={paymentCompleted}
+                    required
+                    className={`${inputClass} appearance-none cursor-pointer`}
+                  >
+                    <option value="" className="bg-[#0a0e12]">
+                      Select a location
+                    </option>
+                    {courseSchedules.map((s) => (
+                      <option key={s.location} value={s.location} className="bg-[#0a0e12]">
+                        {s.location}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={18} className="absolute -translate-y-1/2 pointer-events-none text-white/40 right-4 top-1/2" />
+                </div>
+              </div>
+
+              {/* ── NEW: Date select field ──────────────────────── */}
+              <div>
+                <label className="block mb-2 text-sm text-white/70">Date</label>
+                <div className="relative">
+                  <Calendar size={18} className="absolute -translate-y-1/2 pointer-events-none text-white/40 left-4 top-1/2" />
+                  <select
+                    value={scheduleDate}
+                    onChange={handleDateChange}
+                    disabled={paymentCompleted || !scheduleLocation}
+                    required
+                    className={`${inputClass} appearance-none cursor-pointer`}
+                  >
+                    <option value="" className="bg-[#0a0e12]">
+                      {scheduleLocation ? "Select a date" : "Select location first"}
+                    </option>
+                    {availableDates.map((date) => (
+                      <option key={date} value={date} className="bg-[#0a0e12]">
+                        {date}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={18} className="absolute -translate-y-1/2 pointer-events-none text-white/40 right-4 top-1/2" />
+                </div>
               </div>
 
               {/* ── Selected Schedule display (if any) ────────── */}
