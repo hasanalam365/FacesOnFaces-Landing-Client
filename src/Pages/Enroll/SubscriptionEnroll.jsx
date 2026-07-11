@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import {
   User, Mail, Phone, CheckCircle, ShieldCheck,
   CalendarDays, BadgeCheck, FileSignature, AlertCircle, X,
-  Calendar,
+  Calendar, MapPin, ChevronDown,
 } from "lucide-react";
 import IdentityVerification from "../../Components/IdentityVerification";
 import PaymentForm from "../../Components/PaymentForm";
@@ -28,6 +28,65 @@ const steps = [
     icon: <CheckCircle size={20} className="text-cyan-400" />,
     title: "Start Learning",
     desc: "Full course access from day one of your confirmed start date.",
+  },
+];
+
+// ─── Course Schedules (same as Enroll page) ─────────────────────
+const courseSchedules = [
+  {
+    location: "London",
+    dates: [
+      "17th–19th July",
+      "21st–23rd August",
+      "18th–20th September",
+      "16th–18th October",
+      "20th–22nd November",
+      "18th–20th December",
+    ],
+  },
+  {
+    location: "Upminster",
+    dates: [
+      "24th–26th July",
+      "28th–30th August",
+      "25th–27th September",
+      "23rd–25th October",
+      "27th–29th November",
+      "28th–30th December",
+    ],
+  },
+  {
+    location: "Edinburgh",
+    dates: [
+      "10th–12th July",
+      "14th–16th August",
+      "11th–13th September",
+      "9th–11th October",
+      "13th–15th November",
+      "10th–12th December",
+    ],
+  },
+  {
+    location: "Belfast",
+    dates: [
+      "24th–26th July",
+      "28th–30th August",
+      "25th–27th September",
+      "23rd–25th October",
+      "27th–29th November",
+      "28th–30th December",
+    ],
+  },
+  {
+    location: "Dublin",
+    dates: [
+      "17th–19th July",
+      "21st–23rd August",
+      "18th–20th September",
+      "16th–18th October",
+      "20th–22nd November",
+      "18th–20th December",
+    ],
   },
 ];
 
@@ -157,6 +216,11 @@ const SubscriptionEnroll = () => {
 
 const [selectedSchedule, setSelectedSchedule] = useState(null);
 
+  // ── NEW: values bound to the Location / Date select inputs ──
+  // (shown only when there's no schedule saved already)
+  const [scheduleLocation, setScheduleLocation] = useState("");
+  const [scheduleDate, setScheduleDate] = useState("");
+
 useEffect(() => {
   const date = searchParams.get("date");
   const location = searchParams.get("location");
@@ -179,8 +243,37 @@ useEffect(() => {
 
   if (savedSchedule) {
     setSelectedSchedule(savedSchedule);
+    setScheduleLocation(savedSchedule.location || "");
+    setScheduleDate(savedSchedule.date || "");
   }
 }, []);
+
+  // ── NEW: Location select change ──────────────────────────────
+  const handleLocationChange = (e) => {
+    const location = e.target.value;
+    setScheduleLocation(location);
+    setScheduleDate("");
+
+    if (!location) {
+      localStorage.removeItem("selectedSchedule");
+      setSelectedSchedule(null);
+    }
+  };
+
+  // ── NEW: Date select change ──────────────────────────────────
+  const handleDateChange = (e) => {
+    const date = e.target.value;
+    setScheduleDate(date);
+
+    if (date && scheduleLocation) {
+      const schedule = { date, location: scheduleLocation };
+      localStorage.setItem("selectedSchedule", JSON.stringify(schedule));
+      setSelectedSchedule(schedule);
+    }
+  };
+
+  const availableDates =
+    courseSchedules.find((s) => s.location === scheduleLocation)?.dates || [];
 
   const createPaymentIntent = async () => {
     try {
@@ -543,6 +636,71 @@ useEffect(() => {
                 <label className="block mb-2 text-sm text-white/70">Course</label>
                 <input type="text" value="14 Certificate Fast-Track Course" readOnly className="w-full px-4 py-4 text-white border opacity-50 cursor-not-allowed rounded-xl bg-white/5 border-white/10" />
               </div>
+
+              {/* ── NEW: if no schedule saved, let user pick location & date ── */}
+              {!selectedSchedule && (
+                <>
+                  <div>
+                    <label className="block mb-2 text-sm text-white/70">Location</label>
+                    <div className="relative">
+                      <MapPin
+                        size={18}
+                        className="absolute -translate-y-1/2 pointer-events-none text-white/40 left-4 top-1/2"
+                      />
+                      <select
+                        value={scheduleLocation}
+                        onChange={handleLocationChange}
+                        required
+                        className={`${inputClass} appearance-none cursor-pointer`}
+                      >
+                        <option value="" className="bg-[#0a0e12]">
+                          Select a location
+                        </option>
+                        {courseSchedules.map((s) => (
+                          <option key={s.location} value={s.location} className="bg-[#0a0e12]">
+                            {s.location}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={18}
+                        className="absolute -translate-y-1/2 pointer-events-none text-white/40 right-4 top-1/2"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm text-white/70">Date</label>
+                    <div className="relative">
+                      <Calendar
+                        size={18}
+                        className="absolute -translate-y-1/2 pointer-events-none text-white/40 left-4 top-1/2"
+                      />
+                      <select
+                        value={scheduleDate}
+                        onChange={handleDateChange}
+                        disabled={!scheduleLocation}
+                        required
+                        className={`${inputClass} appearance-none cursor-pointer`}
+                      >
+                        <option value="" className="bg-[#0a0e12]">
+                          {scheduleLocation ? "Select a date" : "Select location first"}
+                        </option>
+                        {availableDates.map((date) => (
+                          <option key={date} value={date} className="bg-[#0a0e12]">
+                            {date}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={18}
+                        className="absolute -translate-y-1/2 pointer-events-none text-white/40 right-4 top-1/2"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
              {selectedSchedule && (
   <div className="p-4 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
     <div className="flex items-start justify-between gap-4">
@@ -565,6 +723,8 @@ useEffect(() => {
             onClick={() => {
               localStorage.removeItem("selectedSchedule");
               setSelectedSchedule(null);
+              setScheduleLocation("");
+              setScheduleDate("");
             }}
             className="transition-colors text-white/40 hover:text-red-400"
           >
