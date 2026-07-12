@@ -169,6 +169,19 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
         .modal-enter {
           animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+        .plan-modal-box {
+          padding: 1.25rem;
+        }
+        @media (min-width: 640px) {
+          .plan-modal-box {
+            padding: 1.75rem;
+          }
+        }
+        @media (min-width: 1024px) {
+          .plan-modal-box {
+            padding: 2.5rem;
+          }
+        }
       `}</style>
 
       <div
@@ -180,25 +193,24 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "1rem",
+          padding: "0.5rem",
           backgroundColor: "rgba(0,0,0,0.75)",
           backdropFilter: "blur(6px)",
           WebkitBackdropFilter: "blur(6px)",
         }}
       >
         <div
-          className="modal-enter"
+          className="modal-enter plan-modal-box"
           style={{
             position: "relative",
             width: "100%",
             maxWidth: "1100px",
-            maxHeight: "90vh",
+            maxHeight: "92vh",
             overflowY: "auto",
             overscrollBehavior: "contain",
             backgroundColor: "#0a0e12",
             border: "1px solid rgba(255,255,255,0.08)",
             borderRadius: "1.5rem",
-            padding: "2.5rem",
             boxShadow:
               "0 40px 120px rgba(0,0,0,0.8), 0 0 60px rgba(34,211,238,0.06)",
           }}
@@ -254,10 +266,7 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
             <X size={16} />
           </button>
 
-         
-
-        
-         {/* Plan cards */}
+          {/* Plan cards */}
           <div style={{ position: "relative", zIndex: 1 }}>
             <PricePlan onSelectPlan={onSelectPlan} />
           </div>
@@ -747,26 +756,29 @@ const handleRemoveSchedule = () => {
                         onChange={(e) => setIsTermsAccepted(e.target.checked)}
                         className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
                       />
-                      <label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer text-white/60">
-                        I have read and agree to the{" "}
-                        <a
-                          href="/terms-and-conditions"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
-                        >
-                          Terms & Conditions
-                        </a>{" "}
-                        and{" "}
-                        <a
-                          href="/privacy-policy"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
-                        >
-                          Privacy Policy
-                        </a>
-                      </label>
+                     <label
+  htmlFor="terms"
+  className="text-sm leading-relaxed cursor-pointer text-white/60"
+>
+  I have read and agree to the{" "}
+  <a
+    href="/terms-and-conditions"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+  >
+    Terms & Conditions
+  </a>{" "}
+  and{" "}
+  <a
+    href="/privacy-policy"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="underline transition-colors text-cyan-400 hover:text-cyan-300 underline-offset-2"
+  >
+    Privacy Policy
+  </a>
+</label>
                     </div>
 
                     <div className="relative">

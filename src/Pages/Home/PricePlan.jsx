@@ -76,34 +76,34 @@ const PricePlan = ({ onSelectPlan }) => {
 
 
   return (
-   <section className="relative px-6 py-16 overflow-hidden text-white bg-[#0a0e12]">
+   <section className="relative px-4 py-10 sm:px-6 sm:py-16 overflow-hidden text-white bg-[#0a0e12]">
       {/* Background Glow */}
       <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[150px] rounded-full"></div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* Heading */}
-        <div className="mb-16 text-center">
+        <div className="mb-10 text-center sm:mb-16">
           <p className="text-cyan-400 text-xs tracking-[4px] uppercase mb-4">
             Enrollment Options
           </p>
 
-          <h2 className="font-serif text-4xl font-light md:text-5xl">
+          <h2 className="font-serif text-3xl font-light sm:text-4xl md:text-5xl">
             Choose Your{" "}
             <span className="italic text-cyan-300">Payment Plan</span>
           </h2>
 
-          <p className="max-w-2xl mx-auto mt-4 text-gray-400">
+          <p className="max-w-2xl mx-auto mt-4 text-sm text-gray-400 sm:text-base">
             Flexible ways to start your journey — pay in full, leave a deposit,
             or subscribe monthly via direct debit.
           </p>
         </div>
 
         {/* Cards */}
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`relative rounded-3xl p-8 flex flex-col min-h-[620px]
+              className={`relative rounded-3xl p-6 sm:p-8 flex flex-col min-h-0 sm:min-h-[620px]
 border border-cyan-400/30
 transition-all duration-500 cursor-pointer
               ${
@@ -126,15 +126,15 @@ transition-all duration-500 cursor-pointer
               )} */}
 
               {/* Content */}
-              <div className={plan.featured ? "mt-6" : ""}>
-                <h3 className="mb-3 text-2xl font-medium">{plan.title}</h3>
+              <div className={plan.featured ? "mt-4 sm:mt-6" : ""}>
+                <h3 className="mb-3 text-xl font-medium sm:text-2xl">{plan.title}</h3>
 
-                <p className="mb-8 text-sm leading-relaxed text-gray-400">
+                <p className="mb-6 text-sm leading-relaxed text-gray-400 sm:mb-8">
                   {plan.description}
                 </p>
 
-                <div className="mb-8">
-                  <h2 className="text-5xl font-light">{plan.price}</h2>
+                <div className="mb-6 sm:mb-8">
+                  <h2 className="text-4xl font-light sm:text-5xl">{plan.price}</h2>
 
                   <p
                     className={`text-sm mt-2 ${
@@ -147,15 +147,15 @@ transition-all duration-500 cursor-pointer
                   </p>
                 </div>
 
-                <ul className="flex-grow space-y-4">
+                <ul className="flex-grow space-y-3 sm:space-y-4">
                   {plan.features.map((feature, i) => (
                     <li
                       key={i}
-                      className="flex items-center gap-3 text-gray-300"
+                      className="flex items-start gap-3 text-sm text-gray-300 sm:items-center sm:text-base"
                     >
                       <Check
                         size={16}
-                        className="flex-shrink-0 text-cyan-400"
+                        className="flex-shrink-0 text-cyan-400 mt-0.5 sm:mt-0"
                       />
                       <span>{feature}</span>
                     </li>
@@ -165,7 +165,7 @@ transition-all duration-500 cursor-pointer
 
               {/* Button */}
               <button onClick={() => handleEnroll(plan)}
-                className={`mt-auto w-full py-4 rounded-full flex items-center justify-center gap-2 font-medium 
+                className={`mt-6 sm:mt-auto w-full py-3.5 sm:py-4 rounded-full flex items-center justify-center gap-2 font-medium text-sm sm:text-base
                   transition-all duration-300 bg-cyan-400 text-black hover:scale-105 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] `}
               > 
                 {plan.buttonText}

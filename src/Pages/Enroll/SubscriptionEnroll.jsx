@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   User, Mail, Phone, CheckCircle, ShieldCheck,
   CalendarDays, BadgeCheck, FileSignature, AlertCircle, X,
@@ -106,6 +106,9 @@ const STEP_LABELS = {
   [STEP_MANDATE]: "Direct Debit",
 };
 
+const SIGNWELL_EMBED_SCRIPT_SRC = "https://static.signwell.com/assets/embedded.js";
+const SIGNWELL_EMBED_CONTAINER_ID = "signwell-embed-container";
+
 const StepIndicator = ({ current }) => {
   const order = [STEP_FORM, STEP_AGREEMENT, STEP_IDENTITY, STEP_PAYMENT, STEP_MANDATE];
   const currentIdx = order.indexOf(current);
@@ -146,44 +149,6 @@ const StepIndicator = ({ current }) => {
   );
 };
 
-// Modal shown right before the user is taken to open+sign the agreement,
-// so they know they need to come back to this page after signing.
-const AgreementNoticeModal = ({ onConfirm, onCancel }) => {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="w-full max-w-md p-7 border rounded-3xl border-cyan-500/20 bg-[#0a0a0a]">
-        <div className="flex items-center justify-center w-12 h-12 mb-5 rounded-full bg-cyan-400/10">
-          <FileSignature size={22} className="text-cyan-400" />
-        </div>
-        <h3 className="mb-2 text-lg font-semibold text-white">
-          Before You Sign
-        </h3>
-        <p className="mb-6 text-sm leading-relaxed text-white/50">
-          Your agreement will open in a new tab. Once you have finished
-          signing, please return to this page — it will automatically
-          continue to the next step for you.
-        </p>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 py-3 text-sm font-medium transition-colors border rounded-xl border-white/10 text-white/60 hover:text-white hover:border-white/20"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="flex items-center justify-center flex-1 gap-2 py-3 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
-          >
-            Got it, Open Agreement →
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const SubscriptionEnroll = () => {
   const form = useRef(null);
 
@@ -191,11 +156,6 @@ const SubscriptionEnroll = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
-  const [canVerify, setCanVerify] = useState(false);
-  
-
-  // Modal shown before moving from the details form into the agreement step
-  const [showAgreementNotice, setShowAgreementNotice] = useState(false);
 
   // Stripe (£250 first payment)
   const hasFetchedIntent = useRef(false);
@@ -208,47 +168,48 @@ const SubscriptionEnroll = () => {
   const [formSnapshot, setFormSnapshot] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   const [agreementSigned, setAgreementSigned] = useState(false);
-  const [checkingAgreement, setCheckingAgreement] = useState(false);
-  const [agreementSigned2, setAgreementSigned2] = useState(false);
-  const pollRef = useRef(null);
   const [signingUrl, setSigningUrl] = useState(null);
+
+  // Embedded SignWell iframe state
+  const [embedScriptReady, setEmbedScriptReady] = useState(
+    typeof window !== "undefined" && !!window.SignWellEmbed
+  );
+  const [embedError, setEmbedError] = useState(false);
+  const [verifyingAgreement, setVerifyingAgreement] = useState(false);
+  const embedInstanceRef = useRef(null);
+  const verifyAttemptsRef = useRef(0);
+  const verifyTimeoutRef = useRef(null);
+
   const [searchParams] = useSearchParams();
 
-const [selectedSchedule, setSelectedSchedule] = useState(null);
-
-  // ── NEW: values bound to the Location / Date select inputs ──
-  // (shown only when there's no schedule saved already)
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [scheduleLocation, setScheduleLocation] = useState("");
   const [scheduleDate, setScheduleDate] = useState("");
 
-useEffect(() => {
-  const date = searchParams.get("date");
-  const location = searchParams.get("location");
+  useEffect(() => {
+    const date = searchParams.get("date");
+    const location = searchParams.get("location");
 
-  if (date && location) {
-    localStorage.setItem(
-      "selectedSchedule",
-      JSON.stringify({
-        date,
-        location,
-      })
+    if (date && location) {
+      localStorage.setItem(
+        "selectedSchedule",
+        JSON.stringify({ date, location })
+      );
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const savedSchedule = JSON.parse(
+      localStorage.getItem("selectedSchedule") || "null"
     );
-  }
-}, [searchParams]);
 
-useEffect(() => {
-  const savedSchedule = JSON.parse(
-    localStorage.getItem("selectedSchedule") || "null"
-  );
+    if (savedSchedule) {
+      setSelectedSchedule(savedSchedule);
+      setScheduleLocation(savedSchedule.location || "");
+      setScheduleDate(savedSchedule.date || "");
+    }
+  }, []);
 
-  if (savedSchedule) {
-    setSelectedSchedule(savedSchedule);
-    setScheduleLocation(savedSchedule.location || "");
-    setScheduleDate(savedSchedule.date || "");
-  }
-}, []);
-
-  // ── NEW: Location select change ──────────────────────────────
   const handleLocationChange = (e) => {
     const location = e.target.value;
     setScheduleLocation(location);
@@ -260,7 +221,6 @@ useEffect(() => {
     }
   };
 
-  // ── NEW: Date select change ──────────────────────────────────
   const handleDateChange = (e) => {
     const date = e.target.value;
     setScheduleDate(date);
@@ -297,63 +257,155 @@ useEffect(() => {
     }
   };
 
+  // ── Load the SignWell embedded-signing JS SDK once ──────────────
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.SignWellEmbed) {
+      setEmbedScriptReady(true);
+      return;
+    }
+    if (document.querySelector(`script[src="${SIGNWELL_EMBED_SCRIPT_SRC}"]`)) {
+      // Already being loaded elsewhere; poll briefly for it to attach.
+      const check = setInterval(() => {
+        if (window.SignWellEmbed) {
+          setEmbedScriptReady(true);
+          clearInterval(check);
+        }
+      }, 200);
+      return () => clearInterval(check);
+    }
+    const script = document.createElement("script");
+    script.src = SIGNWELL_EMBED_SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => setEmbedScriptReady(true);
+    script.onerror = () => setEmbedError(true);
+    document.body.appendChild(script);
+  }, []);
+
+  // ── Server-side re-verification. This is the single source of truth —
+  // the SignWell iframe's `completed` event is only a trigger to check,
+  // never trusted on its own. ─────────────────────────────────────────
+  const verifyAgreementSigned = useCallback(async () => {
+    if (!enrollmentId || agreementSigned) return;
+    setVerifyingAgreement(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/subscription-agreement-status/${enrollmentId}`
+      );
+      if (!res.ok) throw new Error("status check failed");
+      const data = await res.json();
+
+      if (data.signed || data.status === "completed") {
+        verifyAttemptsRef.current = 0;
+        if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current);
+        setAgreementSigned(true);
+        setVerifyingAgreement(false);
+        setStep(STEP_IDENTITY);
+        return;
+      }
+
+      if (data.signingUrl && !signingUrl) {
+        setSigningUrl(data.signingUrl);
+      }
+
+      // SignWell can take a few seconds to fully register completion
+      // server-side after the iframe fires `completed`. Retry a handful
+      // of times before falling back to slow background polling.
+      verifyAttemptsRef.current += 1;
+      setVerifyingAgreement(false);
+      if (verifyAttemptsRef.current <= 6) {
+        verifyTimeoutRef.current = setTimeout(verifyAgreementSigned, 2000);
+      }
+    } catch {
+      setVerifyingAgreement(false);
+      verifyAttemptsRef.current += 1;
+      if (verifyAttemptsRef.current <= 6) {
+        verifyTimeoutRef.current = setTimeout(verifyAgreementSigned, 3000);
+      }
+    }
+  }, [enrollmentId, agreementSigned, signingUrl]);
+
+  // ── Background safety-net polling. Slower interval — the primary
+  // transition now comes from the iframe's `completed` event, this just
+  // covers refreshes, closed tabs, or a missed event. ──────────────────
   useEffect(() => {
     if (step !== STEP_AGREEMENT || !enrollmentId || agreementSigned) return;
 
     let timeoutId = null;
-    let isMounted = true; // Component active ache কিনা track korbe
+    let isMounted = true;
 
-    const checkStatus = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/subscription-agreement-status/${enrollmentId}`
-        );
-
-        // Backend jodi 429 dey, tahole loop ektu dhire chalabo (15 second opekka korbo)
-        if (res.status === 429) {
-          console.warn("Rate limited! Retrying in 15 seconds...");
-          if (isMounted) timeoutId = setTimeout(checkStatus, 15000);
-          return;
-        }
-
-        if (!res.ok) {
-          // Onno kono error hole 8 second por abar try korbe
-          if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
-          return;
-        }
-
-        const data = await res.json();
-
-        console.log("Backend response data:", data);
-
-        if (data.signed || data.status === 'completed') {
-          setAgreementSigned(true);
-          setStep(STEP_IDENTITY);
-          return; // stop here, no need to touch signingUrl or reschedule
-        }
-
-        // Not signed yet — grab/refresh the Client's embedded signing URL if we don't have one
-        if (data.signingUrl && !signingUrl) {
-          setSigningUrl(data.signingUrl);
-        }
-
-        // User jodi ekhono sign na kore, tobe thik 8 second por porer request-ta jabe
-        if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
-      } catch (error) {
-        console.error("Polling error:", error);
-        // Network crash ba onno error-eও 8 second por try korbe
-        if (isMounted) timeoutId = setTimeout(checkStatus, 8000);
-      }
+    const poll = async () => {
+      await verifyAgreementSigned();
+      if (isMounted) timeoutId = setTimeout(poll, 15000);
     };
 
-    // Prothom request-ta 3 second por shuru hobe, jate mount hobar sathe sathe hit na khay
-    timeoutId = setTimeout(checkStatus, 3000);
+    timeoutId = setTimeout(poll, 15000);
 
     return () => {
       isMounted = false;
-      clearTimeout(timeoutId); // Component unmount ba step change hole loop ekbare bondho!
+      clearTimeout(timeoutId);
     };
-  }, [step, enrollmentId, agreementSigned, signingUrl]);
+  }, [step, enrollmentId, agreementSigned, verifyAgreementSigned]);
+
+  // ── Extra safety net: if the tab regains focus while on this step,
+  // check immediately instead of waiting for the next interval tick. ──
+  useEffect(() => {
+    if (step !== STEP_AGREEMENT) return;
+    const onFocus = () => verifyAgreementSigned();
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onFocus);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onFocus);
+    };
+  }, [step, verifyAgreementSigned]);
+
+  // ── Mount the SignWell embedded iframe once we have a signing URL
+  // and the SDK script has loaded. ─────────────────────────────────
+  useEffect(() => {
+    if (step !== STEP_AGREEMENT) return;
+    if (!signingUrl || !embedScriptReady || agreementSigned) return;
+    if (!window.SignWellEmbed) return;
+
+    // Tear down any previous instance before creating a new one
+    if (embedInstanceRef.current?.close) {
+      try { embedInstanceRef.current.close(); } catch {}
+    }
+
+    const container = document.getElementById(SIGNWELL_EMBED_CONTAINER_ID);
+    if (!container) return;
+    container.innerHTML = "";
+
+    const embed = new window.SignWellEmbed({
+      url: signingUrl,
+      containerId: SIGNWELL_EMBED_CONTAINER_ID,
+      allowDecline: true,
+      allowClose: false,
+      events: {
+        completed: () => {
+          verifyAttemptsRef.current = 0;
+          verifyAgreementSigned();
+        },
+        error: () => setEmbedError(true),
+      },
+    });
+    embed.open();
+    embedInstanceRef.current = embed;
+
+    return () => {
+      if (embedInstanceRef.current?.close) {
+        try { embedInstanceRef.current.close(); } catch {}
+      }
+      embedInstanceRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, signingUrl, embedScriptReady, agreementSigned]);
+
+  useEffect(() => {
+    return () => {
+      if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current);
+    };
+  }, []);
 
   // Step 1 → Step 2: validate form fields then proceed to Agreement
   const handleFormNext = async () => {
@@ -386,27 +438,13 @@ useEffect(() => {
       }
       setFormSnapshot({ name, email, phone });
       setEnrollmentId(data.enrollmentId);
-      if (data.signingUrl) setSigningUrl(data.signingUrl); // embedded signing URL for the Client
+      if (data.signingUrl) setSigningUrl(data.signingUrl);
       setStep(STEP_AGREEMENT);
     } catch (err) {
       setErrorMsg(err.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
-
-  // "Open Agreement to Sign" button (Step 2) → show the notice modal first.
-  // Only once the user confirms does the agreement actually open in a new tab.
-  const handleOpenAgreementClick = () => {
-    setShowAgreementNotice(true);
-  };
-
-  // Modal confirmed → open the signing link in a new tab and close the modal
-  const confirmOpenAgreement = () => {
-    if (signingUrl) {
-      window.open(signingUrl, "_blank", "noopener,noreferrer");
-    }
-    setShowAgreementNotice(false);
   };
 
   // Step 3 → Step 4: identity verified, create pre-enrollment, then go to Payment
@@ -420,7 +458,7 @@ useEffect(() => {
       body.append("name", formSnapshot.name);
       body.append("email", formSnapshot.email);
       body.append("phone", formSnapshot.phone);
-      body.append("enrollmentId", enrollmentId); // ⬅️ same record update হবে
+      body.append("enrollmentId", enrollmentId);
       body.append("documentType", data.documentType);
       if (data.documentNumber) body.append("documentNumber", data.documentNumber);
       body.append("frontFile", data.frontFile);
@@ -448,60 +486,54 @@ useEffect(() => {
 
   // Step 4: Stripe card payment success → mark enrollment paid, move to mandate step
   const handlePaymentSuccess = async (paymentIntentId) => {
-  try {
-    setErrorMsg("");
+    try {
+      setErrorMsg("");
 
-    const savedSchedule = JSON.parse(
-      localStorage.getItem("selectedSchedule") || "null"
-    );
+      const savedSchedule = JSON.parse(
+        localStorage.getItem("selectedSchedule") || "null"
+      );
 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/create-subscription-enrollment`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/create-subscription-enrollment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            paymentIntentId,
+            enrollmentId,
+            name: formSnapshot.name,
+            email: formSnapshot.email,
+            phone: formSnapshot.phone,
+            selectedDate: savedSchedule?.date || null,
+            selectedLocation: savedSchedule?.location || null,
+          }),
+        }
+      );
 
-        body: JSON.stringify({
-          paymentIntentId,
-          enrollmentId,
-
-          name: formSnapshot.name,
-          email: formSnapshot.email,
-          phone: formSnapshot.phone,
-
-          selectedDate: savedSchedule?.date || null,
-          selectedLocation: savedSchedule?.location || null,
-        }),
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Enrollment failed");
       }
-    );
 
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.message || "Enrollment failed");
+      const result = await response.json();
+
+      if (result.success) {
+        setIsTermsAccepted(false);
+        localStorage.removeItem("selectedSchedule");
+        setSelectedSchedule(null);
+        setStep(STEP_MANDATE);
+      } else {
+        throw new Error("Enrollment failed. Please contact support.");
+      }
+    } catch (err) {
+      setErrorMsg(
+        err.message || "Something went wrong. Please contact support."
+      );
     }
+  };
 
-    const result = await response.json();
-
-    if (result.success) {
-      setIsTermsAccepted(false);
-
-      localStorage.removeItem("selectedSchedule");
-      setSelectedSchedule(null);
-
-      setStep(STEP_MANDATE);
-    } else {
-      throw new Error("Enrollment failed. Please contact support.");
-    }
-  } catch (err) {
-    setErrorMsg(
-      err.message || "Something went wrong. Please contact support."
-    );
-  }
-};
-
-  // Step 4-এ ঢোকার সাথে সাথে একবার Stripe payment intent তৈরি করা
   useEffect(() => {
     if (step !== STEP_PAYMENT || hasFetchedIntent.current) return;
     hasFetchedIntent.current = true;
@@ -518,7 +550,6 @@ useEffect(() => {
       setLoading(true);
       setErrorMsg("");
 
-      // Needed on the success page after the bank redirect brings the user back
       localStorage.setItem("enrollmentId", enrollmentId);
 
       const res = await fetch(
@@ -540,7 +571,7 @@ useEffect(() => {
         throw new Error(data.message || "Failed to start bank payment setup.");
       }
 
-      window.location.href = data.redirectUrl; // 🚀 redirect to bank page
+      window.location.href = data.redirectUrl;
     } catch (err) {
       console.error(err);
       setErrorMsg(err.message || "Something went wrong starting your bank setup.");
@@ -637,7 +668,6 @@ useEffect(() => {
                 <input type="text" value="14 Certificate Fast-Track Course" readOnly className="w-full px-4 py-4 text-white border opacity-50 cursor-not-allowed rounded-xl bg-white/5 border-white/10" />
               </div>
 
-              {/* ── NEW: if no schedule saved, let user pick location & date ── */}
               {!selectedSchedule && (
                 <>
                   <div>
@@ -701,56 +731,40 @@ useEffect(() => {
                 </>
               )}
 
-             {selectedSchedule && (
-  <div className="p-4 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
-    <div className="flex items-start justify-between gap-4">
-
-      <div className="flex-1">
-        <div className="flex justify-between">
-
-          <div>
-            <p className="text-xs text-white/40">
-              Selected Course Date
-            </p>
-
-            <p className="mt-1 font-semibold text-white">
-              {selectedSchedule.date}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              localStorage.removeItem("selectedSchedule");
-              setSelectedSchedule(null);
-              setScheduleLocation("");
-              setScheduleDate("");
-            }}
-            className="transition-colors text-white/40 hover:text-red-400"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-xs text-white/40">
-            Location
-          </p>
-
-          <p className="mt-1 font-semibold text-cyan-400">
-            {selectedSchedule.location}
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-)}
-              {/* <div>
-                <label className="block mb-2 text-sm text-white/70">Deposit Today</label>
-                <input type="text" value="£250 — Deposit Today" readOnly className="w-full px-4 py-4 font-medium border cursor-not-allowed rounded-xl text-cyan-400 bg-white/5 border-white/10" />
-              </div> */}
+              {selectedSchedule && (
+                <div className="p-4 border rounded-2xl border-cyan-400/20 bg-cyan-400/5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex justify-between">
+                        <div>
+                          <p className="text-xs text-white/40">Selected Course Date</p>
+                          <p className="mt-1 font-semibold text-white">
+                            {selectedSchedule.date}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            localStorage.removeItem("selectedSchedule");
+                            setSelectedSchedule(null);
+                            setScheduleLocation("");
+                            setScheduleDate("");
+                          }}
+                          className="transition-colors text-white/40 hover:text-red-400"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                      <div className="mt-4">
+                        <p className="text-xs text-white/40">Location</p>
+                        <p className="mt-1 font-semibold text-cyan-400">
+                          {selectedSchedule.location}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </form>
             <button
               type="button"
@@ -770,38 +784,67 @@ useEffect(() => {
           </>
         )}
 
-        {/* Step 2: Agreement signing */}
+        {/* Step 2: Agreement signing — embedded inline, no new tab */}
         {step === STEP_AGREEMENT && (
-          <div className="space-y-4 text-center">
-            <div>
+          <div className="space-y-4">
+            <div className="text-center">
               <h3 className="text-lg font-semibold text-white">
                 Sign Your Subscription Agreement
               </h3>
               <p className="mt-2 text-sm text-white/40">
-                Open your agreement below and sign it — this page will continue
-                automatically once it's confirmed.
+                Complete the form below. This page will continue automatically
+                the moment your signature is confirmed — no need to switch tabs
+                or press back.
               </p>
             </div>
 
-            {signingUrl ? (
-              <button
-                type="button"
-                onClick={handleOpenAgreementClick}
-                className="inline-block w-full py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
-              >
-                Open Agreement to Sign →
-              </button>
-            ) : (
-              <div className="flex flex-col items-center gap-3 py-6">
+            {embedError && (
+              <div className="flex items-start gap-3 p-4 border rounded-xl border-red-500/30 bg-red-500/10">
+                <AlertCircle size={18} className="text-red-400 mt-0.5 shrink-0" />
+                <p className="text-sm text-red-400">
+                  We couldn't load the signing widget. Please refresh the page,
+                  or contact us if the problem continues.
+                </p>
+              </div>
+            )}
+
+            {(!signingUrl || !embedScriptReady) && !embedError && (
+              <div className="flex flex-col items-center gap-3 py-10">
                 <div className="w-8 h-8 border-2 rounded-full border-cyan-400 border-t-transparent animate-spin" />
                 <p className="text-xs text-white/30">Preparing your agreement…</p>
               </div>
             )}
+<style>{`
+  #${SIGNWELL_EMBED_CONTAINER_ID} {
+    width: 100%;
+    height: 520px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+  #SignWell-Embedded-Iframe-Container {
+    width: 100% !important;
+    height: 520px !important;
+  
+  }
+  #SignWell-Embedded-Iframe-Container iframe {
+    width: 100% !important;
+    height: 520px !important;
+    border: none !important;
+    
+  }
+`}</style>
+            <div
+              id={SIGNWELL_EMBED_CONTAINER_ID}
+              className="min-h-[520px] rounded-xl overflow-hidden bg-white/5 border border-white/10"
+            />
 
-            <div className="flex flex-col items-center gap-3 pt-2">
-              <div className="w-6 h-6 border-2 rounded-full border-cyan-400/50 border-t-transparent animate-spin" />
-              <p className="text-xs text-white/30">Waiting for signature confirmation…</p>
-            </div>
+            {verifyingAgreement && (
+              <div className="flex items-center justify-center gap-2 text-xs text-white/40">
+                <div className="w-4 h-4 border-2 rounded-full border-cyan-400/60 border-t-transparent animate-spin" />
+                Confirming your signature…
+              </div>
+            )}
 
             <button
               type="button"
@@ -939,15 +982,8 @@ useEffect(() => {
   };
 
   return (
-   <section className="min-h-screen bg-[#050505] py-20 px-6 overflow-x-hidden">
+    <section className="min-h-screen bg-[#050505] py-20 px-6 overflow-x-hidden">
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 blur-[180px] rounded-full pointer-events-none" />
-
-      {showAgreementNotice && (
-        <AgreementNoticeModal
-          onCancel={() => setShowAgreementNotice(false)}
-          onConfirm={confirmOpenAgreement}
-        />
-      )}
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Header */}
@@ -961,10 +997,10 @@ useEffect(() => {
           </h1>
           <p className="max-w-xl mx-auto mt-4 text-white/50">
            So you've decided to go down the subscription route, thats fantastic! Let me break 
-           down exactly how ours works. It’s £100 per month, with a £250 upfront fee, covering 
-           academy operations. You’ll get lifetime support, take a break, come back, retrain 
+           down exactly how ours works. It's £100 per month, with a £250 upfront fee, covering 
+           academy operations. You'll get lifetime support, take a break, come back, retrain 
            free. If you face complications, we step in. You have a course credit allowance, 
-           add courses, your fee stays £100. If regulations change, we’ll adapt, any needed 
+           add courses, your fee stays £100. If regulations change, we'll adapt, any needed 
            upgrades just add a small extra monthly cost. Many return for this flexible, 
            ongoing support. Please read the agreement for full details!
           </p>
