@@ -2,6 +2,19 @@ import React, { useState, useRef, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
 
+// Height (in px) of your site's fixed/sticky top navbar (the "FACES" bar
+// that stays pinned while scrolling). scrollIntoView aligns an element's
+// top edge to the very top of the viewport by default - which places it
+// right behind/under a fixed navbar. This offset tells the scroll to stop
+// short by that many pixels instead, so the category title lands just
+// below the navbar, fully visible.
+//
+// IMPORTANT: set this to your actual navbar's real rendered height
+// (check it in DevTools - element inspector - on the live page). If the
+// title still lands slightly under the navbar, increase this number a
+// little; if it stops too far below, decrease it.
+const STICKY_HEADER_OFFSET = 90;
+
 const faqData = [
   {
     category: "General",
@@ -279,7 +292,11 @@ const FAQ = () => {
               // individually-resizing boxes can ever be picked as a scroll
               // anchor node, on browsers where subtree opt-out from an
               // ancestor is applied inconsistently to elements added later.
-              style={{ overflowAnchor: "none" }}
+              // scroll-margin-top tells scrollIntoView to leave room for the
+              // fixed navbar instead of scrolling this card's top edge all
+              // the way to the very top of the viewport (where it would end
+              // up hidden behind the navbar).
+              style={{ overflowAnchor: "none", scrollMarginTop: STICKY_HEADER_OFFSET }}
               className="overflow-hidden transition-all duration-300 border rounded-3xl border-cyan-600 bg-white/[0.03] backdrop-blur-xl hover:border-cyan-400/30 hover:shadow-[0_0_40px_rgba(34,211,238,0.08)]"
             >
               <button
