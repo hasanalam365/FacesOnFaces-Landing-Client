@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   ChevronDown,
 } from "lucide-react";
+import { trackEvent } from "../utils/analytics";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -30,17 +31,40 @@ const LeadFormPage = ({ onBack }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  trackEvent("lead_form_view", {
+    page: "Advisor Lead Form",
+  });
+}, []);
+
+
+  const trackingRef = React.useRef({
+  formStarted: false,
+});
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+  const { name, value } = e.target;
+
+  if (!trackingRef.current.formStarted) {
+    trackingRef.current.formStarted = true;
+
+    trackEvent("lead_form_started");
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  if (errors[name]) {
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  }
+};
 
   const validate = () => {
     const newErrors = {};
@@ -70,11 +94,18 @@ const LeadFormPage = ({ onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
+    trackEvent("lead_form_submit", {
+  preferred_contact: formData.preferredContact,
+})
 
     try {
       setLoading(true);
       await axios.post(`${API_URL}/lead-form`, formData);
-      setSuccess(true);
+     trackEvent("lead_form_success", {
+  preferred_contact: formData.preferredContact,
+});
+
+setSuccess(true);
     } catch (err) {
       alert(err?.response?.data?.message || "Something went wrong.");
     } finally {

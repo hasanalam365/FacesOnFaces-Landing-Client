@@ -3,15 +3,31 @@ import { motion } from "framer-motion";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AdvisorModal from "../../Components/AdvisorModal";
+import { trackEvent } from "../../utils/analytics";
 
 const StartJourney = () => {
   const navigate = useNavigate();
 
   const [advisorModalOpen, setAdvisorModalOpen] = useState(false);
 
-  const handleEnroll = () => {
-    navigate("/enroll");
-  };
+const handleEnroll = () => {
+  trackEvent("start_journey_enroll_click", {
+    section: "Start Journey",
+    button: "Enroll Now",
+  });
+
+  navigate("/enroll");
+};
+
+const handleAdvisorClick = () => {
+  trackEvent("advisor_modal_open", {
+    section: "Start Journey",
+    button: "Talk To Advisor",
+  });
+
+  setAdvisorModalOpen(true);
+};
+
 
   return (
     <>
@@ -100,7 +116,7 @@ const StartJourney = () => {
 
             {/* Advisor */}
             <motion.button
-              onClick={() => setAdvisorModalOpen(true)}
+              onClick={handleAdvisorClick}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-3 px-8 py-4 font-medium text-white transition-all border rounded-full group border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-white/10"
