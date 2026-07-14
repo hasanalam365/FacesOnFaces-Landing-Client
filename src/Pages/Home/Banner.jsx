@@ -10,10 +10,81 @@ const Banner = () => {
   const [showIcon, setShowIcon] = useState(false);
 
 
+  const trackingRef = useRef({
+  viewed: false,
+  p25: false,
+  p50: false,
+  p75: false,
+  completed: false,
+});
+
 useEffect(() => {
-  trackEvent("banner_view", {
-    section: "Banner",
-  });
+  const video = videoRef.current;
+  if (!video) return;
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        video.play().catch(() => {});
+
+        if (!trackingRef.current.viewed) {
+          trackingRef.current.viewed = true;
+
+          trackEvent("banner_view", {
+            section: "Homepage Banner",
+          });
+        }
+      } else {
+        video.pause();
+      }
+    },
+    { threshold: 0.4 }
+  );
+
+  const handleTimeUpdate = () => {
+    if (!video.duration) return;
+
+    const percent = (video.currentTime / video.duration) * 100;
+
+    if (percent >= 25 && !trackingRef.current.p25) {
+      trackingRef.current.p25 = true;
+
+      trackEvent("banner_video_progress", {
+        progress: 25,
+      });
+    }
+
+    if (percent >= 50 && !trackingRef.current.p50) {
+      trackingRef.current.p50 = true;
+
+      trackEvent("banner_video_progress", {
+        progress: 50,
+      });
+    }
+
+    if (percent >= 75 && !trackingRef.current.p75) {
+      trackingRef.current.p75 = true;
+
+      trackEvent("banner_video_progress", {
+        progress: 75,
+      });
+    }
+
+    if (percent >= 99 && !trackingRef.current.completed) {
+      trackingRef.current.completed = true;
+
+      trackEvent("banner_video_complete");
+    }
+  };
+
+  video.addEventListener("timeupdate", handleTimeUpdate);
+
+  observer.observe(video);
+
+  return () => {
+    observer.disconnect();
+    video.removeEventListener("timeupdate", handleTimeUpdate);
+  };
 }, []);
 
   useEffect(() => {
@@ -36,22 +107,29 @@ useEffect(() => {
   }, []);
 
   // ── Video click → pause/resume ───────────────────────────────
-  const handleVideoClick = () => {
-    const video = videoRef.current;
-    if (!video) return;
+ const handleVideoClick = () => {
+  const video = videoRef.current;
+  if (!video) return;
 
-    if (video.paused) {
-      video.play().catch(() => {});
-      setIsPlaying(true);
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
+  if (video.paused) {
+    video.play().catch(() => {});
+    setIsPlaying(true);
 
-    // ছোট একটা icon flash দেখানোর জন্য
-    setShowIcon(true);
-    setTimeout(() => setShowIcon(false), 500);
-  };
+    trackEvent("banner_video_play", {
+      video_name: "Homepage Hero Video",
+    });
+  } else {
+    video.pause();
+    setIsPlaying(false);
+
+    trackEvent("banner_video_pause", {
+      video_name: "Homepage Hero Video",
+    });
+  }
+
+  setShowIcon(true);
+  setTimeout(() => setShowIcon(false), 500);
+};
 
  
   return (
