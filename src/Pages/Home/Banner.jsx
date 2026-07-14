@@ -1,12 +1,20 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, Pause } from "lucide-react";
+import { trackEvent } from "../../utils/analytics";
 
 const Banner = () => {
 
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showIcon, setShowIcon] = useState(false);
+
+
+useEffect(() => {
+  trackEvent("banner_view", {
+    section: "Banner",
+  });
+}, []);
 
   useEffect(() => {
     const video = videoRef.current;

@@ -25,56 +25,56 @@ const courseSchedules = [
   {
     location: "London",
     dates: [
-      "17th–19th July",
       "21st–23rd August",
       "18th–20th September",
       "16th–18th October",
       "20th–22nd November",
       "18th–20th December",
+      "22nd–24th January",
     ],
   },
   {
     location: "Upminster",
     dates: [
-      "24th–26th July",
       "28th–30th August",
       "25th–27th September",
       "23rd–25th October",
       "27th–29th November",
       "28th–30th December",
+      "29th–31st January",
     ],
   },
   {
     location: "Edinburgh",
     dates: [
-      "10th–12th July",
       "14th–16th August",
       "11th–13th September",
       "9th–11th October",
       "13th–15th November",
       "10th–12th December",
+      "15th–17th January",
     ],
   },
   {
     location: "Belfast",
     dates: [
-      "24th–26th July",
       "28th–30th August",
       "25th–27th September",
       "23rd–25th October",
       "27th–29th November",
       "28th–30th December",
+      "29th–31st January",
     ],
   },
   {
     location: "Dublin",
     dates: [
-      "17th–19th July",
       "21st–23rd August",
       "18th–20th September",
       "16th–18th October",
       "20th–22nd November",
       "18th–20th December",
+      "22nd–24th January",
     ],
   },
 ];
