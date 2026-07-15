@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FileText, ShieldCheck, CreditCard, AlertCircle, AlertTriangle, Phone, Mail, Instagram, Facebook } from "lucide-react";
+import { trackEvent } from "../../utils/analytics";
 
 const NAV_SECTIONS = [
   { id: "s1", label: "1. About these terms" },
@@ -131,10 +132,57 @@ const Warning = ({ children }) => (
 const SubscriptionsAgreement = () => {
   const [activeNav, setActiveNav] = useState(null);
 
-  const handleNav = (id) => {
-    setActiveNav(id);
-    scrollTo(id);
+ useEffect(() => {
+    trackEvent("subscription_agreement_view", {
+      page: "Subscription Agreement",
+      page_type: "legal",
+    });
+  }, []);
+
+useEffect(() => {
+  let tracked50 = false;
+  let tracked90 = false;
+
+  const handleScroll = () => {
+    const scrollTop = window.scrollY;
+    const docHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+
+    const percent = (scrollTop / docHeight) * 100;
+
+    if (percent >= 50 && !tracked50) {
+      tracked50 = true;
+
+      trackEvent("agreement_scroll", {
+        depth: "50%",
+      });
+    }
+
+    if (percent >= 90 && !tracked90) {
+      tracked90 = true;
+
+      trackEvent("agreement_scroll", {
+        depth: "90%",
+      });
+    }
   };
+
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+const handleNav = (id) => {
+  setActiveNav(id);
+  scrollTo(id);
+
+  const section = NAV_SECTIONS.find((item) => item.id === id);
+
+  trackEvent("agreement_section_view", {
+    section_id: id,
+    section_name: section?.label,
+  });
+};
 
   return (
     <div style={{ background: "#ffffff", fontFamily: "Inter, system-ui, sans-serif", color: "#0f172a" }}>
@@ -466,19 +514,45 @@ const SubscriptionsAgreement = () => {
           <SectionCard id="s9" title="9. Contact" muted>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {[
-                { icon: <Mail size={15} />, label: "Email", value: "support@facesonfaces.com", href: "mailto:support@facesonfaces.com" },
+               {
+  icon: <Mail size={15} />,
+  label: "Email",
+  value: "support@facesonfaces.com",
+  href: "mailto:support@facesonfaces.com",
+  event: "agreement_email_click",
+},
                 { icon: <Instagram size={15} />, label: "Instagram", value: "@facesonfaces_" },
                 { icon: <Facebook size={15} />, label: "Facebook", value: "@facesonfaces" },
-                { icon: <Phone size={15} />, label: "Phone", value: "0800 999 1751", href: "tel:08009991751" },
+               {
+  icon: <Phone size={15} />,
+  label: "Phone",
+  value: "0800 999 1751",
+  href: "tel:08009991751",
+  event: "agreement_phone_click",
+},
               ].map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13.5px" }}>
                   <span style={{ color: "#64748b", display: "flex" }}>{item.icon}</span>
                   <span style={{ color: "#94a3b8", minWidth: "70px" }}>{item.label}</span>
                   {item.href ? (
-                    <a href={item.href} style={{ color: "#2563eb", textDecoration: "none" }}>{item.value}</a>
-                  ) : (
-                    <span style={{ color: "#334155" }}>{item.value}</span>
-                  )}
+  <a
+    href={item.href}
+    onClick={() =>
+      trackEvent(item.event, {
+        contact_type: item.label,
+        value: item.value,
+      })
+    }
+    style={{
+      color: "#2563eb",
+      textDecoration: "none",
+    }}
+  >
+    {item.value}
+  </a>
+) : (
+  <span style={{ color: "#334155" }}>{item.value}</span>
+)}
                 </div>
               ))}
             </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   ShieldCheck,
   Database,
@@ -8,7 +8,17 @@ import {
   UserCheck,
 } from "lucide-react";
 
+import { trackEvent } from "../../utils/analytics";
+
 const PrivacyPolicy = () => {
+
+   const pageRef = useRef(null);
+   useEffect(() => {
+  trackEvent("view_privacy_policy", {
+    page_name: "Privacy Policy",
+  });
+}, []);
+
   const sections = [
     {
       icon: <Database size={22} />,
@@ -71,7 +81,7 @@ const PrivacyPolicy = () => {
   ];
 
   return (
-    <div className="bg-white">
+    <div  ref={pageRef} className="bg-white">
       {/* HERO */}
       <section className="relative overflow-hidden text-white bg-gradient-to-br from-slate-950 via-slate-900 to-black">
         <div className="container px-6 py-24 mx-auto">
@@ -172,9 +182,25 @@ const PrivacyPolicy = () => {
             </p>
 
             <div className="space-y-2 text-gray-200">
-              <p>Email: support@facesonfaces.com</p>
-              <p>Instagram: @facesonfaces_</p>
-              <p>Phone: 08009991751</p>
+              <p onClick={() =>
+    trackEvent("contact_email_click", {
+      location: "privacy_policy",
+    })
+  }>Email: support@facesonfaces.com</p>
+              <p onClick={() =>
+    trackEvent("contact_instagram_click", {
+      location: "privacy_policy",
+    })
+  }>Instagram: @facesonfaces_</p>
+              <p
+  onClick={() =>
+    trackEvent("contact_phone_click", {
+      location: "privacy_policy",
+    })
+  }
+>
+  Phone: 08009991751
+</p>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { FileText, ShieldCheck, CreditCard, AlertCircle } from "lucide-react";
+import { trackEvent } from "../../utils/analytics";
 
 const sections = [
   { id: "about", title: "1. About These Terms" },
@@ -77,6 +78,74 @@ const ClauseList = ({ items }) => (
 );
 
 const TermsAndCondition = () => {
+const trackedSections = useRef(new Set());
+
+useEffect(() => {
+  trackEvent("terms_page_view", {
+    page_name: "Terms & Conditions",
+    page_type: "legal",
+  });
+}, []);
+
+useEffect(() => {
+  const milestones = [25, 50, 75, 100];
+  const tracked = new Set();
+
+  const handleScroll = () => {
+    const scrollTop = window.scrollY;
+    const height =
+      document.documentElement.scrollHeight - window.innerHeight;
+
+    if (height <= 0) return;
+
+    const percent = Math.round((scrollTop / height) * 100);
+
+    milestones.forEach((m) => {
+      if (percent >= m && !tracked.has(m)) {
+        tracked.add(m);
+
+        trackEvent("terms_scroll_depth", {
+          percentage: m,
+        });
+      }
+    });
+  };
+
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (
+          entry.isIntersecting &&
+          !trackedSections.current.has(entry.target.id)
+        ) {
+          trackedSections.current.add(entry.target.id);
+
+          trackEvent("terms_section_view", {
+            section: entry.target.id,
+          });
+        }
+      });
+    },
+    {
+      threshold: 0.5,
+    }
+  );
+
+  sections.forEach((section) => {
+    const el = document.getElementById(section.id);
+
+    if (el) observer.observe(el);
+  });
+
+  return () => observer.disconnect();
+}, []);
+
   return (
     <div style={{ background: "#fff", fontFamily: "Inter, system-ui, sans-serif", color: "#0f172a" }}>
 
@@ -110,7 +179,14 @@ const TermsAndCondition = () => {
             {sections.map((s) => (
               <button
                 key={s.id}
-                onClick={() => scrollToSection(s.id)}
+               onClick={() => {
+  trackEvent("terms_navigation_click", {
+    section: s.id,
+    title: s.title,
+  });
+
+  scrollToSection(s.id);
+}}
                 style={{ display: "block", width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", fontSize: "13px", color: "#475569", padding: "6px 10px", borderRadius: "8px", lineHeight: "1.4", marginBottom: "2px" }}
                 onMouseEnter={e => { e.target.style.background = "#f1f5f9"; e.target.style.color = "#0f172a"; }}
                 onMouseLeave={e => { e.target.style.background = "none"; e.target.style.color = "#475569"; }}
@@ -201,17 +277,89 @@ const TermsAndCondition = () => {
             ]} />
           </SectionCard>
 
-          {/* 7. CONTACT */}
-          <SectionCard id="contact" title="7. Contacting Faces on Faces Academy">
-            <p style={{ fontSize: "14.5px", lineHeight: "1.8", color: "#64748b", marginBottom: "16px" }}>
-              You can contact Faces on Faces Academy in any one of the following ways:
-            </p>
-            <ClauseList items={[
-              { clause: "7.1", text: "Email: support@facesonfaces.com" },
-              { clause: "7.2", text: "Facebook: @facesonfaces" },
-              { clause: "7.3", text: "Phone: +44 7308 888874" },
-            ]} />
-          </SectionCard>
+         {/* 7. CONTACT */}
+<SectionCard id="contact" title="7. Contacting Faces on Faces Academy">
+  <p
+    style={{
+      fontSize: "14.5px",
+      lineHeight: "1.8",
+      color: "#64748b",
+      marginBottom: "18px",
+    }}
+  >
+    You can contact Faces on Faces Academy using any of the following methods:
+  </p>
+
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "14px",
+    }}
+  >
+    {/* Email */}
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+      <span style={{ fontWeight: 600, minWidth: "70px" }}>Email</span>
+
+      <a
+        href="mailto:support@facesonfaces.com"
+        onClick={() =>
+          trackEvent("terms_email_click", {
+            location: "terms_page",
+          })
+        }
+        style={{
+          color: "#2563eb",
+          textDecoration: "none",
+        }}
+      >
+        support@facesonfaces.com
+      </a>
+    </div>
+
+    {/* Facebook */}
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+      <span style={{ fontWeight: 600, minWidth: "70px" }}>Facebook</span>
+
+      <a
+        href="https://www.facebook.com/facesonfaces"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() =>
+          trackEvent("terms_facebook_click", {
+            location: "terms_page",
+          })
+        }
+        style={{
+          color: "#2563eb",
+          textDecoration: "none",
+        }}
+      >
+        @facesonfaces
+      </a>
+    </div>
+
+    {/* Phone */}
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+      <span style={{ fontWeight: 600, minWidth: "70px" }}>Phone</span>
+
+      <a
+        href="tel:+447308888874"
+        onClick={() =>
+          trackEvent("terms_phone_click", {
+            location: "terms_page",
+          })
+        }
+        style={{
+          color: "#2563eb",
+          textDecoration: "none",
+        }}
+      >
+        +44 7308 888874
+      </a>
+    </div>
+  </div>
+</SectionCard>
 
           {/* 8. DATA */}
           <SectionCard id="data" title="8. Data Protection">
