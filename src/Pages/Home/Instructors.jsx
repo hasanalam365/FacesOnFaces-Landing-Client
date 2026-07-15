@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { trackEvent } from "../../utils/analytics";
 
 const instructors = [
   {
@@ -40,13 +41,27 @@ const InstructorCard = ({ item, index }) => {
     return () => observer.disconnect();
   }, []);
 
+const handleInstructorClick = () => {
+  trackEvent("instructor_click", {
+    instructor_name: item.name,
+    instructor_id: item.id,
+  });
+};
+
   return (
     <div
-      ref={cardRef}
-      style={{ transitionDelay: isVisible ? `${index * 150}ms` : "0ms" }}
-      className={`group relative h-[420px] md:h-[520px] rounded-3xl overflow-hidden transition-all duration-700 ease-out
-        ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"}`}
-    >
+  ref={cardRef}
+  onClick={handleInstructorClick}
+  className={`group relative h-[420px] md:h-[520px] rounded-3xl overflow-hidden transition-all duration-700 ease-out cursor-pointer
+    ${
+      isVisible
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 translate-y-16"
+    }`}
+  style={{
+    transitionDelay: isVisible ? `${index * 150}ms` : "0ms",
+  }}
+>
       <img
         src={item.image}
         className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-110"

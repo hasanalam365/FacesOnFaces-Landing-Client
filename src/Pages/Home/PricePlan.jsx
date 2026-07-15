@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Check, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { trackEvent } from "../../utils/analytics";
 
  const plans = [
     {
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
       description:"One simple payment — no ongoing commitments. Unlock full course materials immediately.",
       
       price: "£1,099",
+       value:1099,
       subText: "Save £500",
       buttonText: "Enroll & Pay in Full",
       featured: false,
@@ -29,6 +30,7 @@ import { useNavigate } from "react-router-dom";
       description:
         "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
       price: "£250",
+       value:250,
       subText: "Deposit today, then £849",
       buttonText: "Pay Deposit Now",
       featured: true,
@@ -47,6 +49,7 @@ import { useNavigate } from "react-router-dom";
       description:
         "One simple monthly subscription payment, no large upfront amount to pay",
       price: "£100",
+       value:100,
       subText: "per month",
       buttonText: "Start Subscription",
       featured: false,
@@ -64,15 +67,38 @@ import { useNavigate } from "react-router-dom";
 
 const PricePlan = ({ onSelectPlan }) => {
 
+useEffect(() => {
+  trackEvent("pricing_view", {
+    section: "Pricing",
+  });
+}, []);
+
   const navigate = useNavigate();
 
-  const handleEnroll = (plan) => {
-    if (onSelectPlan) {
-      onSelectPlan(plan.id);
-    } else {
-      navigate(plan.link);
-    }
-  };
+const handleEnroll = (plan) => {
+
+trackEvent("pricing_plan_selected", {
+  plan_id: plan.id,
+  plan_name: plan.title,
+
+  value: plan.value,
+  currency: plan.currency,
+});
+
+ trackEvent("pricing_enroll_click", {
+  plan_id: plan.id,
+  plan_name: plan.title,
+
+  value: plan.value,
+  currency: plan.currency,
+});
+
+  if (onSelectPlan) {
+    onSelectPlan(plan.id);
+  } else {
+    navigate(plan.link);
+  }
+};
 
 
   return (

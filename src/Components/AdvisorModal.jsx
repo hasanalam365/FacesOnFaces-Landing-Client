@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { MessageCircle, Phone, X, ChevronRight } from "lucide-react";
+import { trackEvent } from "../utils/analytics";
 
 const WHATSAPP_NUMBER = "+447308888874";
 
@@ -31,45 +32,70 @@ const AdvisorModal = ({ open, onClose }) => {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!open) return;
+useEffect(() => {
+  if (open) {
+    trackEvent("advisor_modal_open", {
+      source: "Advisor Modal",
+    });
+  }
+}, [open]);
 
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
-        if (showLeadForm) {
-          setShowLeadForm(false);
-        } else {
-          onClose();
-        }
-      }
-    };
+ useEffect(() => {
+  if (!open) return;
 
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      trackEvent("advisor_modal_close", {
+        source: "Escape Key",
+      });
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "auto";
-    };
-  }, [open, onClose, showLeadForm]);
+      onClose();
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.removeEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "auto";
+  };
+}, [open, onClose]);
 
   useEffect(() => {
     if (!open) setShowLeadForm(false);
   }, [open]);
 
-  const handleBackdropClick = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      onClose();
-    }
-  };
+ const handleBackdropClick = (e) => {
+  if (modalRef.current && !modalRef.current.contains(e.target)) {
 
-  const handleWhatsApp = () => {
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
-  };
+    trackEvent("advisor_modal_close", {
+      source: "Backdrop",
+    });
 
-  const handleNavigate = () => {
-    navigate("/lead-form");
-  };
+    onClose();
+  }
+};
+
+ const handleWhatsApp = () => {
+
+  trackEvent("advisor_whatsapp_click", {
+    source: "Advisor Modal",
+    contact_method: "WhatsApp",
+  });
+
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
+};
+
+ const handleNavigate = () => {
+
+  trackEvent("advisor_lead_form_click", {
+    source: "Advisor Modal",
+    destination: "/lead-form",
+  });
+
+  navigate("/lead-form");
+};
 
   return (
     <AnimatePresence>
@@ -93,7 +119,15 @@ const AdvisorModal = ({ open, onClose }) => {
           >
             {/* Close Button */}
             <button
-              onClick={onClose}
+             onClick={() => {
+
+    trackEvent("advisor_modal_close", {
+      source: "Close Button",
+    });
+
+    onClose();
+
+  }}
               className="absolute z-20 flex items-center justify-center w-10 h-10 text-gray-400 transition rounded-full top-4 right-4 hover:text-white hover:bg-white/10"
             >
               <X size={18} />

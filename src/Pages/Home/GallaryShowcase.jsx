@@ -1,4 +1,5 @@
 import React from "react";
+import { trackEvent } from "../../utils/analytics";
 
 const GallaryShowcase = () => {
   const images = {
@@ -15,6 +16,13 @@ const GallaryShowcase = () => {
       "https://i.ibb.co.com/mM4p59N/faces2.jpg",
   
   };
+
+const handleImageClick = (imageName, position) => {
+  trackEvent("gallery_image_click", {
+    image_name: imageName,
+    image_position: position,
+  });
+};
 
   return (
     <section className="py-20 bg-black">
@@ -34,42 +42,47 @@ const GallaryShowcase = () => {
   {/* Large Hero Image */}
   <div className="col-span-12 md:col-span-8">
     <img
-      src={images.large}
-      alt=""
-      className="w-full h-[500px] object-cover rounded-xl"
-    />
+  src={images.large}
+  alt=""
+  onClick={() => handleImageClick("faces3", "hero")}
+  className="w-full h-[500px] object-cover rounded-xl cursor-pointer"
+/>
   </div>
 
   {/* Right Stack */}
   <div className="flex flex-col col-span-12 gap-4 md:col-span-4">
     <img
-      src={images.topRight1}
-      alt=""
-      className="w-full h-[242px] object-cover rounded-xl"
-    />
+  src={images.topRight1}
+  alt=""
+  onClick={() => handleImageClick("faces1", "top_right_1")}
+  className="w-full h-[242px] object-cover rounded-xl cursor-pointer"
+/>
 
     <img
-      src={images.topRight2}
-      alt=""
-      className="w-full h-[242px] object-cover rounded-xl"
-    />
+  src={images.topRight2}
+  alt=""
+  onClick={() => handleImageClick("faces5", "top_right_2")}
+  className="w-full h-[242px] object-cover rounded-xl cursor-pointer"
+/>
   </div>
 
   {/* Bottom Row */}
   <div className="col-span-12 md:col-span-6">
     <img
-      src={images.bottomLeft}
-      alt=""
-      className="w-full h-[260px] md:h-[350px] lg:h-[350px] object-cover rounded-xl"
-    />
+  src={images.bottomLeft}
+  alt=""
+  onClick={() => handleImageClick("faces4", "bottom_left")}
+  className="w-full h-[260px] md:h-[350px] lg:h-[350px] object-cover rounded-xl cursor-pointer"
+/>
   </div>
 
   <div className="col-span-12 md:col-span-6">
     <img
-      src={images.center}
-      alt=""
-      className="w-full h-[260px] md:h-[350px] lg:h-[350px] object-cover rounded-xl"
-    />
+  src={images.center}
+  alt=""
+  onClick={() => handleImageClick("faces2", "bottom_right")}
+  className="w-full h-[260px] md:h-[350px] lg:h-[350px] object-cover rounded-xl cursor-pointer"
+/>
   </div>
 
   

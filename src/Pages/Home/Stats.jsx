@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Users,
   TrendingUp,
   ShieldCheck,
-  GraduationCap,
 } from "lucide-react";
+import { trackEvent } from "../../utils/analytics";
 
 const stats = [
   {
@@ -28,8 +28,38 @@ const stats = [
 ];
 
 const Stats = () => {
+ const sectionRef = useRef(null);
+
+   useEffect(() => {
+    const element = sectionRef.current;
+    if (!element) return;
+
+    let tracked = false;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked) {
+          tracked = true;
+
+          trackEvent("view_stats_section", {
+            section_name: "Stats",
+          });
+
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.4,
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="relative py-5">
+    <section  ref={sectionRef} className="relative py-5">
       {/* Background Glow */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-[500px] h-[500px] bg-cyan-500/5 blur-[180px] left-1/2 -translate-x-1/2"></div>

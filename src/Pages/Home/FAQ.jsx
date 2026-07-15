@@ -1,18 +1,9 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { trackEvent } from "../../utils/analytics";
 
-// Height (in px) of your site's fixed/sticky top navbar (the "FACES" bar
-// that stays pinned while scrolling). scrollIntoView aligns an element's
-// top edge to the very top of the viewport by default - which places it
-// right behind/under a fixed navbar. This offset tells the scroll to stop
-// short by that many pixels instead, so the category title lands just
-// below the navbar, fully visible.
-//
-// IMPORTANT: set this to your actual navbar's real rendered height
-// (check it in DevTools - element inspector - on the live page). If the
-// title still lands slightly under the navbar, increase this number a
-// little; if it stops too far below, decrease it.
+
 const STICKY_HEADER_OFFSET = 90;
 
 const faqData = [
@@ -194,23 +185,7 @@ const FAQ = () => {
   const [openQuestion, setOpenQuestion] = useState({});
   const categoryRefs = useRef([]);
 
-  // WHY THIS IS DIFFERENT FROM THE scrollIntoView WE REMOVED EARLIER:
-  // Last time, scrollIntoView raced against a live height animation (fired via
-  // setTimeout, while Framer was still mid-transition) - two independent
-  // animations fighting over scroll position at once, which is what actually
-  // caused the jump.
-  //
-  // There is no animation left now. Opening/closing a category is a single,
-  // instant DOM change. So the real bug here is plain and simple: closing the
-  // previously-open category (which sits above the one you just tapped)
-  // instantly removes its height, so everything below - including the
-  // category you just opened - shifts upward. That's why it looks like the
-  // page "jumps up", and why the newly-revealed questions end up below the
-  // fold, needing a manual scroll.
-  //
-  // useLayoutEffect runs synchronously after the DOM has updated but before
-  // the browser paints, so this scroll correction happens in the very same
-  // frame as the open/close - no delay, no timer, nothing to race against.
+  
   useLayoutEffect(() => {
     if (openCategory === null) return;
     const el = categoryRefs.current[openCategory];
@@ -219,28 +194,43 @@ const FAQ = () => {
     el.scrollIntoView({ behavior: "auto", block: "start" });
   }, [openCategory]);
 
-  const toggleCategory = (index) => {
-    const isOpening = openCategory !== index;
-    setOpenCategory(isOpening ? index : null);
+ const toggleCategory = (index) => {
+  const isOpening = openCategory !== index;
 
-    if (isOpening) {
-      setOpenQuestion({});
-    }
-  };
+  if (isOpening) {
+    trackEvent("faq_category_open", {
+      category: faqData[index].category,
+      category_index: index + 1,
+    });
+  }
 
-  const toggleQuestion = (categoryIndex, questionIndex) => {
-    const key = `${categoryIndex}-${questionIndex}`;
-    setOpenQuestion((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
+  setOpenCategory(isOpening ? index : null);
+
+  if (isOpening) {
+    setOpenQuestion({});
+  }
+};
+
+ const toggleQuestion = (categoryIndex, questionIndex) => {
+  const key = `${categoryIndex}-${questionIndex}`;
+  const opening = !openQuestion[key];
+
+  if (opening) {
+    trackEvent("faq_question_open", {
+      category: faqData[categoryIndex].category,
+      question: faqData[categoryIndex].questions[questionIndex].q,
+      question_index: questionIndex + 1,
+    });
+  }
+
+  setOpenQuestion((prev) => ({
+    ...prev,
+    [key]: opening,
+  }));
+};
 
   return (
-    // overflow-anchor: none on the whole section opts the entire subtree out of
-    // the browser's native "scroll anchoring" feature (the thing that tries to
-    // auto-compensate scroll position when off-screen content resizes). It's kept
-    // here as defense-in-depth even though removing scrollIntoView was the real fix.
+ 
     <section
       className="relative overflow-hidden bg-[#050816] py-24"
       style={{ overflowAnchor: "none" }}

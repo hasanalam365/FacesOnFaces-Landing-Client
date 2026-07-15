@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -7,6 +7,8 @@ import {
   Award,
   Rocket,
 } from "lucide-react";
+
+import { trackEvent } from "../../utils/analytics";
 
 const steps = [
   {
@@ -47,8 +49,31 @@ const steps = [
 ];
 
 const LearningExperience = () => {
+
+  useEffect(() => {
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        trackEvent("learning_experience_view");
+        observer.disconnect();
+      }
+    },
+    {
+      threshold: 0.4,
+    }
+  );
+
+  const section = document.getElementById("learning-experience");
+
+  if (section) {
+    observer.observe(section);
+  }
+
+  return () => observer.disconnect();
+}, []);
+
   return (
-    <section className="relative px-6 py-8 overflow-hidden text-white bg-[#0a0e12]">
+    <section  id="learning-experience" className="relative px-6 py-8 overflow-hidden text-white bg-[#0a0e12]">
       <div className="divider"></div>
       <div className="px-6 mx-auto max-w-7xl">
         {/* Heading */}

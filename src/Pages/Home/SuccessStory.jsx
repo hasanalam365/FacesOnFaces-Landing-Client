@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useRef} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
@@ -7,6 +7,7 @@ import {
   Star,
 } from "lucide-react";
 import Stats from "./Stats";
+import { trackEvent } from "../../utils/analytics";
 
 const testimonials = [
   {
@@ -63,26 +64,69 @@ const testimonials = [
 
 const SuccessStory = () => {
   const [current, setCurrent] = useState(0);
+ 
+  const sectionRef = useRef(null);
 
-  const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % testimonials.length);
-  };
+ const nextSlide = () => {
+  const nextIndex = (current + 1) % testimonials.length;
+
+  trackEvent("testimonial_next", {
+    testimonial_index: nextIndex + 1,
+    testimonial_name: testimonials[nextIndex].name,
+  });
+
+  setCurrent(nextIndex);
+};
 
   const prevSlide = () => {
-    setCurrent(
-      (prev) =>
-        (prev - 1 + testimonials.length) %
-        testimonials.length
-    );
-  };
+  const prevIndex =
+    (current - 1 + testimonials.length) %
+    testimonials.length;
+
+  trackEvent("testimonial_previous", {
+    testimonial_index: prevIndex + 1,
+    testimonial_name: testimonials[prevIndex].name,
+  });
+
+  setCurrent(prevIndex);
+};
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+  const element = sectionRef.current;
+  if (!element) return;
+
+  let tracked = false;
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting && !tracked) {
+        tracked = true;
+
+        trackEvent("view_testimonials_section", {
+          section_name: "Success Stories",
+        });
+
+        observer.disconnect();
+      }
+    },
+    {
+      threshold: 0.4,
+    }
+  );
+
+  observer.observe(element);
+
+  return () => observer.disconnect();
+}, []);
+
+
   return (
-    <section className="px-5 py-24 bg-black">
+    <section  ref={sectionRef} className="px-5 py-24 bg-black">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14">
@@ -156,7 +200,14 @@ const SuccessStory = () => {
                     </div>
                   </div>
 
-                  <button className="px-5 py-2 text-sm transition border rounded-full border-cyan-400/30 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20">
+                  <button
+  onClick={() =>
+    trackEvent("testimonial_read_story", {
+      testimonial_name: testimonials[current].name,
+    })
+  }
+  className="px-5 py-2 text-sm transition border rounded-full border-cyan-400/30 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20"
+>
                     Read Full Story
                   </button>
                 </div>
@@ -177,9 +228,14 @@ const SuccessStory = () => {
               {testimonials.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() =>
-                    setCurrent(index)
-                  }
+                 onClick={() => {
+  trackEvent("testimonial_select", {
+    testimonial_index: index + 1,
+    testimonial_name: testimonials[index].name,
+  });
+
+  setCurrent(index);
+}}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     current === index
                       ? "w-8 bg-cyan-400"

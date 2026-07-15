@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Briefcase,
   ShieldCheck,
@@ -8,6 +8,8 @@ import {
   Rocket,
 } from "lucide-react";
 import { motion } from "framer-motion";
+
+import { trackEvent } from "../../utils/analytics";
 
 const features = [
   {
@@ -49,8 +51,39 @@ const features = [
 ];
 
 const WhyChoose = () => {
+   const sectionRef = useRef(null);
+
+
+   useEffect(() => {
+  const element = sectionRef.current;
+  if (!element) return;
+
+  let tracked = false;
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting && !tracked) {
+        tracked = true;
+
+        trackEvent("view_why_choose_section", {
+          section_name: "Why Choose Faces On Faces",
+        });
+
+        observer.disconnect();
+      }
+    },
+    {
+      threshold: 0.4,
+    }
+  );
+
+  observer.observe(element);
+
+  return () => observer.disconnect();
+}, []);
+
   return (
-    <section className="px-5 py-24 bg-black">
+    <section  ref={sectionRef} className="px-5 py-24 bg-black">
       <div className="mx-auto max-w-7xl">
         {/* Heading */}
         <motion.div
@@ -93,6 +126,11 @@ const WhyChoose = () => {
                   delay: index * 0.08,
                 }}
                 viewport={{ once: true }}
+                onViewportEnter={() =>
+  trackEvent("why_choose_card_view", {
+    feature: item.title,
+  })
+}
                 whileHover={{
                   y: -6,
                   scale: 1.02,

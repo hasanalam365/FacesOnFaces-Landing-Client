@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect,useEffect } from "react";
 import { createPortal } from "react-dom";
 import { BookOpen, ChevronDown, MessageCircle, ArrowRight, Info, ArrowDownNarrowWide } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AdvisorModal from "../../Components/AdvisorModal";
+import { trackEvent } from "../../utils/analytics";
 
 const courseFeatures = [
   {
@@ -170,20 +171,40 @@ const CourseDetails = () => {
   const [advisorModalOpen, setAdvisorModalOpen] = useState(false);
   const navigate = useNavigate();
 
+useEffect(() => {
+  trackEvent("course_details_view", {
+    section: "Course Details",
+  });
+}, []);
+
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  const handleEnroll = () => {
-    navigate("/enroll");
-  };
+ const handleEnroll = () => {
 
-  const handleFeatureClick = (e, feature) => {
-    // Prevent the browser's native focus-scroll from jumping the page
-    // before our scroll-lock effect has a chance to run.
-    e.currentTarget.blur();
-    setSelectedCourse(feature);
-  };
+  trackEvent("course_details_enroll_click", {
+    source: "Course Details",
+    value: 1099,
+    currency: "GBP",
+  });
+
+  navigate("/enroll");
+};
+
+const handleFeatureClick = (e, feature) => {
+  e.currentTarget.blur();
+
+  trackEvent("course_feature_click", {
+    feature_name: feature.title,
+  });
+
+  trackEvent("course_modal_open", {
+    feature_name: feature.title,
+  });
+
+  setSelectedCourse(feature);
+};
 
   return (
     <section className="py-10">
@@ -309,9 +330,14 @@ const CourseDetails = () => {
             {/* Talk To Advisor */}
             <motion.button
               onClick={(e) => {
-                e.currentTarget.blur();
-                setAdvisorModalOpen(true);
-              }}
+  e.currentTarget.blur();
+
+  trackEvent("course_details_advisor_click", {
+    source: "Course Details",
+  });
+
+  setAdvisorModalOpen(true);
+}}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-3 px-8 py-4 font-medium text-white transition-all border rounded-full group border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-white/10"
@@ -323,7 +349,16 @@ const CourseDetails = () => {
         </div>
       </div>
 
-      <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
+     <CourseModal
+  course={selectedCourse}
+  onClose={() => {
+    trackEvent("course_modal_close", {
+      feature_name: selectedCourse?.title,
+    });
+
+    setSelectedCourse(null);
+  }}
+/>
 
       <AdvisorModal open={advisorModalOpen} onClose={() => setAdvisorModalOpen(false)} />
     </section>
