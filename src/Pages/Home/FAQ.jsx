@@ -1,10 +1,11 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
 import { trackEvent } from "../../utils/analytics";
 
-
 const STICKY_HEADER_OFFSET = 90;
+const PAGE_NAME = "home"; // change per page if this component is reused elsewhere
+const SECTION_NAME = "faq";
 
 const faqData = [
   {
@@ -80,20 +81,20 @@ const faqData = [
         q: "What will I learn?",
         a: `You'll gain a solid foundation in aesthetics including:
 
-• Anatomy & Physiology
-• Infection Control
-• Safety in Medicine
-• Complication Management
-• Health and Safety
-• Skin Booster
-• Lumi Eyes
-• Polynucleotide
-• Microneedling
-• Fat Dissolving Injections
-• Vitamins B12
-• Foundation Dermal Filler
-• Foundation Anti-Wrinkle
-• Use of Hyaluronidase`,
+- Anatomy & Physiology
+- Infection Control
+- Safety in Medicine
+- Complication Management
+- Health and Safety
+- Skin Booster
+- Lumi Eyes
+- Polynucleotide
+- Microneedling
+- Fat Dissolving Injections
+- Vitamins B12
+- Foundation Dermal Filler
+- Foundation Anti-Wrinkle
+- Use of Hyaluronidase`,
       },
       {
         q: "Will I be able to perform treatments after completing the course?",
@@ -135,10 +136,10 @@ const faqData = [
         q: "Are payment plans available?",
         a: `Yes. We work with four finance providers:
 
-• Klarna
-• Clearpay
-• Plim
-• Payl8r
+- Klarna
+- Clearpay
+- Plim
+- Payl8r
 
 We also offer a subscription payment option. Please contact our team for further information regarding this package.`,
       },
@@ -184,8 +185,8 @@ const FAQ = () => {
   const [openCategory, setOpenCategory] = useState(null);
   const [openQuestion, setOpenQuestion] = useState({});
   const categoryRefs = useRef([]);
+  const sectionRef = useRef(null);
 
-  
   useLayoutEffect(() => {
     if (openCategory === null) return;
     const el = categoryRefs.current[openCategory];
@@ -194,44 +195,75 @@ const FAQ = () => {
     el.scrollIntoView({ behavior: "auto", block: "start" });
   }, [openCategory]);
 
- const toggleCategory = (index) => {
-  const isOpening = openCategory !== index;
+  useEffect(() => {
+    const element = sectionRef.current;
+    if (!element) return;
 
-  if (isOpening) {
-    trackEvent("faq_category_open", {
-      category: faqData[index].category,
-      category_index: index + 1,
-    });
-  }
+    let tracked = false;
 
-  setOpenCategory(isOpening ? index : null);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked) {
+          tracked = true;
 
-  if (isOpening) {
-    setOpenQuestion({});
-  }
-};
+          trackEvent("section_view", {
+            page: PAGE_NAME,
+            section: SECTION_NAME,
+            section_name: "FAQ",
+          });
 
- const toggleQuestion = (categoryIndex, questionIndex) => {
-  const key = `${categoryIndex}-${questionIndex}`;
-  const opening = !openQuestion[key];
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
 
-  if (opening) {
-    trackEvent("faq_question_open", {
-      category: faqData[categoryIndex].category,
-      question: faqData[categoryIndex].questions[questionIndex].q,
-      question_index: questionIndex + 1,
-    });
-  }
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
-  setOpenQuestion((prev) => ({
-    ...prev,
-    [key]: opening,
-  }));
-};
+  const toggleCategory = (index) => {
+    const isOpening = openCategory !== index;
+
+    if (isOpening) {
+      trackEvent("faq_category_open", {
+        page: PAGE_NAME,
+        section: SECTION_NAME,
+        category: faqData[index].category,
+        category_index: index + 1,
+      });
+    }
+
+    setOpenCategory(isOpening ? index : null);
+
+    if (isOpening) {
+      setOpenQuestion({});
+    }
+  };
+
+  const toggleQuestion = (categoryIndex, questionIndex) => {
+    const key = `${categoryIndex}-${questionIndex}`;
+    const opening = !openQuestion[key];
+
+    if (opening) {
+      trackEvent("faq_question_open", {
+        page: PAGE_NAME,
+        section: SECTION_NAME,
+        category: faqData[categoryIndex].category,
+        question: faqData[categoryIndex].questions[questionIndex].q,
+        question_index: questionIndex + 1,
+      });
+    }
+
+    setOpenQuestion((prev) => ({
+      ...prev,
+      [key]: opening,
+    }));
+  };
 
   return (
- 
     <section
+      ref={sectionRef}
       className="relative overflow-hidden bg-[#050816] py-24"
       style={{ overflowAnchor: "none" }}
     >
@@ -278,14 +310,6 @@ const FAQ = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.05 }}
-              // overflow-anchor: none on each card ensures none of these
-              // individually-resizing boxes can ever be picked as a scroll
-              // anchor node, on browsers where subtree opt-out from an
-              // ancestor is applied inconsistently to elements added later.
-              // scroll-margin-top tells scrollIntoView to leave room for the
-              // fixed navbar instead of scrolling this card's top edge all
-              // the way to the very top of the viewport (where it would end
-              // up hidden behind the navbar).
               style={{ overflowAnchor: "none", scrollMarginTop: STICKY_HEADER_OFFSET }}
               className="overflow-hidden transition-all duration-300 border rounded-3xl border-cyan-600 bg-white/[0.03] backdrop-blur-xl hover:border-cyan-400/30 hover:shadow-[0_0_40px_rgba(34,211,238,0.08)]"
             >

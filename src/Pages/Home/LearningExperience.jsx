@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 
 import { trackEvent } from "../../utils/analytics";
+
+const PAGE_NAME = "home"; // change per page if this component is reused elsewhere
+const SECTION_NAME = "learning_experience";
 
 const steps = [
   {
@@ -49,31 +52,51 @@ const steps = [
 ];
 
 const LearningExperience = () => {
+  // Tracks which step ids have already fired a view event, so the
+  // desktop and mobile variants of the same step (only one of which
+  // is ever visually on-screen at a time) never double-count.
+  const trackedStepsRef = useRef(new Set());
+
+  const handleStepView = (step) => {
+    if (trackedStepsRef.current.has(step.id)) return;
+    trackedStepsRef.current.add(step.id);
+
+    trackEvent("learning_step_view", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      step_id: step.id,
+      step_title: step.title,
+    });
+  };
 
   useEffect(() => {
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        trackEvent("learning_experience_view");
-        observer.disconnect();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          trackEvent("section_view", {
+            page: PAGE_NAME,
+            section: SECTION_NAME,
+            section_name: "Learning Experience",
+          });
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.4,
       }
-    },
-    {
-      threshold: 0.4,
+    );
+
+    const section = document.getElementById("learning-experience");
+
+    if (section) {
+      observer.observe(section);
     }
-  );
 
-  const section = document.getElementById("learning-experience");
-
-  if (section) {
-    observer.observe(section);
-  }
-
-  return () => observer.disconnect();
-}, []);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section  id="learning-experience" className="relative px-6 py-8 overflow-hidden text-white bg-[#0a0e12]">
+    <section id="learning-experience" className="relative px-6 py-8 overflow-hidden text-white bg-[#0a0e12]">
       <div className="divider"></div>
       <div className="px-6 mx-auto max-w-7xl">
         {/* Heading */}
@@ -96,165 +119,168 @@ const LearningExperience = () => {
 
         {/* Timeline */}
         <div className="relative">
-         
-<div className="absolute top-0 bottom-0 left-3 md:left-1/2 md:-translate-x-1/2">
-  <div className="w-[2px] h-full bg-cyan-400/60 shadow-[0_0_20px_#00eaff]" />
-</div>
-{steps.map((step, index) => {
-  const isLeft = index % 2 === 0;
 
-  return (
-    <div
-      key={step.id}
-      className="relative min-h-[170px] md:min-h-[190px]"
-    >
-      {/* Timeline Dot */}
-      <div className="absolute z-20 left-3 md:left-1/2 top-5 md:top-6 md:-translate-x-1/2">
-        <div className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#00eaff]" />
-      </div>
+          <div className="absolute top-0 bottom-0 left-3 md:left-1/2 md:-translate-x-1/2">
+            <div className="w-[2px] h-full bg-cyan-400/60 shadow-[0_0_20px_#00eaff]" />
+          </div>
+          {steps.map((step, index) => {
+            const isLeft = index % 2 === 0;
 
-      {/* DESKTOP LEFT */}
-      {isLeft && (
-        <motion.div
-          initial={{ opacity: 0, x: -80 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="
+            return (
+              <div
+                key={step.id}
+                className="relative min-h-[170px] md:min-h-[190px]"
+              >
+                {/* Timeline Dot */}
+                <div className="absolute z-20 left-3 md:left-1/2 top-5 md:top-6 md:-translate-x-1/2">
+                  <div className="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_15px_#00eaff]" />
+                </div>
+
+                {/* DESKTOP LEFT */}
+                {isLeft && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -80 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    onViewportEnter={() => handleStepView(step)}
+                    transition={{ duration: 0.7 }}
+                    className="
             hidden md:block
             w-[320px]
             text-right
             mr-[calc(50%+90px)]
             ml-auto
           "
-        >
-          <div className="flex items-center justify-end gap-2 mb-3">
-            <span className="text-[10px] tracking-[3px] uppercase text-cyan-400">
-              STEP {step.id}
-            </span>
+                  >
+                    <div className="flex items-center justify-end gap-2 mb-3">
+                      <span className="text-[10px] tracking-[3px] uppercase text-cyan-400">
+                        STEP {step.id}
+                      </span>
 
-           <motion.div
-  animate={{
-    y: [0, -4, 0],
-    boxShadow: [
-      "0 0 0px rgba(34,211,238,0.2)",
-      "0 0 20px rgba(34,211,238,0.5)",
-      "0 0 0px rgba(34,211,238,0.2)",
-    ],
-  }}
-  transition={{
-    duration: 2.5,
-    repeat: Infinity,
-    ease: "easeInOut",
-  }}
-  className="flex items-center justify-center w-8 h-8 border rounded-lg border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
->
-  {step.icon}
-</motion.div>
-          </div>
+                      <motion.div
+                        animate={{
+                          y: [0, -4, 0],
+                          boxShadow: [
+                            "0 0 0px rgba(34,211,238,0.2)",
+                            "0 0 20px rgba(34,211,238,0.5)",
+                            "0 0 0px rgba(34,211,238,0.2)",
+                          ],
+                        }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                        className="flex items-center justify-center w-8 h-8 border rounded-lg border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
+                      >
+                        {step.icon}
+                      </motion.div>
+                    </div>
 
-          <h3 className="mb-3 text-3xl font-light text-white">
-            {step.title}
-          </h3>
+                    <h3 className="mb-3 text-3xl font-light text-white">
+                      {step.title}
+                    </h3>
 
-          <p className="text-sm leading-6 text-gray-400">
-            {step.description}
-          </p>
-        </motion.div>
-      )}
+                    <p className="text-sm leading-6 text-gray-400">
+                      {step.description}
+                    </p>
+                  </motion.div>
+                )}
 
-      {/* DESKTOP RIGHT */}
-      {!isLeft && (
-        <motion.div
-          initial={{ opacity: 0, x: 80 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="
+                {/* DESKTOP RIGHT */}
+                {!isLeft && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 80 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    onViewportEnter={() => handleStepView(step)}
+                    transition={{ duration: 0.7 }}
+                    className="
             hidden md:block
             w-[320px]
             ml-[calc(50%+90px)]
           "
-        >
-          <div className="flex items-center gap-2 mb-3">
-           <motion.div
-  animate={{
-    y: [0, -4, 0],
-    boxShadow: [
-      "0 0 0px rgba(34,211,238,0.2)",
-      "0 0 20px rgba(34,211,238,0.5)",
-      "0 0 0px rgba(34,211,238,0.2)",
-    ],
-  }}
-  transition={{
-    duration: 2.5,
-    repeat: Infinity,
-    ease: "easeInOut",
-  }}
-  className="flex items-center justify-center w-8 h-8 border rounded-lg border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
->
-  {step.icon}
-</motion.div>
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <motion.div
+                        animate={{
+                          y: [0, -4, 0],
+                          boxShadow: [
+                            "0 0 0px rgba(34,211,238,0.2)",
+                            "0 0 20px rgba(34,211,238,0.5)",
+                            "0 0 0px rgba(34,211,238,0.2)",
+                          ],
+                        }}
+                        transition={{
+                          duration: 2.5,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                        className="flex items-center justify-center w-8 h-8 border rounded-lg border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
+                      >
+                        {step.icon}
+                      </motion.div>
 
-            <span className="text-[10px] tracking-[3px] uppercase text-cyan-400">
-              STEP {step.id}
-            </span>
-          </div>
+                      <span className="text-[10px] tracking-[3px] uppercase text-cyan-400">
+                        STEP {step.id}
+                      </span>
+                    </div>
 
-          <h3 className="mb-3 text-3xl font-light text-white">
-            {step.title}
-          </h3>
+                    <h3 className="mb-3 text-3xl font-light text-white">
+                      {step.title}
+                    </h3>
 
-          <p className="text-sm leading-6 text-gray-400">
-            {step.description}
-          </p>
-        </motion.div>
-      )}
+                    <p className="text-sm leading-6 text-gray-400">
+                      {step.description}
+                    </p>
+                  </motion.div>
+                )}
 
-      {/* MOBILE VERSION */}
-      <motion.div
-        initial={{ opacity: 0, x: 30 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="pl-12 md:hidden"
-      >
-        <div className="flex items-center gap-2 mb-3">
-         <motion.div
-  animate={{
-    y: [0, -4, 0],
-    boxShadow: [
-      "0 0 0px rgba(34,211,238,0.2)",
-      "0 0 20px rgba(34,211,238,0.5)",
-      "0 0 0px rgba(34,211,238,0.2)",
-    ],
-  }}
-  transition={{
-    duration: 2.5,
-    repeat: Infinity,
-    ease: "easeInOut",
-  }}
-  className="flex items-center justify-center w-8 h-8 border rounded-lg border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
->
-  {step.icon}
-</motion.div>
+                {/* MOBILE VERSION */}
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  onViewportEnter={() => handleStepView(step)}
+                  transition={{ duration: 0.6 }}
+                  className="pl-12 md:hidden"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <motion.div
+                      animate={{
+                        y: [0, -4, 0],
+                        boxShadow: [
+                          "0 0 0px rgba(34,211,238,0.2)",
+                          "0 0 20px rgba(34,211,238,0.5)",
+                          "0 0 0px rgba(34,211,238,0.2)",
+                        ],
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      className="flex items-center justify-center w-8 h-8 border rounded-lg border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
+                    >
+                      {step.icon}
+                    </motion.div>
 
-          <span className="text-[10px] tracking-[3px] uppercase text-cyan-400">
-            STEP {step.id}
-          </span>
-        </div>
+                    <span className="text-[10px] tracking-[3px] uppercase text-cyan-400">
+                      STEP {step.id}
+                    </span>
+                  </div>
 
-        <h3 className="mb-3 text-2xl font-light text-white">
-          {step.title}
-        </h3>
+                  <h3 className="mb-3 text-2xl font-light text-white">
+                    {step.title}
+                  </h3>
 
-        <p className="text-sm leading-6 text-gray-400 max-w-[220px]">
-          {step.description}
-        </p>
-      </motion.div>
-    </div>
-  );
-})}
+                  <p className="text-sm leading-6 text-gray-400 max-w-[220px]">
+                    {step.description}
+                  </p>
+                </motion.div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

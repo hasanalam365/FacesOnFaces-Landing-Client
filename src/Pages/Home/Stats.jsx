@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { trackEvent } from "../../utils/analytics";
 
+const PAGE_NAME = "home"; // change per page if this component is reused elsewhere
+
 const stats = [
   {
     id: 1,
@@ -28,9 +30,9 @@ const stats = [
 ];
 
 const Stats = () => {
- const sectionRef = useRef(null);
+  const sectionRef = useRef(null);
 
-   useEffect(() => {
+  useEffect(() => {
     const element = sectionRef.current;
     if (!element) return;
 
@@ -41,7 +43,9 @@ const Stats = () => {
         if (entry.isIntersecting && !tracked) {
           tracked = true;
 
-          trackEvent("view_stats_section", {
+          trackEvent("section_view", {
+            page: PAGE_NAME,
+            section: "stats",
             section_name: "Stats",
           });
 
@@ -59,14 +63,14 @@ const Stats = () => {
   }, []);
 
   return (
-    <section  ref={sectionRef} className="relative py-5">
+    <section ref={sectionRef} className="relative py-5">
       {/* Background Glow */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-[500px] h-[500px] bg-cyan-500/5 blur-[180px] left-1/2 -translate-x-1/2"></div>
       </div>
 
       <div className="relative z-10 px-6 mx-auto max-w-7xl lg:px-10">
-       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat) => {
             const Icon = stat.icon;
 
@@ -103,9 +107,9 @@ const Stats = () => {
                   </div>
 
                   {/* Number */}
-                 <h3 className="text-2xl text-white font-['Cormorant_Garamond']">
-  {stat.value}
-</h3>
+                  <h3 className="text-2xl text-white font-['Cormorant_Garamond']">
+                    {stat.value}
+                  </h3>
 
                   {/* Label */}
                   <p className="text-sm text-gray-400">

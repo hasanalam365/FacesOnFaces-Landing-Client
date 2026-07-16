@@ -1,43 +1,54 @@
 import React, { useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import {Facebook} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Facebook } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 
 import { trackEvent } from "../../utils/analytics";
 
+const SECTION_NAME = "footer";
+
 export default function Footer() {
-const footerRef = useRef(null);
+  const footerRef = useRef(null);
+  const location = useLocation();
 
-useEffect(() => {
-  const element = footerRef.current;
-  if (!element) return;
+  // Footer is shared across pages, so we can't hardcode a page name
+  // like other sections do — we read the current route instead, so
+  // every event correctly reflects which page the footer was seen
+  // or clicked on (home, course_details, enroll, etc).
+  const pageName = location.pathname === "/" ? "home" : location.pathname.replace(/^\//, "");
 
-  let tracked = false;
+  useEffect(() => {
+    const element = footerRef.current;
+    if (!element) return;
 
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting && !tracked) {
-        tracked = true;
+    let tracked = false;
 
-        trackEvent("view_footer", {
-          section_name: "Footer",
-        });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked) {
+          tracked = true;
 
-        observer.disconnect();
+          trackEvent("section_view", {
+            page: pageName,
+            section: SECTION_NAME,
+            section_name: "Footer",
+          });
+
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.4,
       }
-    },
-    {
-      threshold: 0.4,
-    }
-  );
+    );
 
-  observer.observe(element);
+    observer.observe(element);
 
-  return () => observer.disconnect();
-}, []);
+    return () => observer.disconnect();
+  }, [pageName]);
 
   return (
-    <footer  ref={footerRef} className="relative bg-black border-t border-white/10">
+    <footer ref={footerRef} className="relative bg-black border-t border-white/10">
       <div className="px-6 mx-auto max-w-7xl">
 
         {/* Main Footer */}
@@ -61,51 +72,57 @@ useEffect(() => {
           <div className="flex flex-col items-center gap-5">
 
             {/* Social */}
-         <div className="flex gap-3">
-  {/* Facebook */}
-  <a
-    href="#"
-    onClick={() =>
-      trackEvent("social_click", {
-        social_platform: "facebook",
-        location: "footer",
-      })
-    }
-    className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
-  >
-    <Facebook
-      size={18}
-      className="text-gray-300"
-    />
-  </a>
+            <div className="flex gap-3">
+              {/* Facebook */}
+              <a
+                href="#"
+                onClick={() =>
+                  trackEvent("social_click", {
+                    page: pageName,
+                    section: SECTION_NAME,
+                    social_platform: "facebook",
+                    location: "footer",
+                  })
+                }
+                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-cyan-400/30 hover:bg-cyan-500/10"
+              >
+                <Facebook
+                  size={18}
+                  className="text-gray-300"
+                />
+              </a>
 
-  {/* WhatsApp */}
-  <a
-    href="https://wa.me/447308888874"
-    target="_blank"
-    rel="noopener noreferrer"
-    onClick={() =>
-      trackEvent("whatsapp_click", {
-        location: "footer",
-      })
-    }
-    className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-green-400/30 hover:bg-green-500/10"
-  >
-    <FaWhatsapp
-      size={18}
-      className="text-gray-300"
-    />
-  </a>
-</div>
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/447308888874"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() =>
+                  trackEvent("whatsapp_click", {
+                    page: pageName,
+                    section: SECTION_NAME,
+                    location: "footer",
+                  })
+                }
+                className="flex items-center justify-center w-10 h-10 transition border rounded-lg border-white/10 bg-white/5 hover:border-green-400/30 hover:bg-green-500/10"
+              >
+                <FaWhatsapp
+                  size={18}
+                  className="text-gray-300"
+                />
+              </a>
+            </div>
 
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <Link
-              onClick={() =>
-    trackEvent("footer_link_click", {
-      link_name: "Privacy Policy",
-    })
-  }
+                onClick={() =>
+                  trackEvent("footer_link_click", {
+                    page: pageName,
+                    section: SECTION_NAME,
+                    link_name: "Privacy Policy",
+                  })
+                }
                 to="/privacy-policy"
                 className="text-gray-400 transition hover:text-cyan-300"
               >
@@ -115,23 +132,27 @@ useEffect(() => {
               <span className="text-gray-600">•</span>
 
               <Link
-               onClick={() =>
-    trackEvent("footer_link_click", {
-      link_name: "Terms and Conditions",
-    })
-  }
+                onClick={() =>
+                  trackEvent("footer_link_click", {
+                    page: pageName,
+                    section: SECTION_NAME,
+                    link_name: "Terms and Conditions",
+                  })
+                }
                 to="/terms-and-conditions"
                 className="text-gray-400 transition hover:text-cyan-300"
               >
                 Terms and Conditions
               </Link>
-               <span className="text-gray-600">•</span>
+              <span className="text-gray-600">•</span>
               <Link
-              onClick={() =>
-    trackEvent("footer_link_click", {
-      link_name: "Refund Policy",
-    })
-  }
+                onClick={() =>
+                  trackEvent("footer_link_click", {
+                    page: pageName,
+                    section: SECTION_NAME,
+                    link_name: "Refund Policy",
+                  })
+                }
                 to="/refund-policy"
                 className="text-gray-400 transition hover:text-cyan-300"
               >

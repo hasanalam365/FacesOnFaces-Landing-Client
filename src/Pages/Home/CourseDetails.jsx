@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect,useEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { BookOpen, ChevronDown, MessageCircle, ArrowRight, Info, ArrowDownNarrowWide } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -19,7 +19,7 @@ const courseFeatures = [
   },
   {
     title: "Anatomy and Physiology",
-    description: "In this course, we ensure every student masters facial anatomy, understanding the underlying structures critical for safe, effective treatments. We guide them through key anatomical landmarks, and at the end, they’ll demonstrate their knowledge in both a written and practical anatomy test, ensuring confidence and precision in their future procedures."
+    description: "In this course, we ensure every student masters facial anatomy, understanding the underlying structures critical for safe, effective treatments. We guide them through key anatomical landmarks, and at the end, they'll demonstrate their knowledge in both a written and practical anatomy test, ensuring confidence and precision in their future procedures."
   },
   {
     title: "Complications Management",
@@ -31,11 +31,11 @@ const courseFeatures = [
   },
   {
     title: "Skin Booster",
-    description: "A skin booster is a revitalizing injectable treatment designed to deeply hydrate and improve facial skin quality from within. In this course, students will learn what makes skin boosters unique and how to safely administer them, focusing solely on facial application. They’ll gain hands-on experience in correct product placement, dosage, and technique, ensuring glowing, natural results every time."
+    description: "A skin booster is a revitalizing injectable treatment designed to deeply hydrate and improve facial skin quality from within. In this course, students will learn what makes skin boosters unique and how to safely administer them, focusing solely on facial application. They'll gain hands-on experience in correct product placement, dosage, and technique, ensuring glowing, natural results every time."
   },
   {
     title: "Lumi Eyes",
-    description: "Lumi Eyes is a specialized under-eye treatment designed to rejuvenate and brighten the delicate eye area. In this course, we teach students the unique properties of Lumi Eyes and how to administer it safely. They’ll learn precise injection techniques tailored to the eye region, ensuring natural, refreshed, and safe results for every client."
+    description: "Lumi Eyes is a specialized under-eye treatment designed to rejuvenate and brighten the delicate eye area. In this course, we teach students the unique properties of Lumi Eyes and how to administer it safely. They'll learn precise injection techniques tailored to the eye region, ensuring natural, refreshed, and safe results for every client."
   },
   {
     title: "Polynucleotide",
@@ -47,7 +47,7 @@ const courseFeatures = [
   },
   {
     title: "Fat Dissolver",
-    description: "In this course, we focus on fat dissolving techniques tailored to common areas like the chin, jawline, underarms, and belly. We teach you how to safely and effectively treat these areas, ensuring natural-looking results. Once you complete the course, you’ll be ready to use any fat dissolver confidently, as long as you carefully follow each product’s label and instructions."
+    description: "In this course, we focus on fat dissolving techniques tailored to common areas like the chin, jawline, underarms, and belly. We teach you how to safely and effectively treat these areas, ensuring natural-looking results. Once you complete the course, you'll be ready to use any fat dissolver confidently, as long as you carefully follow each product's label and instructions."
   },
   {
     title: "Vitamin B12",
@@ -55,21 +55,30 @@ const courseFeatures = [
   },
   {
     title: "Foundation Dermal Filler",
-    description: "In our Foundation Dermal Filler, we set you up for success in three key areas: lips, nasolabial folds, and marionette lines. You'll learn to craft beautifully balanced lips using careful volumizing techniques. We guide you step-by-step to soften nasolabial lines, restoring a youthful look, and refine marionette lines for a harmonious lower face. With hands-on practice and expert guidance, you’ll leave confident in delivering natural, stunning results."
+    description: "In our Foundation Dermal Filler, we set you up for success in three key areas: lips, nasolabial folds, and marionette lines. You'll learn to craft beautifully balanced lips using careful volumizing techniques. We guide you step-by-step to soften nasolabial lines, restoring a youthful look, and refine marionette lines for a harmonious lower face. With hands-on practice and expert guidance, you'll leave confident in delivering natural, stunning results."
   },
   {
     title: "Foundation Anti-Wrinkle",
-    description: "Our Foundation Anti-Wrinkle course prepares you for safe, effective treatments in three key areas: forehead, frown lines, and crow’s feet. As a prescription-only treatment, we teach you how to work with a prescriber and conduct required face-to-face consultations. We emphasize proper local protocols and teach you the correct dosage, mixture ratios, and precise injection points, ensuring every client receives the right balance for a natural, refreshed appearance. With hands-on guidance, you'll feel confident and compliant from start to finish."
+    description: "Our Foundation Anti-Wrinkle course prepares you for safe, effective treatments in three key areas: forehead, frown lines, and crow's feet. As a prescription-only treatment, we teach you how to work with a prescriber and conduct required face-to-face consultations. We emphasize proper local protocols and teach you the correct dosage, mixture ratios, and precise injection points, ensuring every client receives the right balance for a natural, refreshed appearance. With hands-on guidance, you'll feel confident and compliant from start to finish."
   },
   {
     title: "Use of Hyaluronidase",
-    description: "In our Use of Hyaluronidase training, we equip you with the essential skill of safely dissolving hyaluronic acid fillers. You’ll learn both emergency dissolving, in cases of complications, and elective dissolving to fine-tune results. We teach correct dosage, precise techniques, and safety protocols, ensuring you can confidently handle any situation. By mastering both proactive and corrective applications, you’ll ensure safe, confident, and tailored results for your clients."
+    description: "In our Use of Hyaluronidase training, we equip you with the essential skill of safely dissolving hyaluronic acid fillers. You'll learn both emergency dissolving, in cases of complications, and elective dissolving to fine-tune results. We teach correct dosage, precise techniques, and safety protocols, ensuring you can confidently handle any situation. By mastering both proactive and corrective applications, you'll ensure safe, confident, and tailored results for your clients."
   },
 ];
 
+// ─── Funnel step config (keep step_order consistent across all pages) ──
+// course_details = 1, enroll = 2, signing = 3, deposit/payment = 4, subscription = 5
+const FUNNEL_STEP = "course_details";
+const FUNNEL_STEP_ORDER = 1;
+
+// This page's identity for the AdvisorModal's page/source props, so
+// GA4 can tell "advisor opened from Course Details" apart from other
+// entry points like StartJourney.
+const PAGE_NAME = "course_details";
+const SECTION_NAME = "course_details";
+
 // ─── Shared body-scroll-lock hook ──────────────────────────────
-// Locks the page in place (no jump, no background scroll) while
-// `active` is true, and restores the exact scroll position after.
 function useScrollLock(active) {
   useLayoutEffect(() => {
     if (!active) return;
@@ -102,6 +111,43 @@ function useScrollLock(active) {
       window.scrollTo({ top: scrollY, left: 0, behavior: "instant" });
     };
   }, [active]);
+}
+
+// ─── Reusable section-visibility tracking hook ─────────────────
+// Fires ONE event the first time a section becomes visible (>=40%
+// in view). Returns a ref to attach to the section wrapper.
+function useSectionTracking(sectionName, extraProps = {}) {
+  const ref = useRef(null);
+  const trackedRef = useRef(false);
+  const extraPropsRef = useRef(extraProps);
+  extraPropsRef.current = extraProps;
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || trackedRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !trackedRef.current) {
+            trackedRef.current = true;
+            trackEvent("section_view", {
+              page: FUNNEL_STEP,
+              section: sectionName,
+              ...extraPropsRef.current,
+            });
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [sectionName]);
+
+  return ref;
 }
 
 // ─── Course Detail Modal ───────────────────────────────────────
@@ -171,47 +217,77 @@ const CourseDetails = () => {
   const [advisorModalOpen, setAdvisorModalOpen] = useState(false);
   const navigate = useNavigate();
 
-useEffect(() => {
-  trackEvent("course_details_view", {
-    section: "Course Details",
-  });
-}, []);
+  // ── Section refs for visibility tracking ──
+  const headerRef = useSectionTracking("header_pricing_summary");
+  const infoCardsRef = useSectionTracking("course_info_cards");
+  const includesRef = useSectionTracking("course_includes_grid");
+  const ctaRef = useSectionTracking("cta_buttons");
+
+  useEffect(() => {
+    trackEvent("course_details_view", {
+      section: "Course Details",
+    });
+
+    // Funnel step entry — fire once per page load, same shape on
+    // every funnel page (enroll, signing, deposit, subscription).
+    trackEvent("funnel_step_view", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+    });
+  }, []);
 
   const toggleAccordion = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
- const handleEnroll = () => {
+  const handleEnroll = () => {
+    trackEvent("course_details_enroll_click", {
+      source: "Course Details",
+      value: 1099,
+      currency: "GBP",
+    });
 
-  trackEvent("course_details_enroll_click", {
-    source: "Course Details",
-    value: 1099,
-    currency: "GBP",
-  });
+    // Marks that this user is leaving this funnel step forward,
+    // useful for drop-off vs progression comparison.
+    trackEvent("funnel_step_complete", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      next_step: "enroll",
+    });
 
-  navigate("/enroll");
-};
+    navigate("/enroll");
+  };
 
-const handleFeatureClick = (e, feature) => {
-  e.currentTarget.blur();
+  const handleFeatureClick = (e, feature) => {
+    e.currentTarget.blur();
 
-  trackEvent("course_feature_click", {
-    feature_name: feature.title,
-  });
+    trackEvent("course_feature_click", {
+      feature_name: feature.title,
+    });
 
-  trackEvent("course_modal_open", {
-    feature_name: feature.title,
-  });
+    trackEvent("course_modal_open", {
+      feature_name: feature.title,
+    });
 
-  setSelectedCourse(feature);
-};
+    setSelectedCourse(feature);
+  };
+
+  const handleAdvisorClick = (e) => {
+    e.currentTarget.blur();
+
+    trackEvent("course_details_advisor_click", {
+      source: "Course Details",
+    });
+
+    setAdvisorModalOpen(true);
+  };
 
   return (
     <section className="py-10">
       <div className="max-w-6xl mx-auto overflow-hidden border shadow-2xl rounded-3xl border-cyan-400/20 bg-[#0f1519]">
         <div className="p-6 lg:p-10">
           {/* Header */}
-          <div className="pb-8 mb-10 border-b border-cyan-400/10">
+          <div ref={headerRef} className="pb-8 mb-10 border-b border-cyan-400/10">
             <span className="inline-block px-4 py-2 text-sm font-medium text-black rounded-full bg-cyan-400">
               14 Certificates Included
             </span>
@@ -229,7 +305,7 @@ const handleFeatureClick = (e, feature) => {
           </div>
 
           {/* Course Info */}
-          <div className="grid gap-6 mb-12 md:grid-cols-3">
+          <div ref={infoCardsRef} className="grid gap-6 mb-12 md:grid-cols-3">
             <div className="p-6 border rounded-2xl border-cyan-400/20 bg-white/[0.03]">
               <p className="text-sm text-white/50">Course Fee</p>
 
@@ -254,7 +330,7 @@ const handleFeatureClick = (e, feature) => {
           </div>
 
           {/* Course Includes */}
-          <div className="mb-12">
+          <div ref={includesRef} className="mb-12">
             <h3 className="mb-6 text-2xl font-semibold text-white">Course Includes</h3>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -312,7 +388,7 @@ const handleFeatureClick = (e, feature) => {
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-5 mt-12 sm:flex-row">
+          <div ref={ctaRef} className="flex flex-col items-center justify-center gap-5 mt-12 sm:flex-row">
             {/* Enroll */}
             <motion.button
               onClick={handleEnroll}
@@ -329,15 +405,7 @@ const handleFeatureClick = (e, feature) => {
 
             {/* Talk To Advisor */}
             <motion.button
-              onClick={(e) => {
-  e.currentTarget.blur();
-
-  trackEvent("course_details_advisor_click", {
-    source: "Course Details",
-  });
-
-  setAdvisorModalOpen(true);
-}}
+              onClick={handleAdvisorClick}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-3 px-8 py-4 font-medium text-white transition-all border rounded-full group border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-white/10"
@@ -349,18 +417,23 @@ const handleFeatureClick = (e, feature) => {
         </div>
       </div>
 
-     <CourseModal
-  course={selectedCourse}
-  onClose={() => {
-    trackEvent("course_modal_close", {
-      feature_name: selectedCourse?.title,
-    });
+      <CourseModal
+        course={selectedCourse}
+        onClose={() => {
+          trackEvent("course_modal_close", {
+            feature_name: selectedCourse?.title,
+          });
 
-    setSelectedCourse(null);
-  }}
-/>
+          setSelectedCourse(null);
+        }}
+      />
 
-      <AdvisorModal open={advisorModalOpen} onClose={() => setAdvisorModalOpen(false)} />
+      <AdvisorModal
+        open={advisorModalOpen}
+        onClose={() => setAdvisorModalOpen(false)}
+        source={SECTION_NAME}
+        page={PAGE_NAME}
+      />
     </section>
   );
 };

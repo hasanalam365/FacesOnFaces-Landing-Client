@@ -1,144 +1,230 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import AdvisorModal from "../../Components/AdvisorModal";
+import { MessageCircle, Phone, X, ChevronRight } from "lucide-react";
 import { trackEvent } from "../../utils/analytics";
 
-const StartJourney = () => {
+const WHATSAPP_NUMBER = "+447308888874";
+
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const modalVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.25 },
+  },
+  exit: {
+    opacity: 0,
+    y: 30,
+    scale: 0.97,
+    transition: { duration: 0.2 },
+  },
+};
+
+// `source`/`page` let every parent (CourseDetails, StartJourney, etc.)
+// tell us where the modal was opened from, so GA4 can distinguish
+// "advisor_modal_open" coming from different sections/pages instead
+// of every event looking identical.
+const AdvisorModal = ({ open, onClose, source = "unknown", page = "unknown" }) => {
+  const modalRef = useRef(null);
+  const [showLeadForm, setShowLeadForm] = useState(false);
   const navigate = useNavigate();
 
-  const [advisorModalOpen, setAdvisorModalOpen] = useState(false);
+  useEffect(() => {
+    if (open) {
+      trackEvent("advisor_modal_open", {
+        page,
+        source,
+      });
+    }
+  }, [open, page, source]);
 
-const handleEnroll = () => {
-  trackEvent("start_journey_enroll_click", {
-    section: "Start Journey",
-    button: "Enroll Now",
-  });
+  useEffect(() => {
+    if (!open) return;
 
-  navigate("/enroll");
-};
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        trackEvent("advisor_modal_close", {
+          page,
+          source,
+          close_method: "Escape Key",
+        });
 
-const handleAdvisorClick = () => {
-  trackEvent("advisor_modal_open", {
-    section: "Start Journey",
-    button: "Talk To Advisor",
-  });
+        onClose();
+      }
+    };
 
-  setAdvisorModalOpen(true);
-};
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
 
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "auto";
+    };
+  }, [open, onClose, page, source]);
+
+  useEffect(() => {
+    if (!open) setShowLeadForm(false);
+  }, [open]);
+
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      trackEvent("advisor_modal_close", {
+        page,
+        source,
+        close_method: "Backdrop",
+      });
+
+      onClose();
+    }
+  };
+
+  const handleWhatsApp = () => {
+    trackEvent("advisor_whatsapp_click", {
+      page,
+      source,
+      contact_method: "WhatsApp",
+    });
+
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
+  };
+
+  const handleNavigate = () => {
+    trackEvent("advisor_lead_form_click", {
+      page,
+      source,
+      destination: "/lead-form",
+    });
+
+    navigate("/lead-form");
+  };
 
   return (
-    <>
-      <section className="relative overflow-hidden bg-[#050b10] py-28">
-        {/* Background Glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[140px] -top-32 -left-20" />
-
-          <div className="absolute w-[400px] h-[400px] rounded-full bg-cyan-400/10 blur-[150px] bottom-0 right-0" />
-
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.05),transparent_70%)]" />
-        </div>
-
-        <div className="relative z-10 max-w-4xl px-4 mx-auto text-center">
-          {/* Small Heading */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-5 text-[11px] uppercase tracking-[5px] text-cyan-400"
-          >
-            Begin Your Journey
-          </motion.p>
-
-          {/* Heading */}
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="mb-8 font-light leading-tight text-white"
-          >
-            <span className="block text-4xl md:text-6xl">
-              Start Your Aesthetic
-            </span>
-
-            <span className="block text-4xl italic text-cyan-400 md:text-6xl">
-              Career Today
-            </span>
-          </motion.h2>
-
-          {/* Description */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{
-              delay: 0.2,
-              duration: 0.7,
-            }}
-            className="max-w-2xl mx-auto mb-12 leading-8 text-gray-400"
-          >
-            Join thousands of successful students building their future in the
-            world's fastest-growing beauty industry.
-          </motion.p>
-
-          {/* Buttons */}
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          variants={backdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          onMouseDown={handleBackdropClick}
+          className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-md p-4 sm:p-6 sm:items-center"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-            }}
-            viewport={{ once: true }}
-            transition={{
-              delay: 0.3,
-              duration: 0.6,
-            }}
-            className="flex flex-col items-center justify-center gap-5 sm:flex-row"
+            ref={modalRef}
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onMouseDown={(e) => e.stopPropagation()}
+            className="relative w-full max-w-2xl my-auto overflow-hidden border shadow-2xl rounded-3xl bg-[#091017] border-cyan-500/20"
           >
-            {/* Enroll */}
-            <motion.button
-              onClick={handleEnroll}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-3 px-8 py-4 font-medium text-black transition-all rounded-full group bg-cyan-400 hover:bg-cyan-300"
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                trackEvent("advisor_modal_close", {
+                  page,
+                  source,
+                  close_method: "Close Button",
+                });
+
+                onClose();
+              }}
+              className="absolute z-20 flex items-center justify-center w-10 h-10 text-gray-400 transition rounded-full top-4 right-4 hover:text-white hover:bg-white/10"
             >
-              Enroll Now
+              <X size={18} />
+            </button>
 
-              <ArrowRight
-                size={18}
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </motion.button>
+            {/* Background Glow */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute rounded-full w-72 h-72 bg-cyan-500/10 blur-[120px] -top-24 -left-24" />
+              <div className="absolute rounded-full w-80 h-80 bg-cyan-400/10 blur-[140px] -bottom-20 -right-20" />
+            </div>
 
-            {/* Advisor */}
-            <motion.button
-              onClick={handleAdvisorClick}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-3 px-8 py-4 font-medium text-white transition-all border rounded-full group border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-white/10"
-            >
-              <MessageCircle
-                size={18}
-                className="text-cyan-400"
-              />
+            <div className="relative z-10 p-6 sm:p-10">
+              <p className="mb-3 text-xs tracking-[5px] uppercase text-cyan-400">
+                Need Assistance?
+              </p>
+              <h2 className="text-2xl font-light text-white sm:text-3xl md:text-4xl">
+                Talk To An Advisor
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-gray-400 sm:mt-4 sm:text-base">
+                Choose how you'd like to connect with our admissions team. We're
+                here to help you choose the right course and answer any
+                questions.
+              </p>
 
-              Talk To Advisor
-            </motion.button>
+              <div className="grid grid-cols-1 gap-4 mt-6 sm:gap-6 sm:mt-10 md:grid-cols-2">
+                {/* WhatsApp Card */}
+                <motion.div
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  transition={{ duration: 0.25 }}
+                  className="group relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-white/[0.03] p-5 sm:p-7"
+                >
+                  <div className="absolute inset-0 transition duration-500 opacity-0 group-hover:opacity-100 bg-gradient-to-br from-cyan-500/10 via-cyan-400/5 to-transparent" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-green-500/15">
+                      <MessageCircle size={28} className="text-green-400 sm:w-8 sm:h-8" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-white sm:mt-6 sm:text-xl">
+                      WhatsApp Chat
+                    </h3>
+                    <p className="mt-2 text-sm leading-7 text-gray-400 sm:mt-3">
+                      Start chatting with one of our advisors instantly on
+                      WhatsApp. Get answers about courses, pricing, enrollment
+                      and career opportunities.
+                    </p>
+                    <button
+                      onClick={handleWhatsApp}
+                      className="flex items-center justify-center w-full gap-2 px-5 py-3 mt-6 text-sm font-medium text-white transition bg-green-500 rounded-xl hover:bg-green-400 sm:mt-8 sm:text-base"
+                    >
+                      Chat on WhatsApp
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Lead Form Card */}
+                <motion.div
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  transition={{ duration: 0.25 }}
+                  className="group relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-white/[0.03] p-5 sm:p-7"
+                >
+                  <div className="absolute inset-0 transition duration-500 opacity-0 group-hover:opacity-100 bg-gradient-to-br from-cyan-500/10 via-cyan-400/5 to-transparent" />
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-cyan-500/15">
+                      <Phone size={26} className="text-cyan-400 sm:w-8 sm:h-8" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold text-white sm:mt-6 sm:text-xl">
+                      Request A Call
+                    </h3>
+                    <p className="mt-2 text-sm leading-7 text-gray-400 sm:mt-3">
+                      Leave your information and tell us the best time to reach
+                      you. One of our advisors will contact you as soon as
+                      possible.
+                    </p>
+                    <button
+                      onClick={handleNavigate}
+                      className="flex items-center justify-center w-full gap-2 px-5 py-3 mt-6 text-sm font-medium text-black transition rounded-xl bg-cyan-400 hover:bg-cyan-300 sm:mt-8 sm:text-base"
+                    >
+                      Leave My Details
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Advisor Modal */}
-      <AdvisorModal
-        open={advisorModalOpen}
-        onClose={() => setAdvisorModalOpen(false)}
-      />
-    </>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
-export default StartJourney;
+export default AdvisorModal;

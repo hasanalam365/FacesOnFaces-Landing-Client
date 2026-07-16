@@ -27,75 +27,83 @@ const modalVariants = {
   },
 };
 
-const AdvisorModal = ({ open, onClose }) => {
+// `source`/`page` let every parent (CourseDetails, StartJourney, etc.)
+// tell us where the modal was opened from, so GA4 can distinguish
+// "advisor_modal_open" coming from different sections/pages instead
+// of every event looking identical.
+const AdvisorModal = ({ open, onClose, source = "unknown", page = "unknown" }) => {
   const modalRef = useRef(null);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const navigate = useNavigate();
 
-useEffect(() => {
-  if (open) {
-    trackEvent("advisor_modal_open", {
-      source: "Advisor Modal",
-    });
-  }
-}, [open]);
+  useEffect(() => {
+    if (open) {
+      trackEvent("advisor_modal_open", {
+        page,
+        source,
+      });
+    }
+  }, [open, page, source]);
 
- useEffect(() => {
-  if (!open) return;
+  useEffect(() => {
+    if (!open) return;
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Escape") {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        trackEvent("advisor_modal_close", {
+          page,
+          source,
+          close_method: "Escape Key",
+        });
+
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "auto";
+    };
+  }, [open, onClose, page, source]);
+
+  useEffect(() => {
+    if (!open) setShowLeadForm(false);
+  }, [open]);
+
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
       trackEvent("advisor_modal_close", {
-        source: "Escape Key",
+        page,
+        source,
+        close_method: "Backdrop",
       });
 
       onClose();
     }
   };
 
-  document.addEventListener("keydown", handleKeyDown);
-  document.body.style.overflow = "hidden";
-
-  return () => {
-    document.removeEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "auto";
-  };
-}, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) setShowLeadForm(false);
-  }, [open]);
-
- const handleBackdropClick = (e) => {
-  if (modalRef.current && !modalRef.current.contains(e.target)) {
-
-    trackEvent("advisor_modal_close", {
-      source: "Backdrop",
+  const handleWhatsApp = () => {
+    trackEvent("advisor_whatsapp_click", {
+      page,
+      source,
+      contact_method: "WhatsApp",
     });
 
-    onClose();
-  }
-};
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
+  };
 
- const handleWhatsApp = () => {
+  const handleNavigate = () => {
+    trackEvent("advisor_lead_form_click", {
+      page,
+      source,
+      destination: "/lead-form",
+    });
 
-  trackEvent("advisor_whatsapp_click", {
-    source: "Advisor Modal",
-    contact_method: "WhatsApp",
-  });
-
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
-};
-
- const handleNavigate = () => {
-
-  trackEvent("advisor_lead_form_click", {
-    source: "Advisor Modal",
-    destination: "/lead-form",
-  });
-
-  navigate("/lead-form");
-};
+    navigate("/lead-form");
+  };
 
   return (
     <AnimatePresence>
@@ -119,15 +127,15 @@ useEffect(() => {
           >
             {/* Close Button */}
             <button
-             onClick={() => {
+              onClick={() => {
+                trackEvent("advisor_modal_close", {
+                  page,
+                  source,
+                  close_method: "Close Button",
+                });
 
-    trackEvent("advisor_modal_close", {
-      source: "Close Button",
-    });
-
-    onClose();
-
-  }}
+                onClose();
+              }}
               className="absolute z-20 flex items-center justify-center w-10 h-10 text-gray-400 transition rounded-full top-4 right-4 hover:text-white hover:bg-white/10"
             >
               <X size={18} />

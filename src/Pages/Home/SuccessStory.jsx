@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 import Stats from "./Stats";
 import { trackEvent } from "../../utils/analytics";
+
+const PAGE_NAME = "home"; // change per page if this component is reused elsewhere
+const SECTION_NAME = "success_story";
 
 const testimonials = [
   {
@@ -64,69 +67,86 @@ const testimonials = [
 
 const SuccessStory = () => {
   const [current, setCurrent] = useState(0);
- 
+
   const sectionRef = useRef(null);
 
- const nextSlide = () => {
-  const nextIndex = (current + 1) % testimonials.length;
+  // Keeps the interval's nextSlide() reading the latest slide index
+  // instead of the stale `0` it was capturing before (the old
+  // setInterval closed over `current` from the first render only).
+  const currentRef = useRef(current);
+  useEffect(() => {
+    currentRef.current = current;
+  }, [current]);
 
-  trackEvent("testimonial_next", {
-    testimonial_index: nextIndex + 1,
-    testimonial_name: testimonials[nextIndex].name,
-  });
+  // `source` distinguishes autoplay advances from user-initiated
+  // clicks, so GA4 doesn't conflate "user is browsing testimonials"
+  // with "carousel is idling on autoplay".
+  const nextSlide = (source = "manual") => {
+    const nextIndex = (currentRef.current + 1) % testimonials.length;
 
-  setCurrent(nextIndex);
-};
+    trackEvent("testimonial_next", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      testimonial_index: nextIndex + 1,
+      testimonial_name: testimonials[nextIndex].name,
+      trigger: source,
+    });
 
-  const prevSlide = () => {
-  const prevIndex =
-    (current - 1 + testimonials.length) %
-    testimonials.length;
+    setCurrent(nextIndex);
+  };
 
-  trackEvent("testimonial_previous", {
-    testimonial_index: prevIndex + 1,
-    testimonial_name: testimonials[prevIndex].name,
-  });
+  const prevSlide = (source = "manual") => {
+    const prevIndex =
+      (currentRef.current - 1 + testimonials.length) % testimonials.length;
 
-  setCurrent(prevIndex);
-};
+    trackEvent("testimonial_previous", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      testimonial_index: prevIndex + 1,
+      testimonial_name: testimonials[prevIndex].name,
+      trigger: source,
+    });
+
+    setCurrent(prevIndex);
+  };
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
+    const timer = setInterval(() => nextSlide("auto"), 5000);
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
-  const element = sectionRef.current;
-  if (!element) return;
+    const element = sectionRef.current;
+    if (!element) return;
 
-  let tracked = false;
+    let tracked = false;
 
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting && !tracked) {
-        tracked = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked) {
+          tracked = true;
 
-        trackEvent("view_testimonials_section", {
-          section_name: "Success Stories",
-        });
+          trackEvent("section_view", {
+            page: PAGE_NAME,
+            section: SECTION_NAME,
+            section_name: "Success Stories",
+          });
 
-        observer.disconnect();
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.4,
       }
-    },
-    {
-      threshold: 0.4,
-    }
-  );
+    );
 
-  observer.observe(element);
+    observer.observe(element);
 
-  return () => observer.disconnect();
-}, []);
-
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section  ref={sectionRef} className="px-5 py-24 bg-black">
+    <section ref={sectionRef} className="px-5 py-24 bg-black">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14">
@@ -201,13 +221,15 @@ const SuccessStory = () => {
                   </div>
 
                   <button
-  onClick={() =>
-    trackEvent("testimonial_read_story", {
-      testimonial_name: testimonials[current].name,
-    })
-  }
-  className="px-5 py-2 text-sm transition border rounded-full border-cyan-400/30 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20"
->
+                    onClick={() =>
+                      trackEvent("testimonial_read_story", {
+                        page: PAGE_NAME,
+                        section: SECTION_NAME,
+                        testimonial_name: testimonials[current].name,
+                      })
+                    }
+                    className="px-5 py-2 text-sm transition border rounded-full border-cyan-400/30 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20"
+                  >
                     Read Full Story
                   </button>
                 </div>
@@ -218,7 +240,7 @@ const SuccessStory = () => {
           {/* Controls */}
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
-              onClick={prevSlide}
+              onClick={() => prevSlide("manual")}
               className="flex items-center justify-center w-10 h-10 text-gray-400 border rounded-full border-white/10 bg-zinc-900 hover:text-white"
             >
               <ChevronLeft size={18} />
@@ -228,14 +250,16 @@ const SuccessStory = () => {
               {testimonials.map((_, index) => (
                 <button
                   key={index}
-                 onClick={() => {
-  trackEvent("testimonial_select", {
-    testimonial_index: index + 1,
-    testimonial_name: testimonials[index].name,
-  });
+                  onClick={() => {
+                    trackEvent("testimonial_select", {
+                      page: PAGE_NAME,
+                      section: SECTION_NAME,
+                      testimonial_index: index + 1,
+                      testimonial_name: testimonials[index].name,
+                    });
 
-  setCurrent(index);
-}}
+                    setCurrent(index);
+                  }}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     current === index
                       ? "w-8 bg-cyan-400"
@@ -246,7 +270,7 @@ const SuccessStory = () => {
             </div>
 
             <button
-              onClick={nextSlide}
+              onClick={() => nextSlide("manual")}
               className="flex items-center justify-center w-10 h-10 text-gray-400 border rounded-full border-white/10 bg-zinc-900 hover:text-white"
             >
               <ChevronRight size={18} />
@@ -254,12 +278,8 @@ const SuccessStory = () => {
           </div>
         </div>
       </div>
-
-     
     </section>
-    
   );
 };
 
 export default SuccessStory;
-

@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import { trackEvent } from "../../utils/analytics";
 
+const PAGE_NAME = "home"; // change per page if this component is reused elsewhere
+const SECTION_NAME = "instructors";
+
 const instructors = [
   {
     id: 1,
@@ -22,6 +25,7 @@ const instructors = [
 const InstructorCard = ({ item, index }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
+  const viewTrackedRef = useRef(false);
 
   useEffect(() => {
     const el = cardRef.current;
@@ -31,6 +35,20 @@ const InstructorCard = ({ item, index }) => {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+
+          // Track that this specific instructor card was actually
+          // seen, separate from clicked — lets us compare views vs
+          // clicks per instructor.
+          if (!viewTrackedRef.current) {
+            viewTrackedRef.current = true;
+            trackEvent("instructor_card_view", {
+              page: PAGE_NAME,
+              section: SECTION_NAME,
+              instructor_name: item.name,
+              instructor_id: item.id,
+            });
+          }
+
           observer.unobserve(el);
         }
       },
@@ -39,31 +57,34 @@ const InstructorCard = ({ item, index }) => {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [item.id, item.name]);
 
-const handleInstructorClick = () => {
-  trackEvent("instructor_click", {
-    instructor_name: item.name,
-    instructor_id: item.id,
-  });
-};
+  const handleInstructorClick = () => {
+    trackEvent("instructor_click", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      instructor_name: item.name,
+      instructor_id: item.id,
+    });
+  };
 
   return (
     <div
-  ref={cardRef}
-  onClick={handleInstructorClick}
-  className={`group relative h-[420px] md:h-[520px] rounded-3xl overflow-hidden transition-all duration-700 ease-out cursor-pointer
+      ref={cardRef}
+      onClick={handleInstructorClick}
+      className={`group relative h-[420px] md:h-[520px] rounded-3xl overflow-hidden transition-all duration-700 ease-out cursor-pointer
     ${
       isVisible
         ? "opacity-100 translate-y-0"
         : "opacity-0 translate-y-16"
     }`}
-  style={{
-    transitionDelay: isVisible ? `${index * 150}ms` : "0ms",
-  }}
->
+      style={{
+        transitionDelay: isVisible ? `${index * 150}ms` : "0ms",
+      }}
+    >
       <img
         src={item.image}
+        alt={item.name}
         className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-110"
       />
 
@@ -80,8 +101,37 @@ const handleInstructorClick = () => {
 };
 
 const Instructors = () => {
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const element = sectionRef.current;
+    if (!element) return;
+
+    let tracked = false;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked) {
+          tracked = true;
+
+          trackEvent("section_view", {
+            page: PAGE_NAME,
+            section: SECTION_NAME,
+            section_name: "Meet Your Instructors",
+          });
+
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="py-24 bg-[#0a0e12]">
+    <section ref={sectionRef} className="py-24 bg-[#0a0e12]">
       <div className="px-4 mx-auto max-w-7xl">
         {/* Heading */}
         <div className="mb-16 text-center">
