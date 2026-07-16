@@ -148,7 +148,7 @@ setSuccess(true);
             </h2>
             <p className="max-w-md mx-auto mt-5 leading-8 text-gray-400">
               Your information has been submitted successfully. One of our
-              advisors will contact you soon.
+              advisors will contact you shortly.
             </p>
             {onBack && (
               <button

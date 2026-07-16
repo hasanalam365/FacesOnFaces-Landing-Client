@@ -93,6 +93,7 @@ const AdvisorModal = ({ open, onClose, source = "unknown", page = "unknown" }) =
     });
 
     window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank");
+    onClose(); 
   };
 
   const handleNavigate = () => {

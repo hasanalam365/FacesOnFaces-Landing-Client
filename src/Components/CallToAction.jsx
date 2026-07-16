@@ -44,7 +44,7 @@ const navigate = useNavigate();
                 className="text-cyan-400"
               />
 
-              Talk To Advisor
+              Talk To An Advisor
             </motion.button>
              {/* Advisor Modal */}
       <AdvisorModal

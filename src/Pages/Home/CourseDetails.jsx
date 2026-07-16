@@ -403,7 +403,7 @@ const CourseDetails = () => {
               />
             </motion.button>
 
-            {/* Talk To Advisor */}
+            {/* Talk To An Advisor */}
             <motion.button
               onClick={handleAdvisorClick}
               whileHover={{ scale: 1.05 }}
@@ -411,7 +411,7 @@ const CourseDetails = () => {
               className="flex items-center gap-3 px-8 py-4 font-medium text-white transition-all border rounded-full group border-white/10 bg-white/5 backdrop-blur-sm hover:border-cyan-400/40 hover:bg-white/10"
             >
               <MessageCircle size={18} className="text-cyan-400" />
-              Talk To Advisor
+              Talk To An Advisor
             </motion.button>
           </div>
         </div>

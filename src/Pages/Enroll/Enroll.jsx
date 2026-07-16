@@ -735,7 +735,7 @@ const handleRemoveSchedule = () => {
               )}
 
               <div>
-                <label className="block mb-2 text-sm text-white/70">Course Fee</label>
+                <label className="block mb-2 text-sm text-white/70">Choose your payment method</label>
                 <button
                   type="button"
                   onClick={handleFeeFieldClick}
