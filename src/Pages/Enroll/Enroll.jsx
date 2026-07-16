@@ -16,7 +16,7 @@ import {
   CalendarCheck,
   CreditCard,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation  } from "react-router-dom";
 import PaymentForm from "../../Components/PaymentForm";
 import PricePlan from "../Home/PricePlan";
 
@@ -280,6 +280,7 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
 // ─── Main Component ────────────────────────────────────────────
 const Enroll = () => {
   const navigate = useNavigate();
+    const location = useLocation()
   const form = useRef(null);
   const hasFetched = useRef(false);
   const formRef = useRef(null);
@@ -311,6 +312,16 @@ const Enroll = () => {
     setScheduleDate(savedSchedule.date || "");
   }
 }, []);
+
+// PricePlan থেকে "full payment" সরাসরি select করে এলে
+useEffect(() => {
+  if (location.state?.plan === "full") {
+    setSelectedPlan("full");
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }
+}, [location.state]);
 
   const createPaymentIntent = async () => {
     try {

@@ -76,27 +76,29 @@ useEffect(() => {
   const navigate = useNavigate();
 
 const handleEnroll = (plan) => {
+  trackEvent("pricing_plan_selected", {
+    plan_id: plan.id,
+    plan_name: plan.title,
+    value: plan.value,
+    currency: plan.currency,
+  });
 
-trackEvent("pricing_plan_selected", {
-  plan_id: plan.id,
-  plan_name: plan.title,
-
-  value: plan.value,
-  currency: plan.currency,
-});
-
- trackEvent("pricing_enroll_click", {
-  plan_id: plan.id,
-  plan_name: plan.title,
-
-  value: plan.value,
-  currency: plan.currency,
-});
+  trackEvent("pricing_enroll_click", {
+    plan_id: plan.id,
+    plan_name: plan.title,
+    value: plan.value,
+    currency: plan.currency,
+  });
 
   if (onSelectPlan) {
     onSelectPlan(plan.id);
   } else {
-    navigate(plan.link);
+    if (plan.id === "full payment") {
+      // Enroll পেজে সরাসরি payment selected অবস্থায় পাঠানো হচ্ছে
+      navigate(plan.link, { state: { plan: "full" } });
+    } else {
+      navigate(plan.link);
+    }
   }
 };
 
