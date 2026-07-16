@@ -118,6 +118,23 @@ const DepositEnroll = () => {
 
   const [searchParams] = useSearchParams();
   
+const [contactDetails, setContactDetails] = useState({ name: "", email: "", phone: "" });
+
+useEffect(() => {
+  const saved = JSON.parse(localStorage.getItem("enrollContactDetails") || "null");
+  if (saved) setContactDetails(saved);
+}, []);
+
+const handleContactChange = (e) => {
+  const { name, value } = e.target;
+  setContactDetails((prev) => {
+    const updated = { ...prev, [name]: value };
+    localStorage.setItem("enrollContactDetails", JSON.stringify(updated));
+    return updated;
+  });
+};
+
+
 useEffect(() => {
   const date = searchParams.get("date");
   const location = searchParams.get("location");
@@ -225,6 +242,9 @@ const enrollmentData = {
 
   localStorage.removeItem("selectedSchedule");
   setSelectedSchedule(null);
+
+  localStorage.removeItem("enrollContactDetails");  
+  setContactDetails({ name: "", email: "", phone: "" }); 
 }
     } catch (err) {
       setErrorMsg(
@@ -369,12 +389,14 @@ Course
                 />
 
                 <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  required
-                  className={inputClass}
-                />
+  type="text"
+  name="name"
+  placeholder="Full Name"
+  required
+  value={contactDetails.name}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
               </div>
 
               <div className="relative">
@@ -383,13 +405,15 @@ Course
                   className="absolute -translate-y-1/2 left-4 top-1/2 text-white/40"
                 />
 
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email Address"
-                  required
-                  className={inputClass}
-                />
+               <input
+  type="email"
+  name="email"
+  placeholder="Email Address"
+  required
+  value={contactDetails.email}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
               </div>
 
               <div className="relative">
@@ -399,12 +423,14 @@ Course
                 />
 
                 <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone Number"
-                  required
-                  className={inputClass}
-                />
+  type="tel"
+  name="phone"
+  placeholder="Phone Number"
+  required
+  value={contactDetails.phone}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
               </div>
 
               {/* ── NEW: if no schedule saved, let user pick location & date ── */}

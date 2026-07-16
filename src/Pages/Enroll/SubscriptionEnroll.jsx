@@ -186,6 +186,22 @@ const SubscriptionEnroll = () => {
   const [scheduleLocation, setScheduleLocation] = useState("");
   const [scheduleDate, setScheduleDate] = useState("");
 
+  const [contactDetails, setContactDetails] = useState({ name: "", email: "", phone: "" });
+
+useEffect(() => {
+  const saved = JSON.parse(localStorage.getItem("enrollContactDetails") || "null");
+  if (saved) setContactDetails(saved);
+}, []);
+
+const handleContactChange = (e) => {
+  const { name, value } = e.target;
+  setContactDetails((prev) => {
+    const updated = { ...prev, [name]: value };
+    localStorage.setItem("enrollContactDetails", JSON.stringify(updated));
+    return updated;
+  });
+};
+
   useEffect(() => {
     const date = searchParams.get("date");
     const location = searchParams.get("location");
@@ -519,12 +535,16 @@ const SubscriptionEnroll = () => {
 
       const result = await response.json();
 
-      if (result.success) {
-        setIsTermsAccepted(false);
-        localStorage.removeItem("selectedSchedule");
-        setSelectedSchedule(null);
-        setStep(STEP_MANDATE);
-      } else {
+     if (result.success) {
+  setIsTermsAccepted(false);
+  localStorage.removeItem("selectedSchedule");
+  setSelectedSchedule(null);
+
+  localStorage.removeItem("enrollContactDetails");   
+  setContactDetails({ name: "", email: "", phone: "" }); 
+
+  setStep(STEP_MANDATE);
+} else {
         throw new Error("Enrollment failed. Please contact support.");
       }
     } catch (err) {
@@ -617,14 +637,16 @@ const SubscriptionEnroll = () => {
                 <label className="block mb-2 text-sm text-white/70">Full Name</label>
                 <div className="relative">
                   <User size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    placeholder="Enter your full name"
-                    maxLength={100}
-                    className={inputClass}
-                  />
+                 <input
+  type="text"
+  name="name"
+  required
+  placeholder="Enter your full name"
+  maxLength={100}
+  value={contactDetails.name}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
                   {fieldErrors.name && (
                     <p className="mt-1 text-xs text-red-400">{fieldErrors.name}</p>
                   )}
@@ -635,12 +657,14 @@ const SubscriptionEnroll = () => {
                 <div className="relative">
                   <Mail size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
                   <input
-                    type="email"
-                    name="email"
-                    required
-                    placeholder="Enter your email"
-                    className={inputClass}
-                  />
+  type="email"
+  name="email"
+  required
+  placeholder="Enter your email"
+  value={contactDetails.email}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
                   {fieldErrors.email && (
                     <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>
                   )}
@@ -650,14 +674,16 @@ const SubscriptionEnroll = () => {
                 <label className="block mb-2 text-sm text-white/70">Phone Number</label>
                 <div className="relative">
                   <Phone size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                  <input
-                    type="tel"
-                    name="phone"
-                    required
-                    placeholder="Enter your phone number"
-                    maxLength={20}
-                    className={inputClass}
-                  />
+                 <input
+  type="tel"
+  name="phone"
+  required
+  placeholder="Enter your phone number"
+  maxLength={20}
+  value={contactDetails.phone}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
                   {fieldErrors.phone && (
                     <p className="mt-1 text-xs text-red-400">{fieldErrors.phone}</p>
                   )}

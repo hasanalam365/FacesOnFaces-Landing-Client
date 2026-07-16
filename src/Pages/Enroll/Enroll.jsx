@@ -301,6 +301,22 @@ const Enroll = () => {
   const [scheduleLocation, setScheduleLocation] = useState("");
   const [scheduleDate, setScheduleDate] = useState("");
 
+  const [contactDetails, setContactDetails] = useState({ name: "", email: "", phone: "" });
+
+useEffect(() => {
+  const saved = JSON.parse(localStorage.getItem("enrollContactDetails") || "null");
+  if (saved) setContactDetails(saved);
+}, []);
+
+const handleContactChange = (e) => {
+  const { name, value } = e.target;
+  setContactDetails((prev) => {
+    const updated = { ...prev, [name]: value };
+    localStorage.setItem("enrollContactDetails", JSON.stringify(updated));
+    return updated;
+  });
+};
+
   useEffect(() => {
   const savedSchedule = JSON.parse(
     localStorage.getItem("selectedSchedule") || "null"
@@ -457,8 +473,7 @@ useEffect(() => {
 
     const result = await response.json();
 
-    console.log("Status:", response.status);
-    console.log("Result:", result);
+  
 
     if (!response.ok) {
       throw new Error(
@@ -469,14 +484,17 @@ useEffect(() => {
     }
 
     if (result.success) {
-      setPaymentCompleted(true);
-      setClientSecret("");
+  setPaymentCompleted(true);
+  setClientSecret("");
 
-      form.current.reset();
+  form.current.reset();
 
-      localStorage.removeItem("selectedSchedule");
-      setSelectedSchedule(null);
-    }
+  localStorage.removeItem("selectedSchedule");
+  setSelectedSchedule(null);
+
+  localStorage.removeItem("enrollContactDetails");   
+  setContactDetails({ name: "", email: "", phone: "" }); 
+}
   } catch (err) {
     console.error(err);
 
@@ -585,14 +603,16 @@ const handleRemoveSchedule = () => {
                 <div className="relative">
                   <User size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
                   <input
-                    type="text"
-                    name="name"
-                    required
-                    disabled={paymentCompleted}
-                    placeholder="Enter your full name"
-                    maxLength={100}
-                    className={inputClass}
-                  />
+  type="text"
+  name="name"
+  required
+  disabled={paymentCompleted}
+  placeholder="Enter your full name"
+  maxLength={100}
+  value={contactDetails.name}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
                 </div>
               </div>
 
@@ -600,14 +620,16 @@ const handleRemoveSchedule = () => {
                 <label className="block mb-2 text-sm text-white/70">Email Address</label>
                 <div className="relative">
                   <Mail size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    disabled={paymentCompleted}
-                    placeholder="Enter your email"
-                    className={inputClass}
-                  />
+                 <input
+  type="email"
+  name="email"
+  required
+  disabled={paymentCompleted}
+  placeholder="Enter your email"
+  value={contactDetails.email}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
                 </div>
               </div>
 
@@ -616,14 +638,16 @@ const handleRemoveSchedule = () => {
                 <div className="relative">
                   <Phone size={18} className="absolute -translate-y-1/2 text-white/40 left-4 top-1/2" />
                   <input
-                    type="tel"
-                    name="phone"
-                    required
-                    disabled={paymentCompleted}
-                    placeholder="Enter your phone number"
-                    maxLength={20}
-                    className={inputClass}
-                  />
+  type="tel"
+  name="phone"
+  required
+  disabled={paymentCompleted}
+  placeholder="Enter your phone number"
+  maxLength={20}
+  value={contactDetails.phone}
+  onChange={handleContactChange}
+  className={inputClass}
+/>
                 </div>
               </div>
 
