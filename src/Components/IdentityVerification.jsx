@@ -4,16 +4,20 @@ import {
   Upload, X, FileText, AlertCircle, CheckCircle2,
 } from "lucide-react";
 
-const DOC_TYPES = [
+const ADDRESS_PROOF_TYPES = [
   {
-    value: "nid",
-    label: "National ID (NID)",
-    icon: <CreditCard size={18} />,
-    hasDocNumber: true,
-    hasTwoSides: true,
-    docNumberLabel: "NID Number",
-    docNumberPlaceholder: "Enter your NID number",
+    value: "utility_bill",
+    label: "Utility Bill",
+    icon: <Zap size={18} />,
   },
+  {
+    value: "bank_statement",
+    label: "Bank Statement",
+    icon: <CreditCard size={18} />,
+  },
+];
+
+const IDENTITY_PROOF_TYPES = [
   {
     value: "passport",
     label: "Passport",
@@ -25,21 +29,12 @@ const DOC_TYPES = [
   },
   {
     value: "driving_license",
-    label: "Driving License",
+    label: "Driving Licence",
     icon: <Car size={18} />,
     hasDocNumber: true,
     hasTwoSides: true,
-    docNumberLabel: "License Number",
-    docNumberPlaceholder: "Enter your license number",
-  },
-  {
-    value: "electricity_bill",
-    label: "Electricity Bill",
-    icon: <Zap size={18} />,
-    hasDocNumber: false,
-    hasTwoSides: false,
-    docNumberLabel: null,
-    docNumberPlaceholder: null,
+    docNumberLabel: "Driving Licence Number",
+    docNumberPlaceholder: "Enter your driving licence number",
   },
 ];
 
@@ -154,40 +149,66 @@ const FileUploadSlot = ({ label, file, onFileChange, onRemove, error }) => {
 };
 
 const IdentityVerification = ({ onVerified }) => {
-  const [selectedType, setSelectedType] = useState(null);
-  const [docNumber, setDocNumber] = useState("");
-  const [frontFile, setFrontFile] = useState(null);
-  const [backFile, setBackFile] = useState(null);
-  const [singleFile, setSingleFile] = useState(null);
+  // Group 1 — Address Proof
+  const [addressType, setAddressType] = useState(null);
+  const [addressFile, setAddressFile] = useState(null);
+
+  // Group 2 — Identity Proof
+  const [identityType, setIdentityType] = useState(null);
+  const [identityDocNumber, setIdentityDocNumber] = useState("");
+  const [identityFrontFile, setIdentityFrontFile] = useState(null);
+  const [identityBackFile, setIdentityBackFile] = useState(null);
+
   const [errors, setErrors] = useState({});
   const [verified, setVerified] = useState(false);
 
-  const docConfig = DOC_TYPES.find((d) => d.value === selectedType);
+  const addressConfig = ADDRESS_PROOF_TYPES.find((d) => d.value === addressType);
+  const identityConfig = IDENTITY_PROOF_TYPES.find((d) => d.value === identityType);
 
-  const handleTypeSelect = (val) => {
-    setSelectedType(val);
-    setDocNumber("");
-    setFrontFile(null);
-    setBackFile(null);
-    setSingleFile(null);
-    setErrors({});
+  const handleAddressTypeSelect = (val) => {
+    setAddressType(val);
+    setAddressFile(null);
+    setErrors((p) => ({ ...p, addressType: undefined, addressFile: undefined }));
+    setVerified(false);
+  };
+
+  const handleIdentityTypeSelect = (val) => {
+    setIdentityType(val);
+    setIdentityDocNumber("");
+    setIdentityFrontFile(null);
+    setIdentityBackFile(null);
+    setErrors((p) => ({
+      ...p,
+      identityType: undefined,
+      identityDocNumber: undefined,
+      identityFront: undefined,
+      identityBack: undefined,
+    }));
     setVerified(false);
   };
 
   const validate = () => {
     const errs = {};
-    if (!selectedType) {
-      errs.type = "Please select a document type.";
+    if (!addressType) {
+      errs.addressType = "Please select an address proof document.";
+    } else if (!addressFile) {
+      errs.addressFile = "Address proof upload is required.";
     }
-    if (docConfig?.hasDocNumber && !docNumber.trim()) {
-      errs.docNumber = "Document number is required.";
-    }
-    if (docConfig?.hasTwoSides) {
-      if (!frontFile) errs.front = "Front side is required.";
-      if (!backFile) errs.back = "Back side is required.";
+
+    if (!identityType) {
+      errs.identityType = "Please select an identity proof document.";
     } else {
-      if (!singleFile) errs.single = "Document upload is required.";
+      if (identityConfig?.hasDocNumber && !identityDocNumber.trim()) {
+        errs.identityDocNumber = "Document number is required.";
+      }
+      if (identityConfig?.hasTwoSides) {
+        if (!identityFrontFile) errs.identityFront = "Front side is required.";
+        if (!identityBackFile) errs.identityBack = "Back side is required.";
+      } else if (!identityFrontFile) {
+        errs.identityFront = "Document upload is required.";
+      }
     }
+
     return errs;
   };
 
@@ -199,10 +220,12 @@ const IdentityVerification = ({ onVerified }) => {
     }
     setVerified(true);
     onVerified({
-      documentType: selectedType,
-      documentNumber: docNumber || null,
-      frontFile: docConfig?.hasTwoSides ? frontFile : singleFile,
-      backFile: docConfig?.hasTwoSides ? backFile : null,
+      addressProofType: addressType,
+      addressProofFile: addressFile,
+      identityProofType: identityType,
+      identityProofNumber: identityDocNumber || null,
+      identityFrontFile,
+      identityBackFile: identityConfig?.hasTwoSides ? identityBackFile : null,
     });
   };
 
@@ -214,10 +237,12 @@ const IdentityVerification = ({ onVerified }) => {
       <div className="flex items-center gap-3 p-4 border rounded-xl border-green-500/30 bg-green-500/10">
         <CheckCircle2 size={18} className="text-green-400 shrink-0" />
         <div>
-          <p className="text-sm font-medium text-white">Identity document verified</p>
+          <p className="text-sm font-medium text-white">Identity documents verified</p>
           <p className="text-xs text-white/40 mt-0.5">
-            {DOC_TYPES.find((d) => d.value === selectedType)?.label}
-            {docNumber ? ` · ${docNumber}` : ""}
+            {ADDRESS_PROOF_TYPES.find((d) => d.value === addressType)?.label}
+            {" · "}
+            {IDENTITY_PROOF_TYPES.find((d) => d.value === identityType)?.label}
+            {identityDocNumber ? ` · ${identityDocNumber}` : ""}
           </p>
         </div>
         <button
@@ -235,118 +260,161 @@ const IdentityVerification = ({ onVerified }) => {
   }
 
   return (
-    <div className="w-full max-w-full min-w-0 space-y-5 overflow-x-hidden">
-      {/* Document type selector */}
+    <div className="w-full max-w-full min-w-0 space-y-6 overflow-x-hidden">
+      {/* Group 1: Address Proof */}
       <div>
-        <p className="mb-3 text-sm text-white/70">Select document type</p>
+        <p className="mb-3 text-sm text-white/70">
+          Address Proof — upload one of the following
+        </p>
         <div className="grid grid-cols-2 gap-2">
-          {DOC_TYPES.map((dt) => (
+          {ADDRESS_PROOF_TYPES.map((dt) => (
             <button
               key={dt.value}
               type="button"
-              onClick={() => handleTypeSelect(dt.value)}
+              onClick={() => handleAddressTypeSelect(dt.value)}
               className={`flex items-center gap-2.5 px-4 py-3 border rounded-xl text-left transition-all text-sm ${
-                selectedType === dt.value
+                addressType === dt.value
                   ? "border-cyan-400/60 bg-cyan-400/10 text-white"
                   : "border-white/10 bg-white/5 text-white/50 hover:border-white/20 hover:text-white/70"
               }`}
             >
-              <span
-                className={
-                  selectedType === dt.value ? "text-cyan-400" : "text-white/30"
-                }
-              >
+              <span className={addressType === dt.value ? "text-cyan-400" : "text-white/30"}>
                 {dt.icon}
               </span>
               {dt.label}
             </button>
           ))}
         </div>
-        {errors.type && (
+        {errors.addressType && (
           <p className="flex items-center gap-1.5 mt-1.5 text-xs text-red-400">
-            <AlertCircle size={12} /> {errors.type}
+            <AlertCircle size={12} /> {errors.addressType}
           </p>
+        )}
+
+        {addressConfig && (
+          <div className="mt-4">
+            <FileUploadSlot
+              label={`Upload ${addressConfig.label}`}
+              file={addressFile}
+              error={errors.addressFile}
+              onFileChange={(f, err) => {
+                setAddressFile(f);
+                setErrors((p) => ({ ...p, addressFile: err }));
+              }}
+              onRemove={() => setAddressFile(null)}
+            />
+          </div>
         )}
       </div>
 
-      {/* Document fields */}
-      {docConfig && (
-        <>
-          {docConfig.hasDocNumber && (
-            <div>
-              <label className="block mb-2 text-sm text-white/70">
-                {docConfig.docNumberLabel}
-              </label>
-              <input
-                type="text"
-                value={docNumber}
-                onChange={(e) => {
-                  setDocNumber(e.target.value);
-                  setErrors((p) => ({ ...p, docNumber: undefined }));
+      {/* Group 2: Identity Proof */}
+      <div>
+        <p className="mb-3 text-sm text-white/70">
+          Identity Proof — upload one of the following
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {IDENTITY_PROOF_TYPES.map((dt) => (
+            <button
+              key={dt.value}
+              type="button"
+              onClick={() => handleIdentityTypeSelect(dt.value)}
+              className={`flex items-center gap-2.5 px-4 py-3 border rounded-xl text-left transition-all text-sm ${
+                identityType === dt.value
+                  ? "border-cyan-400/60 bg-cyan-400/10 text-white"
+                  : "border-white/10 bg-white/5 text-white/50 hover:border-white/20 hover:text-white/70"
+              }`}
+            >
+              <span className={identityType === dt.value ? "text-cyan-400" : "text-white/30"}>
+                {dt.icon}
+              </span>
+              {dt.label}
+            </button>
+          ))}
+        </div>
+        {errors.identityType && (
+          <p className="flex items-center gap-1.5 mt-1.5 text-xs text-red-400">
+            <AlertCircle size={12} /> {errors.identityType}
+          </p>
+        )}
+
+        {identityConfig && (
+          <div className="mt-4 space-y-4">
+            {identityConfig.hasDocNumber && (
+              <div>
+                <label className="block mb-2 text-sm text-white/70">
+                  {identityConfig.docNumberLabel}
+                </label>
+                <input
+                  type="text"
+                  value={identityDocNumber}
+                  onChange={(e) => {
+                    setIdentityDocNumber(e.target.value);
+                    setErrors((p) => ({ ...p, identityDocNumber: undefined }));
+                  }}
+                  placeholder={identityConfig.docNumberPlaceholder}
+                  maxLength={50}
+                  className={`${inputClass} ${
+                    errors.identityDocNumber ? "border-red-500/50" : ""
+                  }`}
+                />
+                {errors.identityDocNumber && (
+                  <p className="flex items-center gap-1.5 mt-1.5 text-xs text-red-400">
+                    <AlertCircle size={12} /> {errors.identityDocNumber}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {identityConfig.hasTwoSides ? (
+              <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="min-w-0">
+                  <FileUploadSlot
+                    label="Front side"
+                    file={identityFrontFile}
+                    error={errors.identityFront}
+                    onFileChange={(f, err) => {
+                      setIdentityFrontFile(f);
+                      setErrors((p) => ({ ...p, identityFront: err }));
+                    }}
+                    onRemove={() => setIdentityFrontFile(null)}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <FileUploadSlot
+                    label="Back side"
+                    file={identityBackFile}
+                    error={errors.identityBack}
+                    onFileChange={(f, err) => {
+                      setIdentityBackFile(f);
+                      setErrors((p) => ({ ...p, identityBack: err }));
+                    }}
+                    onRemove={() => setIdentityBackFile(null)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <FileUploadSlot
+                label={`Upload ${identityConfig.label}`}
+                file={identityFrontFile}
+                error={errors.identityFront}
+                onFileChange={(f, err) => {
+                  setIdentityFrontFile(f);
+                  setErrors((p) => ({ ...p, identityFront: err }));
                 }}
-                placeholder={docConfig.docNumberPlaceholder}
-                maxLength={50}
-                className={`${inputClass} ${
-                  errors.docNumber ? "border-red-500/50" : ""
-                }`}
+                onRemove={() => setIdentityFrontFile(null)}
               />
-              {errors.docNumber && (
-                <p className="flex items-center gap-1.5 mt-1.5 text-xs text-red-400">
-                  <AlertCircle size={12} /> {errors.docNumber}
-                </p>
-              )}
-            </div>
-          )}
+            )}
+          </div>
+        )}
+      </div>
 
-          {docConfig.hasTwoSides ? (
-            <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="min-w-0">
-                <FileUploadSlot
-                  label="Front side"
-                  file={frontFile}
-                  error={errors.front}
-                  onFileChange={(f, err) => {
-                    setFrontFile(f);
-                    setErrors((p) => ({ ...p, front: err }));
-                  }}
-                  onRemove={() => setFrontFile(null)}
-                />
-              </div>
-              <div className="min-w-0">
-                <FileUploadSlot
-                  label="Back side"
-                  file={backFile}
-                  error={errors.back}
-                  onFileChange={(f, err) => {
-                    setBackFile(f);
-                    setErrors((p) => ({ ...p, back: err }));
-                  }}
-                  onRemove={() => setBackFile(null)}
-                />
-              </div>
-            </div>
-          ) : (
-            <FileUploadSlot
-              label={`Upload ${docConfig.label}`}
-              file={singleFile}
-              error={errors.single}
-              onFileChange={(f, err) => {
-                setSingleFile(f);
-                setErrors((p) => ({ ...p, single: err }));
-              }}
-              onRemove={() => setSingleFile(null)}
-            />
-          )}
-
-          <button
-            type="button"
-            onClick={handleConfirm}
-            className="w-full py-3 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
-          >
-            Confirm Document
-          </button>
-        </>
-      )}
+      <button
+        type="button"
+        onClick={handleConfirm}
+        className="w-full py-3 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
+      >
+        Confirm Documents
+      </button>
     </div>
   );
 };

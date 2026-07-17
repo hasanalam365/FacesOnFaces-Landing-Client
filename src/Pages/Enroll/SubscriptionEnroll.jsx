@@ -475,10 +475,12 @@ const handleContactChange = (e) => {
       body.append("email", formSnapshot.email);
       body.append("phone", formSnapshot.phone);
       body.append("enrollmentId", enrollmentId);
-      body.append("documentType", data.documentType);
-      if (data.documentNumber) body.append("documentNumber", data.documentNumber);
-      body.append("frontFile", data.frontFile);
-      if (data.backFile) body.append("backFile", data.backFile);
+      body.append("addressProofType", data.addressProofType);
+      body.append("identityProofType", data.identityProofType);
+      if (data.identityProofNumber) body.append("identityProofNumber", data.identityProofNumber);
+      body.append("addressProofFile", data.addressProofFile);
+      body.append("identityFrontFile", data.identityFrontFile);
+      if (data.identityBackFile) body.append("identityBackFile", data.identityBackFile);
 
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/create-subscription-pre-enrollment`,
