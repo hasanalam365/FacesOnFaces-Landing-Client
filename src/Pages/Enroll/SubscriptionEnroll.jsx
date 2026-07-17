@@ -914,7 +914,7 @@ const handleContactChange = (e) => {
             <div>
               <h3 className="mb-1 text-lg font-semibold text-white">Complete First Payment</h3>
               <p className="text-sm text-white/40">
-                Your identity is verified. Pay £250 by card to secure your place.
+                Your identity is verified. Pay £350 by card to secure your place.
               </p>
             </div>
             {stripeLoading ? (
