@@ -1,6 +1,10 @@
 import { BookOpen, Calendar, ChevronDown, MapPin, X } from 'lucide-react'
 import React, { useState, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { trackEvent } from '../../utils/analytics'
+
+const PAGE_NAME = "enroll";
+const SECTION_NAME = "left_side_course_info";
 
 const courseFeatures = [
   {
@@ -221,18 +225,31 @@ const LeftSide = ({ onDateClick }) => {
 
   const handleLocationClick = (locationName) => {
     const found = courseSchedules.find((s) => s.location === locationName);
-    
-   
 
     if (!found) return;
-    setActiveLocation(activeLocation?.location === locationName ? null : found);
-    
+
+    const isClosing = activeLocation?.location === locationName;
+
+    trackEvent(isClosing ? "schedule_location_collapse" : "schedule_location_expand", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      location: locationName,
+    });
+
+    setActiveLocation(isClosing ? null : found);
   };
 
  
 
   // Called when user clicks a specific date — opens plan modal in parent
   const handleDateClick = (date, location) => {
+    trackEvent("schedule_date_click", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      location,
+      date,
+    });
+
     if (onDateClick) {
       onDateClick(date, location);
     }
@@ -241,7 +258,14 @@ const LeftSide = ({ onDateClick }) => {
 
   const handleFeatureClick = (e, feature) => {
   e.currentTarget.blur();
-  lastClickedRef.current = e.currentTarget; 
+  lastClickedRef.current = e.currentTarget;
+
+  trackEvent("course_feature_click", {
+    page: PAGE_NAME,
+    section: SECTION_NAME,
+    feature_name: feature.title,
+  });
+
   setSelectedCourse(feature);
   
 };

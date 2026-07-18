@@ -17,6 +17,13 @@ import {
 } from "lucide-react";
 
 import PaymentForm from "../../Components/PaymentForm";
+import { trackEvent } from "../../utils/analytics";
+
+// ─── Funnel config (keep in sync with Enroll, SubscriptionEnroll,
+// SubscriptionsAgreement, SubscriptionSuccess) ──
+const FUNNEL_STEP = "deposit_enroll";
+const FUNNEL_STEP_ORDER = 3;
+const PAGE_NAME = "deposit_enroll";
 
 const steps = [
   {
@@ -117,8 +124,24 @@ const DepositEnroll = () => {
   const [scheduleDate, setScheduleDate] = useState("");
 
   const [searchParams] = useSearchParams();
-  
+
 const [contactDetails, setContactDetails] = useState({ name: "", email: "", phone: "" });
+
+  // ── Funnel entry: page view. Also records whether the visitor
+  // arrived with a schedule already picked on the Enroll page (via
+  // query params) vs landing here without one — useful to see if
+  // skipping schedule selection earlier correlates with drop-off here.
+  useEffect(() => {
+    trackEvent("funnel_step_view", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      page: PAGE_NAME,
+      arrived_with_schedule: Boolean(
+        searchParams.get("date") && searchParams.get("location")
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 useEffect(() => {
   const saved = JSON.parse(localStorage.getItem("enrollContactDetails") || "null");
@@ -185,6 +208,11 @@ useEffect(() => {
       }
     } catch (err) {
       setErrorMsg("Unable to initialize payment.");
+      trackEvent("payment_intent_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        plan: "deposit",
+      });
     } finally {
       setLoading(false);
     }
@@ -238,6 +266,17 @@ const enrollmentData = {
 
       if (result.success) {
   setPaymentCompleted(true);
+
+  // Final conversion event for the deposit branch of the funnel.
+  trackEvent("deposit_completed", {
+    page: PAGE_NAME,
+    step: FUNNEL_STEP,
+    plan: "deposit",
+    value: 250,
+    currency: "GBP",
+    remaining_balance: 849,
+  });
+
   form.current.reset();
 
   localStorage.removeItem("selectedSchedule");
@@ -245,16 +284,35 @@ const enrollmentData = {
 
   localStorage.removeItem("enrollContactDetails");  
   setContactDetails({ name: "", email: "", phone: "" }); 
+} else {
+  trackEvent("enrollment_error", {
+    page: PAGE_NAME,
+    step: FUNNEL_STEP,
+    plan: "deposit",
+    error_message: result.message || "Deposit enrollment failed",
+  });
 }
     } catch (err) {
       setErrorMsg(
         "Enrollment failed. Please contact support."
       );
+
+      trackEvent("enrollment_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        plan: "deposit",
+        error_message: err.message,
+      });
     }
   };
 
 
   const handleRemoveSchedule = () => {
+  trackEvent("schedule_remove", {
+    page: PAGE_NAME,
+    step: FUNNEL_STEP,
+  });
+
   localStorage.removeItem("selectedSchedule");
   setSelectedSchedule(null);
   setScheduleLocation("");
@@ -266,6 +324,14 @@ const enrollmentData = {
     const location = e.target.value;
     setScheduleLocation(location);
     setScheduleDate("");
+
+    if (location) {
+      trackEvent("schedule_location_select", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        location,
+      });
+    }
 
     if (!location) {
       localStorage.removeItem("selectedSchedule");
@@ -282,11 +348,31 @@ const enrollmentData = {
       const schedule = { date, location: scheduleLocation };
       localStorage.setItem("selectedSchedule", JSON.stringify(schedule));
       setSelectedSchedule(schedule);
+
+      trackEvent("schedule_date_select", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        location: scheduleLocation,
+        date,
+      });
     }
   };
 
   const availableDates =
     courseSchedules.find((s) => s.location === scheduleLocation)?.dates || [];
+
+  const handleTermsAcceptedChange = (e) => {
+    const checked = e.target.checked;
+    setIsTermsAccepted(checked);
+
+    if (checked) {
+      trackEvent("terms_accepted", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        plan: "deposit",
+      });
+    }
+  };
 
   const inputClass =
     "w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none";
@@ -529,11 +615,7 @@ Course
               <input
                 type="checkbox"
                 checked={isTermsAccepted}
-                onChange={(e) =>
-                  setIsTermsAccepted(
-                    e.target.checked
-                  )
-                }
+                onChange={handleTermsAcceptedChange}
                 className="mt-1 accent-cyan-400"
               />
 

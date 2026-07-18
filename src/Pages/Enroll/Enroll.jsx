@@ -16,9 +16,16 @@ import {
   CalendarCheck,
   CreditCard,
 } from "lucide-react";
-import { useNavigate,useLocation  } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import PaymentForm from "../../Components/PaymentForm";
 import PricePlan from "../Home/PricePlan";
+import { trackEvent } from "../../utils/analytics";
+
+// ─── Funnel config (keep in sync with CourseDetails, DepositEnroll,
+// SubscriptionEnroll, SubscriptionsAgreement, SubscriptionSuccess) ──
+const FUNNEL_STEP = "enroll";
+const FUNNEL_STEP_ORDER = 2;
+const PAGE_NAME = "enroll";
 
 // ─── Course Schedules (moved here from LeftSide) ───────────────
 const courseSchedules = [
@@ -144,17 +151,53 @@ function useScrollLock(active) {
 const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
   useScrollLock(isOpen);
 
+  // Track every time the payment-plan picker opens — this is the
+  // step right before the funnel branches into full/deposit/subscription,
+  // so its open-rate vs the eventual plan-click rate tells us how many
+  // people saw the options but picked none (closed without choosing).
+  useEffect(() => {
+    if (isOpen) {
+      trackEvent("payment_plan_modal_open", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+      });
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        trackEvent("payment_plan_modal_close", {
+          page: PAGE_NAME,
+          step: FUNNEL_STEP,
+          close_method: "Escape Key",
+        });
+        onClose();
+      }
     };
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
+    if (e.target === e.currentTarget) {
+      trackEvent("payment_plan_modal_close", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        close_method: "Backdrop",
+      });
+      onClose();
+    }
+  };
+
+  const handleCloseButtonClick = () => {
+    trackEvent("payment_plan_modal_close", {
+      page: PAGE_NAME,
+      step: FUNNEL_STEP,
+      close_method: "Close Button",
+    });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -233,7 +276,7 @@ const PlanModal = ({ isOpen, onClose, onSelectPlan, selectedPlan }) => {
 
           {/* Close button */}
           <button
-            onClick={onClose}
+            onClick={handleCloseButtonClick}
             aria-label="Close"
             style={{
               position: "absolute",
@@ -303,6 +346,15 @@ const Enroll = () => {
 
   const [contactDetails, setContactDetails] = useState({ name: "", email: "", phone: "" });
 
+  // ── Funnel entry: page view ─────────────────────────────────
+  useEffect(() => {
+    trackEvent("funnel_step_view", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      page: PAGE_NAME,
+    });
+  }, []);
+
 useEffect(() => {
   const saved = JSON.parse(localStorage.getItem("enrollContactDetails") || "null");
   if (saved) setContactDetails(saved);
@@ -356,6 +408,11 @@ useEffect(() => {
       }
     } catch {
       setErrorMsg("Payment setup failed. Please refresh and try again.");
+      trackEvent("payment_intent_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        plan: "full",
+      });
     } finally {
       setLoading(false);
     }
@@ -363,7 +420,23 @@ useEffect(() => {
 
   // ── Called when user picks a plan from the modal ────────────
   const handlePlanSelect = (planId) => {
+    // This is the key funnel-branch point: full / deposit / subscription.
+    // Firing funnel_step_complete here (with next_step) lets GA4 show,
+    // for every visitor who reached Enroll, which of the three paths
+    // they actually took — or whether they took none.
+    trackEvent("payment_plan_selected", {
+      page: PAGE_NAME,
+      step: FUNNEL_STEP,
+      plan: planId,
+    });
+
     if (planId === "deposit") {
+      trackEvent("funnel_step_complete", {
+        step: FUNNEL_STEP,
+        step_order: FUNNEL_STEP_ORDER,
+        next_step: "deposit_enroll",
+      });
+
       // Pass schedule via query params so deposit page can also save it
       const params = new URLSearchParams();
       if (selectedSchedule) {
@@ -374,6 +447,12 @@ useEffect(() => {
       return;
     }
     if (planId === "subscription") {
+      trackEvent("funnel_step_complete", {
+        step: FUNNEL_STEP,
+        step_order: FUNNEL_STEP_ORDER,
+        next_step: "subscription_enroll",
+      });
+
       const params = new URLSearchParams();
       if (selectedSchedule) {
         params.set("date", selectedSchedule.date);
@@ -383,6 +462,12 @@ useEffect(() => {
       return;
     }
     // "full" plan — stay on this page
+    trackEvent("funnel_step_complete", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      next_step: "full_payment_form",
+    });
+
     setModalOpen(false);
     setSelectedPlan("full");
     setTimeout(() => {
@@ -398,7 +483,12 @@ useEffect(() => {
   const handleFeeFieldClick = (e) => {
     if (paymentCompleted) return;
     e.currentTarget.blur();
-    
+
+    trackEvent("payment_method_field_click", {
+      page: PAGE_NAME,
+      step: FUNNEL_STEP,
+    });
+
     setModalOpen(true);
   };
 
@@ -407,6 +497,14 @@ useEffect(() => {
     const location = e.target.value;
     setScheduleLocation(location);
     setScheduleDate("");
+
+    if (location) {
+      trackEvent("schedule_location_select", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        location,
+      });
+    }
 
     if (!location) {
       localStorage.removeItem("selectedSchedule");
@@ -423,6 +521,13 @@ useEffect(() => {
       const schedule = { date, location: scheduleLocation };
       localStorage.setItem("selectedSchedule", JSON.stringify(schedule));
       setSelectedSchedule(schedule);
+
+      trackEvent("schedule_date_select", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        location: scheduleLocation,
+        date,
+      });
     }
   };
 
@@ -487,6 +592,17 @@ useEffect(() => {
   setPaymentCompleted(true);
   setClientSecret("");
 
+  // Final conversion event for the "full payment" branch of the
+  // funnel — this is what a GA4 Funnel Exploration should treat as
+  // the completed goal for this path.
+  trackEvent("enrollment_completed", {
+    page: PAGE_NAME,
+    step: FUNNEL_STEP,
+    plan: "full",
+    value: 1099,
+    currency: "GBP",
+  });
+
   form.current.reset();
 
   localStorage.removeItem("selectedSchedule");
@@ -499,15 +615,40 @@ useEffect(() => {
     console.error(err);
 
     setErrorMsg(err.message);
+
+    trackEvent("enrollment_error", {
+      page: PAGE_NAME,
+      step: FUNNEL_STEP,
+      plan: "full",
+      error_message: err.message,
+    });
   }
 };
 
 const handleRemoveSchedule = () => {
+  trackEvent("schedule_remove", {
+    page: PAGE_NAME,
+    step: FUNNEL_STEP,
+  });
+
   localStorage.removeItem("selectedSchedule");
   setSelectedSchedule(null);
   setScheduleLocation("");
   setScheduleDate("");
 };
+
+  const handleTermsAcceptedChange = (e) => {
+    const checked = e.target.checked;
+    setIsTermsAccepted(checked);
+
+    if (checked) {
+      trackEvent("terms_accepted", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        plan: "full",
+      });
+    }
+  };
 
 
   const inputClass = "w-full py-4 pl-12 pr-4 text-white border rounded-xl bg-white/5 border-white/10 focus:border-cyan-400 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed";
@@ -788,7 +929,7 @@ const handleRemoveSchedule = () => {
                         type="checkbox"
                         id="terms"
                         checked={isTermsAccepted}
-                        onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                        onChange={handleTermsAcceptedChange}
                         className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
                       />
                      <label
