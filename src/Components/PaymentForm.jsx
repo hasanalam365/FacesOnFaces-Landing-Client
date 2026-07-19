@@ -71,6 +71,7 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
                 color: "#f87171", 
               },
             },
+             hidePostalCode: true,
           }}
           onChange={(e) => {
             setCardComplete(e.complete); 
