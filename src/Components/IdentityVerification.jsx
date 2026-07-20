@@ -3,6 +3,7 @@ import {
   CreditCard, BookOpen, Car, Zap,
   Upload, X, FileText, AlertCircle, CheckCircle2,
 } from "lucide-react";
+import { trackEvent } from "../utils/analytics";
 
 const ADDRESS_PROOF_TYPES = [
   {
@@ -54,13 +55,27 @@ const FileUploadSlot = ({ label, file, onFileChange, onRemove, error }) => {
   const validateAndSet = (f) => {
     if (!ALLOWED_TYPES.includes(f.type)) {
       onFileChange(null, "Only JPG, PNG, or PDF files are allowed.");
+      trackEvent("document_upload_rejected", {
+        component: "identity_verification",
+        slot: label,
+        reason: "invalid_type",
+      });
       return;
     }
     if (f.size > MAX_SIZE_BYTES) {
       onFileChange(null, `File must be under ${MAX_SIZE_MB}MB.`);
+      trackEvent("document_upload_rejected", {
+        component: "identity_verification",
+        slot: label,
+        reason: "file_too_large",
+      });
       return;
     }
     onFileChange(f, null);
+    trackEvent("document_uploaded", {
+      component: "identity_verification",
+      slot: label,
+    });
   };
 
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -170,6 +185,12 @@ const IdentityVerification = ({ onVerified }) => {
     setAddressFile(null);
     setErrors((p) => ({ ...p, addressType: undefined, addressFile: undefined }));
     setVerified(false);
+
+    trackEvent("identity_doc_type_select", {
+      component: "identity_verification",
+      group: "address_proof",
+      doc_type: val,
+    });
   };
 
   const handleIdentityTypeSelect = (val) => {
@@ -185,6 +206,12 @@ const IdentityVerification = ({ onVerified }) => {
       identityBack: undefined,
     }));
     setVerified(false);
+
+    trackEvent("identity_doc_type_select", {
+      component: "identity_verification",
+      group: "identity_proof",
+      doc_type: val,
+    });
   };
 
   const validate = () => {
@@ -216,9 +243,20 @@ const IdentityVerification = ({ onVerified }) => {
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
+      trackEvent("identity_confirm_validation_error", {
+        component: "identity_verification",
+        fields: Object.keys(errs),
+      });
       return;
     }
     setVerified(true);
+
+    trackEvent("identity_documents_confirmed", {
+      component: "identity_verification",
+      address_proof_type: addressType,
+      identity_proof_type: identityType,
+    });
+
     onVerified({
       addressProofType: addressType,
       addressProofFile: addressFile,
@@ -249,6 +287,11 @@ const IdentityVerification = ({ onVerified }) => {
           type="button"
           onClick={() => {
             setVerified(false);
+
+            trackEvent("identity_documents_change_clicked", {
+              component: "identity_verification",
+            });
+
             onVerified(null);
           }}
           className="ml-auto text-xs transition-colors text-white/40 hover:text-white"

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { AlertCircle, Lock } from "lucide-react";
+import { trackEvent } from "../utils/analytics";
 
 const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
   const stripe = useStripe();
@@ -8,7 +9,8 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
 
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
-  const [cardComplete, setCardComplete] = useState(false); 
+  const [cardComplete, setCardComplete] = useState(false);
+  const hasTrackedStart = React.useRef(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,6 +23,10 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
 
     setProcessing(true);
     setError("");
+
+    trackEvent("payment_submit_attempt", {
+      component: "payment_form",
+    });
 
     const card = elements.getElement(CardElement);
 
@@ -39,6 +45,16 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
       // Stripe এর error message 
       setError(result.error.message);
       setProcessing(false);
+
+      // Stripe's decline/error codes (card_declined, insufficient_funds,
+      // expired_card, etc.) are the single most useful signal for why
+      // people drop off right at the finish line — worth its own event
+      // rather than folding into a generic enrollment_error.
+      trackEvent("payment_declined", {
+        component: "payment_form",
+        error_code: result.error.code || "unknown",
+        error_message: result.error.message,
+      });
       return;
     }
 
@@ -49,6 +65,10 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
       await onPaymentSuccess(result.paymentIntent.id);
     } else {
       setError("Payment was not completed. Please try again.");
+      trackEvent("payment_incomplete", {
+        component: "payment_form",
+        status: result.paymentIntent?.status || "unknown",
+      });
     }
 
     setProcessing(false);
@@ -74,6 +94,17 @@ const PaymentForm = ({ clientSecret, onPaymentSuccess }) => {
              hidePostalCode: true,
           }}
           onChange={(e) => {
+            // Fires once, the first time someone actually starts typing
+            // into the card field — a cleaner "began payment" signal than
+            // the submit click, since it captures people who start but
+            // never finish entering card details.
+            if (!hasTrackedStart.current && (e.complete || e.value)) {
+              hasTrackedStart.current = true;
+              trackEvent("card_details_started", {
+                component: "payment_form",
+              });
+            }
+
             setCardComplete(e.complete); 
             if (e.error) {
               setError(e.error.message);

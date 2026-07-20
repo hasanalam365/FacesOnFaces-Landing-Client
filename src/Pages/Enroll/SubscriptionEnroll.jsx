@@ -7,6 +7,13 @@ import {
 import IdentityVerification from "../../Components/IdentityVerification";
 import PaymentForm from "../../Components/PaymentForm";
 import { useSearchParams } from "react-router-dom";
+import { trackEvent } from "../../utils/analytics";
+
+// ─── Funnel config (keep in sync with Enroll, DepositEnroll,
+// SubscriptionsAgreement, SubscriptionSuccess) ──
+const FUNNEL_STEP = "subscription_enroll";
+const FUNNEL_STEP_ORDER = 3;
+const PAGE_NAME = "subscription_enroll";
 
 const steps = [
   {
@@ -106,6 +113,18 @@ const STEP_LABELS = {
   [STEP_MANDATE]: "Direct Debit",
 };
 
+// Sub-step order within this page, used to build funnel_step_complete
+// events (e.g. "form" -> "agreement" -> "identity" -> "payment" -> "mandate").
+// Distinct from the site-wide FUNNEL_STEP_ORDER (which only counts
+// course_details / enroll / subscription_enroll as top-level pages).
+const SUBSTEP_ORDER = {
+  [STEP_FORM]: 1,
+  [STEP_AGREEMENT]: 2,
+  [STEP_IDENTITY]: 3,
+  [STEP_PAYMENT]: 4,
+  [STEP_MANDATE]: 5,
+};
+
 const SIGNWELL_EMBED_SCRIPT_SRC = "https://static.signwell.com/assets/embedded.js";
 const SIGNWELL_EMBED_CONTAINER_ID = "signwell-embed-container";
 
@@ -188,6 +207,37 @@ const SubscriptionEnroll = () => {
 
   const [contactDetails, setContactDetails] = useState({ name: "", email: "", phone: "" });
 
+  // ── Funnel entry: page view ─────────────────────────────────
+  useEffect(() => {
+    trackEvent("funnel_step_view", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      page: PAGE_NAME,
+      arrived_with_schedule: Boolean(
+        searchParams.get("date") && searchParams.get("location")
+      ),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Track every sub-step transition inside this multi-step page.
+  // This is the core of the drop-off picture your team asked for:
+  // it tells you exactly how many visitors reached each of the 5
+  // internal steps (Details -> Agreement -> Identity -> Payment ->
+  // Direct Debit), so you can see precisely where people bail.
+  const prevStepRef = useRef(null);
+  useEffect(() => {
+    if (prevStepRef.current === step) return;
+    prevStepRef.current = step;
+
+    trackEvent("subscription_substep_view", {
+      page: PAGE_NAME,
+      step: FUNNEL_STEP,
+      substep: step,
+      substep_order: SUBSTEP_ORDER[step] || null,
+    });
+  }, [step]);
+
 useEffect(() => {
   const saved = JSON.parse(localStorage.getItem("enrollContactDetails") || "null");
   if (saved) setContactDetails(saved);
@@ -231,6 +281,14 @@ const handleContactChange = (e) => {
     setScheduleLocation(location);
     setScheduleDate("");
 
+    if (location) {
+      trackEvent("schedule_location_select", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        location,
+      });
+    }
+
     if (!location) {
       localStorage.removeItem("selectedSchedule");
       setSelectedSchedule(null);
@@ -245,7 +303,26 @@ const handleContactChange = (e) => {
       const schedule = { date, location: scheduleLocation };
       localStorage.setItem("selectedSchedule", JSON.stringify(schedule));
       setSelectedSchedule(schedule);
+
+      trackEvent("schedule_date_select", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        location: scheduleLocation,
+        date,
+      });
     }
+  };
+
+  const handleRemoveSchedule = () => {
+    trackEvent("schedule_remove", {
+      page: PAGE_NAME,
+      step: FUNNEL_STEP,
+    });
+
+    localStorage.removeItem("selectedSchedule");
+    setSelectedSchedule(null);
+    setScheduleLocation("");
+    setScheduleDate("");
   };
 
   const availableDates =
@@ -268,6 +345,11 @@ const handleContactChange = (e) => {
       }
     } catch {
       setErrorMsg("Payment setup failed. Please refresh and try again.");
+      trackEvent("payment_intent_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_PAYMENT,
+      });
     } finally {
       setStripeLoading(false);
     }
@@ -294,7 +376,13 @@ const handleContactChange = (e) => {
     script.src = SIGNWELL_EMBED_SCRIPT_SRC;
     script.async = true;
     script.onload = () => setEmbedScriptReady(true);
-    script.onerror = () => setEmbedError(true);
+    script.onerror = () => {
+      setEmbedError(true);
+      trackEvent("agreement_widget_load_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+      });
+    };
     document.body.appendChild(script);
   }, []);
 
@@ -316,6 +404,17 @@ const handleContactChange = (e) => {
         if (verifyTimeoutRef.current) clearTimeout(verifyTimeoutRef.current);
         setAgreementSigned(true);
         setVerifyingAgreement(false);
+
+        // Funnel milestone: agreement confirmed signed server-side —
+        // the most important checkpoint in the subscription branch,
+        // since this is what "Signing" refers to in your requirement.
+        trackEvent("funnel_step_complete", {
+          step: FUNNEL_STEP,
+          substep: STEP_AGREEMENT,
+          substep_order: SUBSTEP_ORDER[STEP_AGREEMENT],
+          next_substep: STEP_IDENTITY,
+        });
+
         setStep(STEP_IDENTITY);
         return;
       }
@@ -399,10 +498,20 @@ const handleContactChange = (e) => {
       allowClose: false,
       events: {
         completed: () => {
+          trackEvent("agreement_signature_submitted", {
+            page: PAGE_NAME,
+            step: FUNNEL_STEP,
+          });
           verifyAttemptsRef.current = 0;
           verifyAgreementSigned();
         },
-        error: () => setEmbedError(true),
+        error: () => {
+          setEmbedError(true);
+          trackEvent("agreement_widget_error", {
+            page: PAGE_NAME,
+            step: FUNNEL_STEP,
+          });
+        },
       },
     });
     embed.open();
@@ -438,7 +547,15 @@ const handleContactChange = (e) => {
     if (!phone) errors.phone = "Phone number is required";
 
     setFieldErrors(errors);
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0) {
+      trackEvent("form_validation_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_FORM,
+        fields: Object.keys(errors),
+      });
+      return;
+    }
 
     setErrorMsg("");
     setLoading(true);
@@ -455,9 +572,22 @@ const handleContactChange = (e) => {
       setFormSnapshot({ name, email, phone });
       setEnrollmentId(data.enrollmentId);
       if (data.signingUrl) setSigningUrl(data.signingUrl);
+
+      trackEvent("funnel_step_complete", {
+        step: FUNNEL_STEP,
+        substep: STEP_FORM,
+        substep_order: SUBSTEP_ORDER[STEP_FORM],
+        next_substep: STEP_AGREEMENT,
+      });
+
       setStep(STEP_AGREEMENT);
     } catch (err) {
       setErrorMsg(err.message || "Something went wrong. Please try again.");
+      trackEvent("agreement_creation_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        error_message: err.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -495,10 +625,24 @@ const handleContactChange = (e) => {
       const result = await res.json();
       if (!result.enrollmentId) throw new Error("No enrollment ID returned");
       setEnrollmentId(result.enrollmentId);
+
+      trackEvent("funnel_step_complete", {
+        step: FUNNEL_STEP,
+        substep: STEP_IDENTITY,
+        substep_order: SUBSTEP_ORDER[STEP_IDENTITY],
+        next_substep: STEP_PAYMENT,
+      });
+
       setStep(STEP_PAYMENT);
     } catch (err) {
       setErrorMsg(err.message || "Something went wrong. Please try again.");
       setIdentityData(null);
+
+      trackEvent("identity_verification_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        error_message: err.message,
+      });
     }
   };
 
@@ -545,6 +689,25 @@ const handleContactChange = (e) => {
   localStorage.removeItem("enrollContactDetails");   
   setContactDetails({ name: "", email: "", phone: "" }); 
 
+  // First payment (£250) is a real conversion in its own right, even
+  // though the Direct Debit mandate step still follows — track it as
+  // its own value so you can see it separately from the eventual
+  // mandate completion (which happens off-site at the bank).
+  trackEvent("subscription_first_payment_completed", {
+    page: PAGE_NAME,
+    step: FUNNEL_STEP,
+    value: 250,
+    currency: "GBP",
+    plan: "subscription",
+  });
+
+  trackEvent("funnel_step_complete", {
+    step: FUNNEL_STEP,
+    substep: STEP_PAYMENT,
+    substep_order: SUBSTEP_ORDER[STEP_PAYMENT],
+    next_substep: STEP_MANDATE,
+  });
+
   setStep(STEP_MANDATE);
 } else {
         throw new Error("Enrollment failed. Please contact support.");
@@ -553,6 +716,13 @@ const handleContactChange = (e) => {
       setErrorMsg(
         err.message || "Something went wrong. Please contact support."
       );
+
+      trackEvent("enrollment_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_PAYMENT,
+        error_message: err.message,
+      });
     }
   };
 
@@ -574,6 +744,12 @@ const handleContactChange = (e) => {
 
       localStorage.setItem("enrollmentId", enrollmentId);
 
+      trackEvent("mandate_setup_started", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_MANDATE,
+      });
+
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/gc/create-redirect-flow`,
         {
@@ -593,11 +769,44 @@ const handleContactChange = (e) => {
         throw new Error(data.message || "Failed to start bank payment setup.");
       }
 
+      // Visitor is about to leave the site for their bank. The actual
+      // "mandate completed" conversion should be tracked on whichever
+      // page GoCardless redirects back to (e.g. SubscriptionSuccess).
       window.location.href = data.redirectUrl;
     } catch (err) {
       console.error(err);
       setErrorMsg(err.message || "Something went wrong starting your bank setup.");
       setLoading(false);
+
+      trackEvent("mandate_setup_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        error_message: err.message,
+      });
+    }
+  };
+
+  const handlePaymentTermsChange = (e) => {
+    const checked = e.target.checked;
+    setIsTermsAccepted(checked);
+    if (checked) {
+      trackEvent("terms_accepted", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_PAYMENT,
+      });
+    }
+  };
+
+  const handleMandateTermsChange = (e) => {
+    const checked = e.target.checked;
+    setIsTermsAccepted(checked);
+    if (checked) {
+      trackEvent("terms_accepted", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_MANDATE,
+      });
     }
   };
 
@@ -772,12 +981,7 @@ const handleContactChange = (e) => {
                         </div>
                         <button
                           type="button"
-                          onClick={() => {
-                            localStorage.removeItem("selectedSchedule");
-                            setSelectedSchedule(null);
-                            setScheduleLocation("");
-                            setScheduleDate("");
-                          }}
+                          onClick={handleRemoveSchedule}
                           className="transition-colors text-white/40 hover:text-red-400"
                         >
                           <X size={18} />
@@ -929,7 +1133,7 @@ const handleContactChange = (e) => {
                     type="checkbox"
                     id="sub-terms"
                     checked={isTermsAccepted}
-                    onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                    onChange={handlePaymentTermsChange}
                     className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
                   />
                   <label htmlFor="sub-terms" className="text-sm leading-relaxed cursor-pointer text-white/60">
@@ -971,7 +1175,7 @@ const handleContactChange = (e) => {
                 type="checkbox"
                 id="mandate-terms"
                 checked={isTermsAccepted}
-                onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                onChange={handleMandateTermsChange}
                 className="w-4 h-4 mt-0.5 shrink-0 accent-cyan-400 cursor-pointer"
               />
               <label htmlFor="mandate-terms" className="text-sm leading-relaxed cursor-pointer text-white/60">

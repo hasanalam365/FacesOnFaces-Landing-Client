@@ -4,6 +4,14 @@ import {
   completeGoCardlessFlow,
   createSubscription,
 } from "../subscription.service";
+import { trackEvent } from "../../../utils/analytics";
+import { useParams } from "react-router-dom";
+
+// ─── Funnel config (keep in sync with Enroll, DepositEnroll,
+// SubscriptionEnroll, SubscriptionsAgreement) ──
+const FUNNEL_STEP = "subscription_success";
+const FUNNEL_STEP_ORDER = 4;
+const PAGE_NAME = "subscription_success";
 
 const SubscriptionSuccess = () => {
   const [loading, setLoading] = useState(true);
@@ -11,6 +19,18 @@ const SubscriptionSuccess = () => {
   const [error, setError] = useState("");
   const [data, setData] = useState(null);
   const hasRun = useRef(false);
+  const params=useParams()
+
+  // ── Funnel entry: this page only ever loads after a GoCardless
+  // bank redirect, so a view here means the visitor made it all the
+  // way through Details -> Agreement -> Identity -> Payment -> Bank.
+  useEffect(() => {
+    trackEvent("funnel_step_view", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      page: PAGE_NAME,
+    });
+  }, []);
 
   useEffect(() => {
     // React 18 StrictMode runs effects twice in development. A GoCardless
@@ -63,10 +83,29 @@ const SubscriptionSuccess = () => {
 
         localStorage.removeItem("enrollmentId");
         setStep("done");
+
+        // ── Final conversion for the entire subscription branch of the
+        // funnel: the £100/month Direct Debit mandate is now active.
+        // This is the true end-of-funnel event for "Signing" ->
+        // "Deposit/Subscription" tracking your team asked for.
+        trackEvent("mandate_completed", {
+          page: PAGE_NAME,
+          step: FUNNEL_STEP,
+          plan: "subscription",
+          value: 100,
+          currency: "GBP",
+          billing_cycle: "monthly",
+        });
       } catch (err) {
         console.error(err);
         setError(err.message || "Something went wrong");
         setStep("error");
+
+        trackEvent("mandate_completion_error", {
+          page: PAGE_NAME,
+          step: FUNNEL_STEP,
+          error_message: err.message,
+        });
       } finally {
         setLoading(false);
       }
@@ -74,6 +113,8 @@ const SubscriptionSuccess = () => {
 
     init();
   }, []);
+
+  
 
   // UI states
   if (step === "processing" || loading) {
@@ -102,7 +143,13 @@ const SubscriptionSuccess = () => {
           <h2 className="text-xl font-semibold">Setup Failed</h2>
           <p className="text-sm text-white/60">{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              trackEvent("mandate_retry_click", {
+                page: PAGE_NAME,
+                step: FUNNEL_STEP,
+              });
+              window.location.reload();
+            }}
             className="px-6 py-3 mt-4 text-black bg-cyan-400 rounded-xl"
           >
             Try Again
@@ -111,6 +158,9 @@ const SubscriptionSuccess = () => {
       </div>
     );
   }
+
+
+
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-6">
@@ -164,7 +214,13 @@ const SubscriptionSuccess = () => {
         </div>
 
         <button
-          onClick={() => (window.location.href = "/")}
+          onClick={() => {
+            trackEvent("subscription_success_home_click", {
+              page: PAGE_NAME,
+              step: FUNNEL_STEP,
+            });
+            window.location.href = "/";
+          }}
           className="w-full py-3 font-medium text-black transition bg-cyan-400 rounded-xl hover:bg-cyan-300"
         >
           Go to Home →
