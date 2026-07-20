@@ -70,18 +70,25 @@ const SuccessStory = () => {
 
   const sectionRef = useRef(null);
 
-  // Keeps the interval's nextSlide() reading the latest slide index
-  // instead of the stale `0` it was capturing before (the old
-  // setInterval closed over `current` from the first render only).
+  // Keeps the interval's advance() reading the latest slide index
+  // instead of a stale one from the first render.
   const currentRef = useRef(current);
   useEffect(() => {
     currentRef.current = current;
   }, [current]);
 
-  // `source` distinguishes autoplay advances from user-initiated
-  // clicks, so GA4 doesn't conflate "user is browsing testimonials"
-  // with "carousel is idling on autoplay".
-  const nextSlide = (source = "manual") => {
+  // Silent slide change — used by the autoplay timer. No analytics
+  // event is fired here: autoplay is a UI animation, not a user
+  // action, and tracking it was flooding GA4 with an event every
+  // 5 seconds for anyone who just left the page open.
+  const advanceSilently = () => {
+    const nextIndex = (currentRef.current + 1) % testimonials.length;
+    setCurrent(nextIndex);
+  };
+
+  // User-initiated navigation — these DO fire events, since they
+  // represent real engagement (someone actively browsing testimonials).
+  const nextSlide = () => {
     const nextIndex = (currentRef.current + 1) % testimonials.length;
 
     trackEvent("testimonial_next", {
@@ -89,13 +96,12 @@ const SuccessStory = () => {
       section: SECTION_NAME,
       testimonial_index: nextIndex + 1,
       testimonial_name: testimonials[nextIndex].name,
-      trigger: source,
     });
 
     setCurrent(nextIndex);
   };
 
-  const prevSlide = (source = "manual") => {
+  const prevSlide = () => {
     const prevIndex =
       (currentRef.current - 1 + testimonials.length) % testimonials.length;
 
@@ -104,14 +110,13 @@ const SuccessStory = () => {
       section: SECTION_NAME,
       testimonial_index: prevIndex + 1,
       testimonial_name: testimonials[prevIndex].name,
-      trigger: source,
     });
 
     setCurrent(prevIndex);
   };
 
   useEffect(() => {
-    const timer = setInterval(() => nextSlide("auto"), 5000);
+    const timer = setInterval(advanceSilently, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -240,7 +245,7 @@ const SuccessStory = () => {
           {/* Controls */}
           <div className="flex items-center justify-center gap-4 mt-8">
             <button
-              onClick={() => prevSlide("manual")}
+              onClick={prevSlide}
               className="flex items-center justify-center w-10 h-10 text-gray-400 border rounded-full border-white/10 bg-zinc-900 hover:text-white"
             >
               <ChevronLeft size={18} />
@@ -270,7 +275,7 @@ const SuccessStory = () => {
             </div>
 
             <button
-              onClick={() => nextSlide("manual")}
+              onClick={nextSlide}
               className="flex items-center justify-center w-10 h-10 text-gray-400 border rounded-full border-white/10 bg-zinc-900 hover:text-white"
             >
               <ChevronRight size={18} />
