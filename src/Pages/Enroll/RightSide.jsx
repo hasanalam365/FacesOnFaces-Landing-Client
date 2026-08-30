@@ -1,7 +1,15 @@
 import { BookOpen, Calendar, ChevronDown, MapPin } from 'lucide-react'
 import React from 'react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
+import { trackEvent } from "../../utils/analytics";
+
+// NOTE: RightSide isn't imported by any page in the files I've seen so far
+// (CourseDetails/Enroll render their own pricing summary inline). If this
+// component is actually mounted on a specific page, update PAGE_NAME below
+// to match that page's convention (e.g. "course_details", "enroll").
+const PAGE_NAME = "course_details";
+const SECTION_NAME = "course_pricing_sidebar";
 
 const courseFeatures = [
   "Infection Control",
@@ -104,7 +112,26 @@ const fadeUp = {
 
 const RightSide = () => {
  const [activeLocation, setActiveLocation] = useState(null);
-    
+
+  useEffect(() => {
+    trackEvent("section_view", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+    });
+  }, []);
+
+  const handleLocationToggle = (index) => {
+    const isClosing = activeLocation === index;
+
+    trackEvent(isClosing ? "schedule_location_collapse" : "schedule_location_expand", {
+      page: PAGE_NAME,
+      section: SECTION_NAME,
+      location: courseSchedules[index]?.location,
+    });
+
+    setActiveLocation(isClosing ? null : index);
+  };
+
   return (
    <div className="overflow-hidden border rounded-3xl border-white/10 bg-white/[0.03] backdrop-blur-xl">
 
@@ -244,11 +271,7 @@ const RightSide = () => {
       >
         {/* Header */}
         <button
-          onClick={() =>
-            setActiveLocation(
-              activeLocation === index ? null : index
-            )
-          }
+          onClick={() => handleLocationToggle(index)}
           className="flex items-center justify-between w-full px-6 py-5 text-left "
         >
           <div className="flex items-center gap-3">

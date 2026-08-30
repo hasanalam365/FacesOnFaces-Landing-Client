@@ -3,6 +3,14 @@ import { CheckCircle, AlertCircle } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import IdentityVerification from "../../Components/IdentityVerification";
 import PaymentForm from "../../Components/PaymentForm";
+import { trackEvent } from "../../utils/analytics";
+
+// NOTE: this page's structure (identity -> payment -> GoCardless mandate)
+// duplicates SubscriptionEnroll.jsx's inline flow. Confirmed first-payment
+// amount is £250 (deposit today), then £100/month via GoCardless mandate —
+// this file's UI text and tracking value are corrected to match below.
+const FUNNEL_STEP = "subscription_continue";
+const PAGE_NAME = "subscription_continue";
 
 // Step IDs owned by this page
 const STEP_IDENTITY = "identity";
@@ -128,6 +136,11 @@ const SubscriptionContinue = () => {
 
         setFormSnapshot(snapshot);
         setGateStatus("verified");
+
+        trackEvent("funnel_step_view", {
+          step: FUNNEL_STEP,
+          page: PAGE_NAME,
+        });
       } catch (err) {
         if (!cancelled) {
           navigate("/please-sign-agreement", { replace: true });
@@ -193,8 +206,23 @@ const SubscriptionContinue = () => {
       const result = await res.json();
       if (!result.enrollmentId) throw new Error("No enrollment ID returned");
       setEnrollmentId(result.enrollmentId);
+
+      trackEvent("identity_verification_completed", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_IDENTITY,
+        next_substep: STEP_PAYMENT,
+      });
+
       setStep(STEP_PAYMENT);
     } catch (err) {
+      trackEvent("identity_verification_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_IDENTITY,
+        error_message: err.message,
+      });
+
       setErrorMsg(err.message || "Something went wrong. Please try again.");
       setIdentityData(null);
     }
@@ -228,11 +256,31 @@ const SubscriptionContinue = () => {
       if (result.success) {
         setIsTermsAccepted(false);
         localStorage.removeItem("selectedSchedule");
+
+        // First payment (£250 deposit) is a real conversion in its own
+        // right, tracked separately from the eventual £100/month mandate
+        // completion (which happens off-site at the bank).
+        trackEvent("subscription_first_payment_completed", {
+          page: PAGE_NAME,
+          step: FUNNEL_STEP,
+          substep: STEP_PAYMENT,
+          value: 250,
+          currency: "GBP",
+          plan: "subscription",
+        });
+
         setStep(STEP_MANDATE);
       } else {
         throw new Error("Enrollment failed. Please contact support.");
       }
     } catch (err) {
+      trackEvent("enrollment_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_PAYMENT,
+        error_message: err.message,
+      });
+
       setErrorMsg(err.message || "Something went wrong. Please contact support.");
     }
   };
@@ -263,9 +311,23 @@ const SubscriptionContinue = () => {
       localStorage.removeItem("subFormSnapshot");
       localStorage.removeItem("subSigningUrl");
 
+      trackEvent("mandate_setup_started", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_MANDATE,
+      });
+
       window.location.href = data.redirectUrl;
     } catch (err) {
       console.error(err);
+
+      trackEvent("mandate_setup_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        substep: STEP_MANDATE,
+        error_message: err.message,
+      });
+
       setErrorMsg(err.message || "Something went wrong starting your bank setup.");
       setLoading(false);
     }
@@ -320,7 +382,7 @@ const SubscriptionContinue = () => {
             <div>
               <h3 className="mb-1 text-lg font-semibold text-white">Complete First Payment</h3>
               <p className="text-sm text-white/40">
-                Your identity is verified. Pay £350 by card to secure your place.
+                Your identity is verified. Pay £250 by card to secure your place.
               </p>
             </div>
             {stripeLoading ? (

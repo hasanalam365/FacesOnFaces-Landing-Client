@@ -10,6 +10,8 @@ const META_STANDARD_EVENT_MAP = {
   mandate_completed: "Subscribe",
   course_details_enroll_click: "InitiateCheckout",
   start_journey_enroll_click: "InitiateCheckout",
+  pricing_enroll_click: "InitiateCheckout",
+  explore_courses_enroll_click: "InitiateCheckout",
   advisor_lead_form_click: "Lead",
   whatsapp_click: "Contact",
   advisor_whatsapp_click: "Contact",

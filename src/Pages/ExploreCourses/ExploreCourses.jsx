@@ -9,6 +9,10 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { trackEvent } from "../../utils/analytics";
+
+const PAGE_NAME = "explore_courses";
 
 
 const courseFeatures = [
@@ -123,13 +127,38 @@ const ExploreCourses = () => {
 
       const navigate=useNavigate()
       const [activeLocation, setActiveLocation] = useState(null);
-    
+
+      useEffect(() => {
+        trackEvent("explore_courses_view", {
+          page: PAGE_NAME,
+        });
+      }, []);
+
       const handleEnroll=()=>{
+        trackEvent("explore_courses_enroll_click", {
+          page: PAGE_NAME,
+          value: 1099,
+          currency: "GBP",
+        });
         navigate('/enroll')
       }
       const handleBackHome=()=>{
+        trackEvent("explore_courses_back_home_click", {
+          page: PAGE_NAME,
+        });
         navigate('/')
       }
+
+      const handleLocationToggle = (index) => {
+        const isClosing = activeLocation === index;
+
+        trackEvent(isClosing ? "schedule_location_collapse" : "schedule_location_expand", {
+          page: PAGE_NAME,
+          location: courseSchedules[index]?.location,
+        });
+
+        setActiveLocation(isClosing ? null : index);
+      };
 
   return (
    <section className="relative overflow-hidden bg-[#050505] py-24 px-4">
@@ -350,11 +379,7 @@ const ExploreCourses = () => {
       >
         {/* Header */}
         <button
-          onClick={() =>
-            setActiveLocation(
-              activeLocation === index ? null : index
-            )
-          }
+          onClick={() => handleLocationToggle(index)}
           className="flex items-center justify-between w-full px-6 py-5 text-left "
         >
           <div className="flex items-center gap-3">

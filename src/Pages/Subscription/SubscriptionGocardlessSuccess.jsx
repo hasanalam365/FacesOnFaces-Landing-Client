@@ -2,6 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { completeGoCardlessFlow, createSubscription } from "./subscription.service";
+import { trackEvent } from "../../utils/analytics";
+
+// NOTE: this component completes the exact same GoCardless flow as
+// SubscriptionSuccess.jsx (same completeGoCardlessFlow + createSubscription
+// calls). If both routes are actually live for the same user journey,
+// "mandate_completed" could fire twice for one real conversion. Confirm
+// which of the two pages GoCardless actually redirects to, and consider
+// removing tracking from (or deleting) whichever one is unused.
+const FUNNEL_STEP = "subscription_success";
+const FUNNEL_STEP_ORDER = 4;
+const PAGE_NAME = "subscription_gocardless_success";
 
 // "processing" | "success" | "error"
 const SubscriptionGoCardlessSuccess = () => {
@@ -15,6 +26,12 @@ const SubscriptionGoCardlessSuccess = () => {
   const runCompletion = async () => {
     setStatus("processing");
     setErrorMsg("");
+
+    trackEvent("funnel_step_view", {
+      step: FUNNEL_STEP,
+      step_order: FUNNEL_STEP_ORDER,
+      page: PAGE_NAME,
+    });
 
     // GoCardless's Redirect Flow API appends this on the way back from the bank.
     const flowId = searchParams.get("redirect_flow_id");
@@ -45,10 +62,25 @@ const SubscriptionGoCardlessSuccess = () => {
       localStorage.removeItem("subSigningUrl");
       localStorage.removeItem("selectedSchedule");
 
+      trackEvent("mandate_completed", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        plan: "subscription",
+        value: 100,
+        currency: "GBP",
+        billing_cycle: "monthly",
+      });
+
       setStatus("success");
     } catch (err) {
       setErrorMsg(err.message || "We couldn't finish setting up your Direct Debit.");
       setStatus("error");
+
+      trackEvent("mandate_completion_error", {
+        page: PAGE_NAME,
+        step: FUNNEL_STEP,
+        error_message: err.message,
+      });
     }
   };
 
@@ -100,7 +132,13 @@ const SubscriptionGoCardlessSuccess = () => {
             </p>
             <button
               type="button"
-              onClick={runCompletion}
+              onClick={() => {
+                trackEvent("mandate_retry_click", {
+                  page: PAGE_NAME,
+                  step: FUNNEL_STEP,
+                });
+                runCompletion();
+              }}
               className="inline-flex items-center justify-center w-full gap-2 py-4 text-sm font-medium text-black transition-colors rounded-xl bg-cyan-400 hover:bg-cyan-300"
             >
               <RefreshCw size={16} />

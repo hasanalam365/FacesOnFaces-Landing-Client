@@ -11,6 +11,7 @@ import { trackEvent } from "../../utils/analytics";
       
       price: "£1,099",
        value:1099,
+       currency: "GBP",
       subText: "Save £500",
       buttonText: "Enroll & Pay in Full",
       featured: false,
@@ -31,6 +32,7 @@ import { trackEvent } from "../../utils/analytics";
         "Reserve your spot with a deposit now and pay the remaining balance on the day of the course.",
       price: "£250",
        value:250,
+       currency: "GBP",
       subText: "Deposit today, then £849",
       buttonText: "Pay Deposit Now",
       featured: true,
@@ -50,6 +52,7 @@ import { trackEvent } from "../../utils/analytics";
         "One simple monthly subscription payment, no large upfront amount to pay",
       price: "£100",
        value:100,
+       currency: "GBP",
       subText: "per month",
       buttonText: "Start Subscription",
       featured: false,

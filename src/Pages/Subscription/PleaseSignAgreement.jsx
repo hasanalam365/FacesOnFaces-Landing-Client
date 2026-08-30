@@ -1,13 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FileSignature } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { trackEvent } from "../../utils/analytics";
+
+const PAGE_NAME = "please_sign_agreement";
 
 const PleaseSignAgreement = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const enrollmentId = searchParams.get("enrollmentId");
 
+  useEffect(() => {
+    trackEvent("please_sign_agreement_view", {
+      page: PAGE_NAME,
+      has_enrollment_id: Boolean(enrollmentId),
+    });
+  }, [enrollmentId]);
+
   const handleBack = () => {
+    trackEvent("please_sign_agreement_cta_click", {
+      page: PAGE_NAME,
+      has_enrollment_id: Boolean(enrollmentId),
+    });
+
     // If we know which enrollment this was, let SubscriptionEnroll try to
     // resume it (it reads subEnrollmentId/subFormSnapshot from localStorage
     // itself); otherwise just start fresh.
