@@ -30,8 +30,14 @@ const buildMetaParams = (params) => {
 };
 
 export const trackEvent = (eventName, params = {}) => {
-  // GA4 / GTM — ensure dataLayer exists even if GTM hasn't finished
-  // loading yet, so early events (e.g. on page mount) aren't lost.
+  // GA4 — we're loading gtag.js directly (no GTM container), so gtag()
+  // must be called explicitly. Pushing to dataLayer alone does nothing
+  // here since there's no GTM listening for custom dataLayer pushes.
+  if (typeof window.gtag === "function") {
+    window.gtag("event", eventName, params);
+  }
+
+  // Keep dataLayer push too, in case a GTM container gets added later.
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: eventName,
